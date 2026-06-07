@@ -234,7 +234,7 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   position:relative;z-index:3;
   display:flex;align-items:flex-end;justify-content:space-between;
   padding:0 5% 2%;
-  height:62%;min-height:220px;flex-shrink:0;
+  height:72%;min-height:260px;flex-shrink:0;
 }
 
 /* Enemy side — sprite on top, info panel below */
@@ -322,33 +322,32 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   z-index:10;top:10%;left:15%;
 }
 
-/* ── Multi-enemy cards — sprite top, info bottom ── */
+/* ── Multi-enemy cards — sprite top, info bottom, NO box border ── */
 #enemy-cards-wrap{
   display:flex;flex-direction:row;gap:.5rem;width:100%;justify-content:center;align-items:flex-end;
 }
 
 /* default single enemy sprite size */
 #enemy-cards-wrap .enemy-card-sprite svg,
-#enemy-cards-wrap .enemy-card-sprite img{width:80px!important;height:80px!important}
+#enemy-cards-wrap .enemy-card-sprite img{width:110px!important;height:110px!important}
 /* 2 enemies */
 #enemy-cards-wrap.enemy-count-2 .enemy-card-sprite svg,
-#enemy-cards-wrap.enemy-count-2 .enemy-card-sprite img{width:64px!important;height:64px!important}
+#enemy-cards-wrap.enemy-count-2 .enemy-card-sprite img{width:90px!important;height:90px!important}
 /* 3 enemies */
 #enemy-cards-wrap.enemy-count-3 .enemy-card-sprite svg,
-#enemy-cards-wrap.enemy-count-3 .enemy-card-sprite img{width:52px!important;height:52px!important}
+#enemy-cards-wrap.enemy-count-3 .enemy-card-sprite img{width:72px!important;height:72px!important}
 
 .enemy-card{
-  display:flex;flex-direction:column;align-items:center;gap:.25rem;
-  background:rgba(0,0,0,.65);border:1px solid rgba(255,60,60,.35);
-  border-radius:10px;padding:.4rem .5rem .35rem;cursor:pointer;
-  transition:border-color .15s,box-shadow .15s;
-  backdrop-filter:blur(4px);flex:1;position:relative;
+  display:flex;flex-direction:column;align-items:center;gap:.2rem;
+  background:transparent;border:none;
+  padding:.3rem .4rem .25rem;cursor:pointer;
+  transition:transform .15s;
+  flex:1;position:relative;
 }
 .enemy-card.targeted{
-  border-color:rgba(255,200,60,.85);
-  box-shadow:0 0 14px rgba(255,200,60,.45);
+  transform:scale(1.06);
 }
-.enemy-card:hover:not(.targeted){border-color:rgba(255,100,100,.6)}
+.enemy-card:hover:not(.targeted){ transform:scale(1.03); }
 
 /* sprite on top */
 .enemy-card-sprite{
@@ -358,33 +357,36 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   image-rendering:pixelated;
   animation:enemy-idle 2s ease-in-out infinite;
 }
-.enemy-card.targeted .enemy-card-sprite{
-  filter:drop-shadow(0 4px 8px rgba(0,0,0,.7)) drop-shadow(0 0 10px rgba(255,200,60,.7));
-}
 .enemy-card-sprite.die-anim{animation:enemy-die .5s forwards}
 .enemy-card-sprite.hit-flash{animation:hit-flash .35s ease-out!important}
 
-/* info panel below sprite */
+/* info panel below sprite — no box, just text + hp bar */
 .enemy-card-info{width:100%;text-align:center}
 .enemy-card-name{
-  font-family:'Chakra Petch',sans-serif;font-size:.72rem;
-  color:#ff8888;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:'Chakra Petch',sans-serif;font-size:.74rem;
+  color:#ffaaaa;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 4px #000,0 0 8px rgba(0,0,0,.9);
 }
 .enemy-card-hp-wrap{
-  background:rgba(0,0,0,.5);border-radius:5px;height:7px;
-  overflow:hidden;position:relative;border:1px solid rgba(255,0,0,.3);margin:.2rem 0;
+  background:rgba(0,0,0,.55);border-radius:5px;height:7px;
+  overflow:hidden;position:relative;border:1px solid rgba(255,0,0,.4);margin:.2rem 0;
 }
 .enemy-card-hp-fill{height:100%;transition:width .35s ease}
 .enemy-card-hp-text{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:.55rem;color:#fff;font-family:'Chakra Petch',sans-serif;
+  text-shadow:0 0 3px #000;
 }
-.enemy-card-atk{font-size:.56rem;color:#ff9988}
+.enemy-card-atk{font-size:.58rem;color:#ffbb99;text-shadow:0 1px 3px #000}
 .enemy-card.shake-anim{animation:enemy-shake .3s}
 
-/* target indicator badge */
+/* target glow indicator — subtle ring under targeted enemy, no box */
+.enemy-card.targeted .enemy-card-sprite{
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.8)) drop-shadow(0 0 14px rgba(255,200,60,.85)) drop-shadow(0 0 4px rgba(255,220,80,.6));
+}
 .enemy-card.targeted::after{
-  content:'🎯';position:absolute;top:-8px;right:-4px;font-size:.75rem;
+  content:'▲';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
+  font-size:.6rem;color:rgba(255,200,60,.9);text-shadow:0 0 6px rgba(255,200,60,.8);
 }
 
 /* Player side (bottom-left) */
@@ -1603,22 +1605,22 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
     min-height: 0;
   }
   #battle-fighters {
-    height: 55%;
-    min-height: 200px;
+    height: 65%;
+    min-height: 240px;
     padding: 0 3% 1%;
   }
   #pixel-monster svg,
-  #pixel-monster img { width: 80px !important; height: 80px !important; }
+  #pixel-monster img { width: 110px !important; height: 110px !important; }
   #pixel-player  svg,
-  #pixel-player  img { width: 72px !important; height: 72px !important; }
+  #pixel-player  img { width: 100px !important; height: 100px !important; }
 
-  /* enemy cards on mobile — row layout, larger sprites */
+  /* enemy cards on mobile */
   #enemy-cards-wrap .enemy-card-sprite svg,
-  #enemy-cards-wrap .enemy-card-sprite img{width:68px!important;height:68px!important}
+  #enemy-cards-wrap .enemy-card-sprite img{width:100px!important;height:100px!important}
   #enemy-cards-wrap.enemy-count-2 .enemy-card-sprite svg,
-  #enemy-cards-wrap.enemy-count-2 .enemy-card-sprite img{width:56px!important;height:56px!important}
+  #enemy-cards-wrap.enemy-count-2 .enemy-card-sprite img{width:80px!important;height:80px!important}
   #enemy-cards-wrap.enemy-count-3 .enemy-card-sprite svg,
-  #enemy-cards-wrap.enemy-count-3 .enemy-card-sprite img{width:44px!important;height:44px!important}
+  #enemy-cards-wrap.enemy-count-3 .enemy-card-sprite img{width:64px!important;height:64px!important}
 
   /* Command menu 4 wide on mobile */
   #rpg-cmd-menu {
