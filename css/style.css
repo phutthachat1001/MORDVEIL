@@ -195,6 +195,11 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 .mon-btn.boss{border-color:var(--orange);color:var(--orange);box-shadow:0 0 8px var(--orange)33}
 .mon-btn.defeated{opacity:.55;border-color:var(--green) !important;color:var(--green) !important}
 .battle-actions{display:flex;gap:.5rem;width:100%;margin-bottom:1rem;flex-wrap:wrap}
+.btn-attack,.btn-flee,.btn-auto,.skill-btn{
+  -webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
 .btn-attack{background:linear-gradient(135deg,#402010,#601020);border:1px solid var(--red);color:var(--red);padding:.7rem 1rem;border-radius:8px;cursor:pointer;font-family:'Chakra Petch',sans-serif;font-size:.9rem;flex:1;transition:all .2s}
 .btn-attack:hover:not(:disabled){box-shadow:0 0 12px #ff444444;transform:scale(1.02)}
 .btn-attack:disabled{opacity:.4;cursor:not-allowed}
