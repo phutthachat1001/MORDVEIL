@@ -1438,6 +1438,16 @@ function showBattleContent(monster, stats) {
     else sceneBg.style.filter = '';
   }
 
+  // Load zone battle background image
+  const bgImg = document.getElementById('battle-bg-img');
+  if (bgImg) {
+    const src = `./assets/bg/battle/zone${G.currentZone || 1}.png`;
+    bgImg.onload  = () => bgImg.classList.add('active');
+    bgImg.onerror = () => bgImg.classList.remove('active');
+    bgImg.classList.remove('active');
+    bgImg.src = src;
+  }
+
   // Boss glow on the scene
   const scene = document.getElementById('rpg-battle-scene');
   if (scene) {

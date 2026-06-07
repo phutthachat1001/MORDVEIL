@@ -213,7 +213,7 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 /* Scene image (user-provided BG) */
 #battle-bg-img{
   position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;z-index:1;opacity:.35;
+  object-fit:cover;z-index:1;opacity:.55;
   image-rendering:pixelated;
   display:none;
 }
