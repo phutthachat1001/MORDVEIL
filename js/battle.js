@@ -1428,6 +1428,7 @@ function showBattleContent(monster, stats) {
   document.getElementById('mon-type').textContent    = monster.isBoss ? '🔴 บอสศัตรู' : 'ศัตรูทั่วไป';
   document.getElementById('mon-stats').textContent   = `ATK: ${stats.atk}`;
   updateMonsterHpBar();
+  updateBattlePlayerStatus();
   renderEnemyQueue();
   document.getElementById('btn-attack').disabled = false;
   renderSkillBar();
@@ -1484,6 +1485,23 @@ function updateMonsterHpBar() {
       ? 'linear-gradient(90deg,#cc6600,#ff9900)'
       : 'linear-gradient(90deg,#880000,#ff2200)';
   document.getElementById('mon-hp-text').textContent = `${Math.max(0, G.currentMonsterHp)}/${G.currentMonsterMaxHp}`;
+}
+
+function updateBattlePlayerStatus() {
+  const nameEl = document.getElementById('bps-name');
+  const barEl  = document.getElementById('bps-hp-bar');
+  const txtEl  = document.getElementById('bps-hp-text');
+  if (!nameEl) return;
+  const cls = CLASSES ? CLASSES.find(c => c.id === G.classId) : null;
+  nameEl.textContent = `${cls ? cls.icon : '⚔'} LV${G.level} ${G.playerName}`;
+  const pct = Math.max(0, (G.hp / G.maxHp) * 100);
+  barEl.style.width = pct + '%';
+  barEl.style.background = pct > 50
+    ? 'linear-gradient(90deg,#22cc44,#44ff88)'
+    : pct > 25
+      ? 'linear-gradient(90deg,#cc8800,#ffbb00)'
+      : 'linear-gradient(90deg,#cc2200,#ff4400)';
+  txtEl.textContent = `${G.hp}/${G.maxHp}`;
 }
 
 // ---------- Skill system ----------
@@ -1968,6 +1986,7 @@ function playerAttack() {
   if (monEl) { monEl.classList.add('shake-anim'); setTimeout(() => monEl.classList.remove('shake-anim'), 300); }
 
   if (G.currentMonsterHp <= 0) { monsterDie(); return; }
+  updateBattlePlayerStatus();
   setTimeout(() => { monsterAttack(); }, 600);
 }
 
@@ -2066,6 +2085,7 @@ function monsterAttack() {
   }
 
   updateTopBar();
+  updateBattlePlayerStatus();
   document.getElementById('btn-attack').disabled = false;
   renderSkillBar();
   if (G.hp <= 0) playerDie();

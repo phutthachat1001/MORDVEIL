@@ -202,6 +202,30 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 .btn-flee:hover{border-color:var(--blue);color:var(--blue)}
 .btn-auto{background:var(--bg3);border:2px solid var(--border2);color:var(--text2);padding:.7rem 1rem;border-radius:8px;cursor:pointer;font-family:'Chakra Petch',sans-serif;font-size:.9rem;flex:1;transition:all .2s}
 .btn-auto.on{background:linear-gradient(135deg,#0d2010,#1a3020);border-color:var(--green);color:var(--green);box-shadow:0 0 10px #44ff8844}
+/* player status bar in battle */
+#battle-player-status{
+  display:flex;align-items:center;gap:.5rem;
+  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
+  padding:.35rem .7rem;width:100%;margin-bottom:.4rem;box-sizing:border-box;
+}
+#bps-name{
+  font-family:'Chakra Petch',sans-serif;font-size:.78rem;color:var(--gold);
+  white-space:nowrap;flex-shrink:0;
+}
+.bps-hp-bar{
+  flex:1;height:10px;background:rgba(255,255,255,.1);
+  border-radius:6px;overflow:hidden;position:relative;
+}
+.bps-hp-fill{
+  height:100%;border-radius:6px;
+  background:linear-gradient(90deg,#22cc44,#44ff88);
+  transition:width .3s;
+}
+.bps-hp-text{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.62rem;font-family:'Chakra Petch',sans-serif;color:#fff;
+  text-shadow:0 0 4px #000;
+}
 .kill-counter{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:.4rem .8rem;text-align:center;font-size:.82rem;width:100%;margin-bottom:.5rem}
 .kill-counter span{color:var(--red);font-family:'Chakra Petch',sans-serif;font-size:1rem;font-weight:600}
 .battle-log{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.8rem;width:100%;max-height:220px;overflow-y:auto;font-size:.82rem;line-height:1.65;scroll-behavior:smooth}
