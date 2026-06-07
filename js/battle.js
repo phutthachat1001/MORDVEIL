@@ -2210,15 +2210,14 @@ function playerAttack() {
 // ---------- Attack effect image ----------
 
 function _showAttackEffect(container, isCrit) {
-  const weapon = G.equippedWeaponId ? G.inventory.find(i => i.uid === G.equippedWeaponId) : null;
-  const wName  = weapon ? (weapon.name || '').toLowerCase() : '';
-
-  let fx = 'slash'; // default
-  if (isCrit)                                                 fx = 'explosion';
-  else if (wName.includes('ธนู') || wName.includes('bow') || wName.includes('arrow')) fx = 'arrow';
-  else if (wName.includes('มืด') || wName.includes('dark') || wName.includes('shadow')) fx = 'dark';
-  else if (wName.includes('ศักดิ์') || wName.includes('holy') || wName.includes('light') || wName.includes('divine')) fx = 'holy';
-  else if (wName.includes('ระเบิด') || wName.includes('bomb') || wName.includes('magic')) fx = 'explosion';
+  const CLASS_FX = {
+    warrior: 'slash',
+    mage:    'explosion',
+    rogue:   'dark',
+    archer:  'arrow',
+    paladin: 'holy',
+  };
+  const fx = CLASS_FX[G.classId] || 'slash';
 
   const img = document.createElement('img');
   img.src = `./assets/effects/${fx}.png`;
