@@ -307,16 +307,33 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 }
 .hit-flash{animation:hit-flash .35s ease-out!important}
 
-/* Slash effect overlay on enemy sprite */
-@keyframes slash-anim{
-  0%{opacity:1;transform:scaleX(-1) scale(.5) rotate(-30deg)}
-  40%{opacity:1;transform:scaleX(-1) scale(1.2) rotate(10deg)}
-  100%{opacity:0;transform:scaleX(-1) scale(1.4) rotate(20deg)}
+/* Attack effect image overlay on enemy card */
+@keyframes attack-fx-anim{
+  0%  {opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(-15deg)}
+  20% {opacity:1;transform:translate(-50%,-50%) scale(1.15) rotate(5deg)}
+  65% {opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.2) rotate(8deg)}
 }
-.slash-fx{
-  position:absolute;font-size:2.2rem;pointer-events:none;
-  animation:slash-anim .35s ease-out forwards;
-  z-index:10;top:10%;left:15%;
+@keyframes attack-fx-crit{
+  0%  {opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-20deg)}
+  15% {opacity:1;transform:translate(-50%,-50%) scale(1.4) rotate(8deg)}
+  50% {opacity:1;transform:translate(-50%,-50%) scale(1.1) rotate(-3deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.35) rotate(10deg)}
+}
+.attack-fx-img{
+  position:absolute;
+  top:40%;left:50%;
+  width:130px;height:130px;
+  pointer-events:none;
+  object-fit:contain;
+  image-rendering:pixelated;
+  z-index:20;
+  animation:attack-fx-anim .55s ease-out forwards;
+}
+.attack-fx-img.crit{
+  width:170px;height:170px;
+  animation:attack-fx-crit .55s ease-out forwards;
+  filter:drop-shadow(0 0 12px rgba(255,180,0,.9));
 }
 
 /* ── Multi-enemy cards ── */

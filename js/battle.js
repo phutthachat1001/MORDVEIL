@@ -2188,28 +2188,45 @@ function playerAttack() {
 
   updateMonsterHpBar();
 
-  // shake + hit flash on target enemy card
+  // shake + hit flash + attack effect image on target enemy card
   const targetCard = document.querySelector(`.enemy-card[data-idx="${G.targetIndex}"]`);
   if (targetCard) {
     targetCard.classList.add('shake-anim');
     setTimeout(() => targetCard.classList.remove('shake-anim'), 300);
-    // flash white on sprite
     const sprite = targetCard.querySelector('.enemy-card-sprite');
     if (sprite) {
       sprite.classList.add('hit-flash');
       setTimeout(() => sprite.classList.remove('hit-flash'), 350);
     }
-    // slash fx overlay
-    const slash = document.createElement('span');
-    slash.className = 'slash-fx';
-    slash.textContent = '⚡';
-    targetCard.appendChild(slash);
-    setTimeout(() => slash.remove(), 400);
+    // pick effect image based on weapon / crit
+    _showAttackEffect(targetCard, isCrit);
   }
 
   if (G.currentMonsterHp <= 0) { monsterDie(); return; }
   updateBattlePlayerStatus();
   setTimeout(() => { monsterAttack(); }, 600);
+}
+
+// ---------- Attack effect image ----------
+
+function _showAttackEffect(container, isCrit) {
+  const weapon = G.equippedWeaponId ? G.inventory.find(i => i.uid === G.equippedWeaponId) : null;
+  const wName  = weapon ? (weapon.name || '').toLowerCase() : '';
+
+  let fx = 'slash'; // default
+  if (isCrit)                                                 fx = 'explosion';
+  else if (wName.includes('ธนู') || wName.includes('bow') || wName.includes('arrow')) fx = 'arrow';
+  else if (wName.includes('มืด') || wName.includes('dark') || wName.includes('shadow')) fx = 'dark';
+  else if (wName.includes('ศักดิ์') || wName.includes('holy') || wName.includes('light') || wName.includes('divine')) fx = 'holy';
+  else if (wName.includes('ระเบิด') || wName.includes('bomb') || wName.includes('magic')) fx = 'explosion';
+
+  const img = document.createElement('img');
+  img.src = `./assets/effects/${fx}.png`;
+  img.className = 'attack-fx-img' + (isCrit ? ' crit' : '');
+  img.draggable = false;
+  container.style.position = 'relative';
+  container.appendChild(img);
+  setTimeout(() => img.remove(), 600);
 }
 
 // ---------- Monster attack ----------

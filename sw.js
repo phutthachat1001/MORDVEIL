@@ -1,4 +1,4 @@
-const CACHE = 'mordveil-v18';
+const CACHE = 'mordveil-v19';
 const ASSETS = [
   './Play.html',
   './css/style.css',
@@ -22,6 +22,11 @@ const ASSETS = [
   './js/audio.js',
   './assets/button/playnext.png',
   './assets/button/newgame.png',
+  './assets/effects/slash.png',
+  './assets/effects/explosion.png',
+  './assets/effects/dark.png',
+  './assets/effects/arrow.png',
+  './assets/effects/holy.png',
 ];
 
 self.addEventListener('install', e => {
