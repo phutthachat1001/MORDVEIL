@@ -19,6 +19,9 @@ function renderZoneTabs() {
       G.battleInProgress = false;
       document.getElementById('battle-content').style.display    = 'none';
       document.getElementById('monster-list-area').style.display = 'block';
+      document.getElementById('battle-map-wrap').style.display   = 'none';
+      const ba = document.getElementById('battle-arena');
+      if (ba) ba.style.display = '';
       const arena = document.getElementById('pixel-battle-arena');
       if (arena) { arena.innerHTML = ''; arena.style.display = 'none'; }
       renderZoneTabs();
@@ -1377,6 +1380,9 @@ function startBattle(monster) {
 function showBattleContent(monster, stats) {
   document.getElementById('battle-content').style.display    = 'block';
   document.getElementById('monster-list-area').style.display = 'none';
+  document.getElementById('battle-map-wrap').style.display   = 'none';
+  const ba = document.getElementById('battle-arena');
+  if (ba) ba.style.display = '';
   const stonePanel = document.getElementById('stone-lore-panel');
   if (stonePanel) stonePanel.style.display = 'none';
 

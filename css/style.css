@@ -351,7 +351,7 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   box-shadow:0 0 20px currentColor, 0 4px 20px rgba(0,0,0,.9);
 }
 #battle-map-wrap{
-  flex:1;overflow:hidden;display:flex;flex-direction:column;
+  overflow:hidden;display:flex;flex-direction:column;
 }
 #battle-map-wrap .map-container{
   position:relative;line-height:0;
@@ -686,9 +686,9 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 
 /* hub responsive */
 @media(max-width:700px){
-  .hub-scene{height:260px;padding:0 2% 12px}
+  .hub-scene{height:240px;padding:0 2% 8px;overflow:hidden}
   .hub-building{width:80px!important;height:100px!important}
-  .hub-npc-sprite svg{width:42px!important;height:66px!important}
+  .hub-npc-sprite svg{width:38px!important;height:60px!important}
   .hub-dlg-portrait-wrap{width:90px;min-width:90px}
   .hub-dlg-portrait svg{width:42px!important;height:66px!important}
   .hub-panel{width:92%;right:4%;top:8%}
@@ -699,6 +699,10 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   .hub-person{display:none}
   .hub-cart{display:none}
   .hub-lamp{display:none}
+  /* NPC name/role tags smaller on mobile so they don't overflow */
+  .hub-npc-name-tag{font-size:.58rem;margin-top:.1rem;padding:.08rem .25rem!important}
+  /* Hide role-tag on mobile to save vertical space */
+  .hub-npc-role-tag{display:none}
 }
 
 /* LEVEL UP */
@@ -1058,8 +1062,22 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   /* panel body fills available space */
   .panel-body { flex: 1; overflow-y: auto; }
 
-  /* battle arena fills panel */
-  .battle-panel .battle-arena { flex: 1; overflow-y: auto; }
+  /* battle panel: map + arena stack correctly without gap */
+  .battle-panel { flex-direction: column; }
+  .battle-panel .panel-body.battle-arena {
+    flex: 1;
+    overflow-y: auto;
+    padding: .5rem;
+  }
+  /* world map wrap — shrink to fit, don't push arena down */
+  #battle-map-wrap {
+    flex-shrink: 0;
+    max-height: 38vh;
+    overflow: hidden;
+  }
+  #battle-map-wrap .map-container {
+    max-height: 34vh;
+  }
 
   /* quest panel pane heights */
   #rpq-pane-main,
@@ -1079,6 +1097,27 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 
   /* fix panels with overflow */
   #panel-rpg-quests, #panel-left { border-right: none; }
+
+  /* class select: 2×3 grid on mobile */
+  .class-grid { grid-template-columns: repeat(2, 1fr) !important; gap: .6rem; }
+  .class-card { padding: 1rem .7rem; }
+  .class-icon { font-size: 2.2rem; margin-bottom: .5rem; }
+  .class-name { font-size: .88rem; }
+  .class-desc { font-size: .72rem; }
+  .class-stats { font-size: .68rem; }
+  #screen-class { padding: 1rem; }
+  #screen-class h2 { font-size: 1.4rem; margin-bottom: .3rem; }
+
+  /* mobile action bar — compact scrollable */
+  #mobile-action-bar {
+    padding: .2rem .3rem;
+    gap: .25rem;
+  }
+  #mobile-action-bar button {
+    font-size: .68rem;
+    padding: .25rem .45rem;
+    white-space: nowrap;
+  }
 }
 
 /* ============================================================

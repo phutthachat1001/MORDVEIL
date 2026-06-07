@@ -1132,7 +1132,8 @@ function renderHubScene() {
     const slot = document.createElement('div');
     slot.className = 'hub-npc-slot';
     slot.id = `hub-npc-${npc.id}`;
-    slot.style.cssText = `position:absolute;bottom:80px;left:${npc.pos || '50%'};transform:translateX(-50%);`;
+    const bottomPx = window.innerWidth <= 700 ? 50 : 80;
+    slot.style.cssText = `position:absolute;bottom:${bottomPx}px;left:${npc.pos || '50%'};transform:translateX(-50%);`;
 
     const sprite = HUB_NPC_SPRITES[npc.id] || HUB_NPC_SPRITES.innkeeper;
 

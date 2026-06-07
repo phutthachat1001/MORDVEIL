@@ -102,6 +102,7 @@ function confirmClass() {
   document.getElementById('screen-class').classList.remove('active');
   document.getElementById('screen-game').classList.add('active');
   renderAll();
+  if (typeof showBattleMap === 'function') showBattleMap();
   if (typeof migrateEventState       === 'function') migrateEventState();
   if (typeof scheduleNextCombatEvent === 'function') scheduleNextCombatEvent();
   if (typeof startEventTimers        === 'function') startEventTimers();

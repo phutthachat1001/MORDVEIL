@@ -841,6 +841,8 @@
     document.getElementById('battle-map-wrap').style.display = 'block';
     document.getElementById('battle-content').style.display  = 'none';
     document.getElementById('monster-list-area').style.display = 'none';
+    const arena = document.getElementById('battle-arena');
+    if (arena) arena.style.display = 'none';
     const panel = document.getElementById('map-monster-panel');
     if (panel) panel.style.display = 'none';
     const backBtn = document.getElementById('btn-back-map');
