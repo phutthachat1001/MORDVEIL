@@ -40,6 +40,7 @@ let G = {
   battleInProgress: false,
   currentMonsterHp: 0,
   currentMonsterMaxHp: 0,
+  enemyQueue: [],
   monsterPoisonTurns: 0,
   monsterBurnTurns: 0,
   playerPoisonTurns: 0,

@@ -1320,6 +1320,14 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 .die-anim {
   animation: monster-die 0.7s ease-in forwards !important;
 }
+/* monster spawn (next in queue) */
+.spawn-anim {
+  animation: monster-spawn 0.35s ease-out;
+}
+@keyframes monster-spawn {
+  from { opacity:0; transform: translateX(40px) scale(.8); }
+  to   { opacity:1; transform: translateX(0)    scale(1); }
+}
 @keyframes arenaFlash {
   0%   { opacity: .3; }
   100% { opacity: 0; }

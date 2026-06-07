@@ -1358,12 +1358,25 @@ function getMonsterSprite(monsterName, isBoss, zone, imgFile) {
 
 // ---------- Start / show / hide ----------
 
+function _rollWaveSize(monster) {
+  if (monster.isBoss) return 1;
+  const r = Math.random();
+  if (r < 0.50) return 1;
+  if (r < 0.80) return 2;
+  return 3;
+}
+
 function startBattle(monster) {
   stopAuto();
   G.battleInProgress    = false;
   G.currentMonster      = null;
   _skillCooldowns  = {};
   _skillBuffs      = {};
+
+  // build enemy queue (boss always 1, others 1-3)
+  const waveSize = _rollWaveSize(monster);
+  G.enemyQueue = [];
+  for (let i = 1; i < waveSize; i++) G.enemyQueue.push({...monster});
 
   const stats = getMonsterStats(G.currentZone, monster.tier, monster.isBoss);
   G.currentMonster      = {...monster, zone:G.currentZone};
@@ -1374,7 +1387,8 @@ function startBattle(monster) {
   G.monsterBurnTurns    = 0;
   G.turnCount           = 0;
   showBattleContent(monster, stats);
-  logBattle(`<span class="log-sys">⚔ เริ่มต่อสู้กับ ${monster.name}! HP:${stats.maxHp} ATK:${stats.atk}</span>`);
+  const waveLabel = waveSize > 1 ? ` (${waveSize} ตัว!)` : '';
+  logBattle(`<span class="log-sys">⚔ เริ่มต่อสู้กับ ${monster.name}!${waveLabel} HP:${stats.maxHp} ATK:${stats.atk}</span>`);
 }
 
 function showBattleContent(monster, stats) {
@@ -1414,8 +1428,25 @@ function showBattleContent(monster, stats) {
   document.getElementById('mon-type').textContent    = monster.isBoss ? '🔴 บอสศัตรู' : 'ศัตรูทั่วไป';
   document.getElementById('mon-stats').textContent   = `ATK: ${stats.atk}`;
   updateMonsterHpBar();
+  renderEnemyQueue();
   document.getElementById('btn-attack').disabled = false;
   renderSkillBar();
+}
+
+function renderEnemyQueue() {
+  let el = document.getElementById('enemy-queue-row');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'enemy-queue-row';
+    el.style.cssText = 'display:flex;gap:6px;align-items:center;justify-content:center;margin-bottom:.3rem;min-height:22px';
+    const nameEl = document.getElementById('mon-name');
+    if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(el, nameEl.nextSibling);
+  }
+  const queue = G.enemyQueue || [];
+  if (queue.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = queue.map(m =>
+    `<span style="background:rgba(255,60,60,.18);border:1px solid #ff4444;border-radius:5px;padding:1px 7px;font-size:.7rem;color:#ffaaaa">${m.sprite||'👾'} ${m.name}</span>`
+  ).join('<span style="color:#888;font-size:.7rem">▶</span>');
 }
 
 function hideBattleContent() {
@@ -1425,9 +1456,12 @@ function hideBattleContent() {
   G.currentMonster   = null;
   G.currentMonsterHp = 0;
   G.currentMonsterMaxHp = 0;
+  G.enemyQueue       = [];
   G.monsterPoisonTurns = 0;
   G.monsterBurnTurns   = 0;
   G.turnCount = 0;
+  const queueEl = document.getElementById('enemy-queue-row');
+  if (queueEl) queueEl.innerHTML = '';
 
   document.getElementById('battle-content').style.display    = 'none';
   document.getElementById('monster-list-area').style.display = 'block';
@@ -2132,7 +2166,17 @@ function monsterDie() {
 
   setTimeout(() => {
     if (G.hp > 0) {
-      spawnSameMonster(monster);
+      if (G.enemyQueue && G.enemyQueue.length > 0) {
+        // next enemy in this wave
+        const next = G.enemyQueue.shift();
+        spawnNextEnemy(next, monster);
+      } else {
+        // wave clear — start new wave with same monster type
+        const waveSize = _rollWaveSize(monster);
+        G.enemyQueue = [];
+        for (let i = 1; i < waveSize; i++) G.enemyQueue.push({...monster});
+        spawnSameMonster(monster);
+      }
     } else {
       hideBattleContent();
     }
@@ -2153,15 +2197,42 @@ function spawnSameMonster(monster) {
   G.monsterBurnTurns    = 0;
   G.turnCount           = 0;
 
-  // refresh monster sprite
   const monEl = document.getElementById('pixel-monster');
   if (monEl) {
     monEl.classList.remove('die-anim');
     monEl.innerHTML = getMonsterSprite(monster.name, monster.isBoss, G.currentZone, monster.img);
   }
+  document.getElementById('mon-name').textContent = monster.name + (monster.isBoss ? ' 👑' : '');
   updateMonsterHpBar();
+  renderEnemyQueue();
   document.getElementById('btn-attack').disabled = false;
   renderSkillBar();
+}
+
+function spawnNextEnemy(next, prevMonster) {
+  const stats = getMonsterStats(G.currentZone, next.tier, next.isBoss);
+  G.currentMonster      = {...next, zone:G.currentZone};
+  G.currentMonsterHp    = stats.maxHp;
+  G.currentMonsterMaxHp = stats.maxHp;
+  G.battleInProgress    = true;
+  G.monsterPoisonTurns  = 0;
+  G.monsterBurnTurns    = 0;
+  G.turnCount           = 0;
+
+  const monEl = document.getElementById('pixel-monster');
+  if (monEl) {
+    monEl.classList.remove('die-anim');
+    monEl.innerHTML = getMonsterSprite(next.name, next.isBoss, G.currentZone, next.img);
+    monEl.classList.add('spawn-anim');
+    setTimeout(() => monEl.classList.remove('spawn-anim'), 400);
+  }
+  document.getElementById('mon-name').textContent = next.name + (next.isBoss ? ' 👑' : '');
+  document.getElementById('mon-stats').textContent = `ATK: ${stats.atk}`;
+  updateMonsterHpBar();
+  renderEnemyQueue();
+  document.getElementById('btn-attack').disabled = false;
+  renderSkillBar();
+  logBattle(`<span class="log-sys">⚔ ตัวถัดไป: ${next.name}! HP:${stats.maxHp} (เหลือ ${(G.enemyQueue||[]).length} ตัว)</span>`);
 }
 
 // ---------- Kill counter ----------

@@ -65,6 +65,7 @@ function loadGame() {
       if (!G.unlockedCosmeticTiers)              G.unlockedCosmeticTiers = [1];
       // migrate: skill tree & branching
       if (!G.skillTreeSpent)    G.skillTreeSpent    = {};
+      if (!G.enemyQueue)        G.enemyQueue        = [];
       if (!G.evoQuestProgress)  G.evoQuestProgress  = {};
       if (!G.evoQuestDone)      G.evoQuestDone      = {};
       if (!G.unlockedSkills)    G.unlockedSkills    = [];
