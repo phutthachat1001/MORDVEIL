@@ -7,6 +7,7 @@
 function renderZoneTabs() {
   const tabs = document.getElementById('zone-tabs');
   tabs.innerHTML = '';
+  tabs.style.display = 'flex';
   ZONES.forEach(z => {
     const locked = G.level < z.reqLevel;
     const tab = document.createElement('div');

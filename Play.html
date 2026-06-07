@@ -952,15 +952,23 @@
   }
 
   function showBattleMap() {
+    const mobile = window.innerWidth <= 700;
     document.getElementById('battle-map-wrap').style.display = 'block';
     document.getElementById('battle-content').style.display  = 'none';
-    document.getElementById('monster-list-area').style.display = 'none';
-    const arena = document.getElementById('battle-arena');
-    if (arena) arena.style.display = 'none';
     const panel = document.getElementById('map-monster-panel');
     if (panel) panel.style.display = 'none';
     const backBtn = document.getElementById('btn-back-map');
     if (backBtn) backBtn.style.display = 'none';
+    if (mobile) {
+      // mobile: keep battle-arena visible so monster list shows below map
+      const arena = document.getElementById('battle-arena');
+      if (arena) arena.style.display = '';
+      document.getElementById('monster-list-area').style.display = 'block';
+    } else {
+      document.getElementById('monster-list-area').style.display = 'none';
+      const arena = document.getElementById('battle-arena');
+      if (arena) arena.style.display = 'none';
+    }
     renderMapPins();
   }
 
