@@ -256,78 +256,95 @@ function sellLowestRarity() {
 // ---------- inventory render ----------
 
 function renderInventory() {
-  // chest buttons
-  const area   = document.getElementById('chest-open-area');
-  const labels = { common:'ธรรมดา', uncommon:'พิเศษ', rare:'หายาก', boss:'บอส' };
-  area.innerHTML = '';
+  const COLS = 4, ROWS = 8, TOTAL = COLS * ROWS; // 32 slots
+
+  // build chest entries
+  const chestLabels = { common:'ธรรมดา', uncommon:'พิเศษ', rare:'หายาก', boss:'บอส' };
+  const chestIcons  = { common:'📦', uncommon:'🎁', rare:'💎', boss:'👑' };
+  const chestColors = { common:'var(--common)', uncommon:'var(--uncommon)', rare:'var(--rare)', boss:'var(--legend)' };
+  let chestSlots = [];
   ['common','uncommon','rare','boss'].forEach(t => {
     const count = G.chests[t] || 0;
-    if (!count) return;
-    const btn = document.createElement('button');
-    btn.className = `chest-btn ${t}`;
-    btn.innerHTML = `📦 หีบ${labels[t]} ×${count}`;
-    btn.onclick        = () => openChest(t);
-    btn.onmouseenter   = () => showDropTooltip(btn, _chestDropLines(t), 'สุ่ม 1 ใน 6 ช่องอุปกรณ์');
-    btn.onmouseleave   = () => hideDropTooltip();
-    area.appendChild(btn);
+    for (let i = 0; i < count; i++) chestSlots.push({ _chest: t });
   });
-  const totalChests = ['common','uncommon','rare','boss'].reduce((s,t) => s + (G.chests[t]||0), 0);
-  document.getElementById('chest-count-display').textContent = totalChests;
 
-  // filter bar
-  renderFilterBar();
-
-  // inventory grid
-  const grid = document.getElementById('inv-grid');
-  grid.innerHTML = '';
-
+  // build item entries (apply filters)
   let items = [...G.inventory];
-
-  // filter by slot type
   if (invFilterSlot !== 'all') {
-    if (invFilterSlot === 'weapon') items = items.filter(i => i.slot === 'weapon' || !i.slot);
+    if (invFilterSlot === 'weapon')    items = items.filter(i => i.slot === 'weapon' || !i.slot);
     else if (invFilterSlot === 'armor-all') items = items.filter(i => i.slot && i.slot !== 'weapon');
-    else if (invFilterSlot === 'myclass') items = items.filter(i => canEquipItem(i));
-    else if (invFilterSlot === 'sellable') items = items.filter(i => !isItemEquipped(i.uid));
+    else if (invFilterSlot === 'myclass')   items = items.filter(i => canEquipItem(i));
+    else if (invFilterSlot === 'sellable')  items = items.filter(i => !isItemEquipped(i.uid));
     else items = items.filter(i => i.slot === invFilterSlot);
   }
-
-  // filter by rarity
   if (invFilterRarity !== 'all') {
     if (invFilterRarity === 'epic+') items = items.filter(i => ['epic','legend','ancient'].includes(i.rarity));
     else items = items.filter(i => i.rarity === invFilterRarity);
   }
 
-  items.forEach(item => {
-    const equipped = isItemEquipped(item.uid);
-    const canEquip = canEquipItem(item);
-    const el = document.createElement('div');
+  // when filtering items, hide chests to keep grid clean; show chests only on 'all'
+  const showChests = invFilterSlot === 'all' && invFilterRarity === 'all';
+  const slots = showChests ? [...chestSlots, ...items] : [...items];
 
-    let cls = `inv-item rarity-${item.rarity}`;
-    if (equipped) cls += ' equipped';
-    if (!canEquip) cls += ' cannot-equip';
+  // render filter bar
+  renderFilterBar();
 
-    el.className = cls;
+  // render grid
+  const grid = document.getElementById('inv-grid');
+  grid.innerHTML = '';
 
-    if (!item.slot) item.slot = 'weapon';
-    const slotMeta = SLOT_META[item.slot] || SLOT_META.weapon;
-    const tooltip  = `${item.name}\n${RARITIES[item.rarity]?.label||''}\n${slotMeta?.label||''}\n${buildStatLine(item)}${item.effect?'\n'+item.effect:''}${!canEquip?'\n🔒 ต้องการคลาส: '+(CLASSES.find(c=>c.id===item.requiredClass)?.name||item.requiredClass):''}`;
-    el.title = tooltip;
+  for (let i = 0; i < TOTAL; i++) {
+    const cell = document.createElement('div');
+    const entry = slots[i];
 
-    const lockIcon = !canEquip ? ' 🔒' : '';
-    const eqBadge  = equipped  ? ' <span class="eq-badge">สวมอยู่</span>' : '';
-    el.innerHTML = `${item.icon||'⚔'} ${item.name.slice(0,8)}${item.name.length>8?'…':''}${lockIcon}${eqBadge}`;
-    el.onclick   = () => showTooltip(item);
-    if (!equipped && canEquip) {
-      el.onmouseenter = (e) => _showCompareTooltip(e, item);
-      el.onmouseleave = () => _hideCompareTooltip();
+    if (!entry) {
+      cell.className = 'inv-cell inv-cell-empty';
+      grid.appendChild(cell);
+      continue;
     }
-    grid.appendChild(el);
-  });
+
+    if (entry._chest) {
+      const t = entry._chest;
+      cell.className = `inv-cell inv-cell-chest chest-${t}`;
+      cell.style.borderColor = chestColors[t];
+      cell.innerHTML = `<span class="inv-cell-icon">${chestIcons[t]}</span><span class="inv-cell-name">${chestLabels[t]}</span>`;
+      cell.onclick = () => openChest(t);
+      cell.onmouseenter = () => showDropTooltip(cell, _chestDropLines(t), 'สุ่ม 1 ใน 6 ช่องอุปกรณ์');
+      cell.onmouseleave = () => hideDropTooltip();
+    } else {
+      const item    = entry;
+      const equipped = isItemEquipped(item.uid);
+      const canEquip = canEquipItem(item);
+      if (!item.slot) item.slot = 'weapon';
+
+      let cls = `inv-cell inv-cell-item rarity-${item.rarity}`;
+      if (equipped)  cls += ' equipped';
+      if (!canEquip) cls += ' cannot-equip';
+      cell.className = cls;
+
+      const lockIcon = !canEquip ? '<span class="inv-cell-lock">🔒</span>' : '';
+      const eqBadge  = equipped  ? '<span class="eq-badge">E</span>' : '';
+      cell.innerHTML = `<span class="inv-cell-icon">${item.icon||'⚔'}</span><span class="inv-cell-name">${item.name.slice(0,7)}${item.name.length>7?'…':''}</span>${lockIcon}${eqBadge}`;
+      cell.onclick   = () => showTooltip(item);
+      if (!equipped && canEquip) {
+        cell.onmouseenter = (e) => _showCompareTooltip(e, item);
+        cell.onmouseleave = () => _hideCompareTooltip();
+      }
+    }
+    grid.appendChild(cell);
+  }
+
+  // update counts in header
+  const totalChests = ['common','uncommon','rare','boss'].reduce((s,t) => s + (G.chests[t]||0), 0);
+  const chestDisp = document.getElementById('chest-count-display');
+  if (chestDisp) chestDisp.textContent = totalChests;
+
   const invLen = G.inventory.length;
   const invCountEl = document.getElementById('inv-count');
-  invCountEl.textContent = invLen;
-  invCountEl.style.color = invLen >= 45 ? 'var(--red)' : invLen >= 40 ? 'var(--orange)' : '';
+  if (invCountEl) {
+    invCountEl.textContent = invLen;
+    invCountEl.style.color = invLen >= 45 ? 'var(--red)' : invLen >= 40 ? 'var(--orange)' : '';
+  }
   const badge = document.getElementById('inv-full-badge');
   if (badge) badge.style.display = invLen >= 40 ? 'inline' : 'none';
 }

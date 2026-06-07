@@ -451,13 +451,18 @@
 <div id="inv-popup-overlay" onclick="if(event.target===this)closeInventoryPopup()">
   <div class="inv-popup-box" onclick="event.stopPropagation()">
     <div class="inv-popup-header">
-      <span class="inv-popup-title">🎒 กระเป๋าสัมภาระ</span>
+      <span class="inv-popup-title">🎒 กระเป๋าสัมภาระ
+        <span style="font-size:.75rem;color:var(--text2);font-weight:400">
+          (<span id="inv-count">0</span>/50
+          <span id="inv-full-badge" style="display:none;color:var(--red)"> เต็ม!</span>)
+          📦 <span id="chest-count-display">0</span>
+        </span>
+      </span>
       <button class="inv-popup-close" onclick="closeInventoryPopup()">✕</button>
     </div>
     <div class="inv-popup-body">
-      <div class="chest-open-area inv-popup-chests" id="chest-open-area"></div>
       <div id="inv-filter-bar" class="inv-filter-bar inv-popup-filter"></div>
-      <div class="inv-grid inv-popup-grid" id="inv-grid"></div>
+      <div class="inv-bag-grid" id="inv-grid"></div>
     </div>
   </div>
 </div>
