@@ -1,4 +1,4 @@
-const CACHE = 'mordveil-v1';
+const CACHE = 'mordveil-v10';
 const ASSETS = [
   './Play.html',
   './css/style.css',
