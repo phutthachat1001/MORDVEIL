@@ -208,20 +208,18 @@ let _mobileActiveTab = 'battle'; // default on first load
 function isMobile() { return window.innerWidth <= 700; }
 
 function switchMobileTab(tab) {
+  // bag = popup overlay, does not change the active panel
+  if (tab === 'bag') {
+    if (typeof toggleInventoryPopup === 'function') toggleInventoryPopup();
+    return;
+  }
+
   _mobileActiveTab = tab;
-
-  // determine left panel id based on game mode
-  const leftId = G.gameMode === 'fullrpg' ? 'panel-rpg-quests' : 'panel-left';
-
-  const panelIds = {
-    left:   leftId,
-    battle: document.querySelector('.battle-panel')?.id || '',
-    char:   document.querySelector('.main-layout .panel:last-child')?.id || '',
-  };
 
   // toggle mobile-active class — only on mobile
   if (!isMobile()) return;
 
+  const leftId = G.gameMode === 'fullrpg' ? 'panel-rpg-quests' : 'panel-left';
   document.querySelectorAll('.main-layout .panel').forEach(p => p.classList.remove('mobile-active'));
 
   if (tab === 'left') {
@@ -233,13 +231,11 @@ function switchMobileTab(tab) {
   } else if (tab === 'char') {
     const cp = document.getElementById('panel-char');
     if (cp) cp.classList.add('mobile-active');
-  } else if (tab === 'bag') {
-    if (typeof toggleInventoryPopup === 'function') toggleInventoryPopup();
   }
 
   // sync bottom nav active state
   document.querySelectorAll('#mobile-nav .mnav-btn').forEach(b => b.classList.remove('active'));
-  const btnMap = { left:'mnav-left', battle:'mnav-battle', char:'mnav-char', bag:'mnav-bag' };
+  const btnMap = { left:'mnav-left', battle:'mnav-battle', char:'mnav-char' };
   const activeBtn = document.getElementById(btnMap[tab]);
   if (activeBtn) activeBtn.classList.add('active');
 

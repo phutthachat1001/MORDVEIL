@@ -236,8 +236,7 @@
     <span id="mode-badge" style="font-size:.75rem;font-weight:700;padding:.15rem .5rem;border-radius:4px;background:rgba(0,0,0,.3);border:1px solid currentColor;margin-left:auto">💼 RPG Working</span>
     <button onclick="showStats()"        style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">สถิติ</button>
     <button onclick="showAchievements()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">ความสำเร็จ</button>
-    <button onclick="openMap()" style="background:linear-gradient(135deg,#0f1a30,#1a2a40);border:2px solid #4488ff;color:#88aaff;padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🗺 แผนที่</button>
-    <button onclick="toggleInventoryPopup()" id="topbar-bag-btn" style="background:linear-gradient(135deg,#1a1a10,#2a2010);border:2px solid var(--gold);color:var(--gold);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🎒 กระเป๋า <span style="font-size:.72rem;color:var(--text2)">หีบ:<span id="chest-count-display">0</span> ของ:<span id="inv-count">0</span>/50<span id="inv-full-badge" style="display:none;background:#ff8800;color:#000;border-radius:4px;padding:0 3px;font-size:.6rem;font-weight:700;margin-left:2px">เต็ม!</span></span></button>
+    <span style="display:none"><span id="chest-count-display">0</span><span id="inv-count">0</span><span id="inv-full-badge"></span></span>
     <button onclick="openShop()" style="background:linear-gradient(135deg,#1a2a40,#0f1a2e);border:2px solid var(--gold);color:var(--gold);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🏪 ร้านค้า</button>
     <button id="btn-manualsave" onclick="manualSave()" style="background:linear-gradient(135deg,#1a3a1a,#0f2e0f);border:2px solid #4caf50;color:#7dff7d;padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">💾 เซฟ</button>
     <button class="btn-newgame" onclick="confirmNewGame()">🔄 เริ่มใหม่</button>
@@ -256,8 +255,6 @@
   <div id="mobile-action-bar">
     <button onclick="showStats()"             style="border-color:var(--border2)">📊 สถิติ</button>
     <button onclick="showAchievements()"      style="border-color:var(--border2)">🏆 ความสำเร็จ</button>
-    <button onclick="openMap()"               style="border-color:#4488ff;color:#88aaff">🗺 แผนที่</button>
-    <button onclick="toggleInventoryPopup()"  style="border-color:var(--gold);color:var(--gold)">🎒 กระเป๋า <span id="mob-chest-count" style="font-size:.65rem;color:var(--text2)"></span></button>
     <button onclick="openShop()"              style="border-color:var(--gold);color:var(--gold)">🏪 ร้านค้า</button>
     <button onclick="manualSave()"            style="border-color:#4caf50;color:#7dff7d">💾 เซฟ</button>
     <button onclick="confirmNewGame()"        style="border-color:var(--red);color:var(--red)">🔄 เริ่มใหม่</button>
