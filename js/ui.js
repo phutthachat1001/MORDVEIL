@@ -233,13 +233,11 @@ function switchMobileTab(tab) {
   } else if (tab === 'char') {
     const cp = document.getElementById('panel-char');
     if (cp) cp.classList.add('mobile-active');
-  } else if (tab === 'bag') {
-    if (typeof toggleInventoryPopup === 'function') toggleInventoryPopup();
   }
 
   // sync bottom nav active state
   document.querySelectorAll('#mobile-nav .mnav-btn').forEach(b => b.classList.remove('active'));
-  const btnMap = { left:'mnav-left', battle:'mnav-battle', char:'mnav-char', bag:'mnav-bag' };
+  const btnMap = { left:'mnav-left', battle:'mnav-battle', char:'mnav-char' };
   const activeBtn = document.getElementById(btnMap[tab]);
   if (activeBtn) activeBtn.classList.add('active');
 
