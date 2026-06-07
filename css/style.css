@@ -229,58 +229,55 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
              radial-gradient(1px 1px at 92% 12%,rgba(255,255,255,.4),transparent);
 }
 
-/* ── Fighter Stage — enemy top, player bottom ── */
+/* ── Fighter Stage ── */
 #battle-fighters{
   position:relative;z-index:3;
   display:flex;align-items:flex-end;justify-content:space-between;
-  padding:0 5% 2%;
+  padding:0 4% 14px;
   height:72%;min-height:260px;flex-shrink:0;
 }
 
-/* Enemy side — sprite on top, info panel below */
+/* ── Shared info panel style (enemy & player) ── */
+.fighter-info-panel{
+  width:100%;border-radius:10px;padding:.32rem .6rem .28rem;text-align:center;
+  background:rgba(0,0,0,.68);
+  backdrop-filter:blur(6px);
+}
+.fighter-label{
+  font-family:'Chakra Petch',sans-serif;font-size:.78rem;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 4px #000;line-height:1.3;
+}
+.fighter-hp-wrap{
+  background:rgba(0,0,0,.5);border-radius:5px;height:9px;
+  overflow:hidden;position:relative;margin:.22rem 0;
+}
+.fighter-hp-fill{height:100%;transition:width .35s ease;border-radius:5px}
+.fighter-hp-text{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.56rem;color:#fff;font-family:'Chakra Petch',sans-serif;
+  text-shadow:0 0 3px #000;
+}
+.fighter-atk-row{
+  display:flex;align-items:center;justify-content:center;gap:.35rem;
+  font-size:.6rem;margin-top:.1rem;
+}
+
+/* ── Enemy side ── */
 #battle-enemy-side{
   display:flex;flex-direction:column;align-items:center;
-  gap:.3rem;width:55%;
+  gap:.25rem;width:46%;
 }
-#battle-enemy-info{
-  background:rgba(0,0,0,.72);border:1px solid rgba(255,60,60,.4);
-  border-radius:10px;padding:.35rem .65rem;text-align:center;width:100%;
-  backdrop-filter:blur(6px);order:2;
-}
-#battle-enemy-name{
-  font-family:'Chakra Petch',sans-serif;font-size:.9rem;
-  color:#ff8888;font-weight:700;line-height:1.2;
-}
-#battle-enemy-type{font-size:.65rem;color:#ff6666;margin-bottom:.3rem}
-#battle-enemy-hp-wrap{
-  background:rgba(0,0,0,.5);border-radius:6px;height:10px;
-  overflow:hidden;position:relative;border:1px solid rgba(255,0,0,.3);
-}
-#battle-enemy-hp-fill{
-  height:100%;background:linear-gradient(90deg,#cc0000,#ff4444);
-  transition:width .4s ease;
-}
-#battle-enemy-hp-text{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:.6rem;color:#fff;font-family:'Chakra Petch',sans-serif;
-}
-#battle-enemy-atk{font-size:.62rem;color:#ff9988;margin-top:.25rem;text-align:center}
-#battle-enemy-queue{
-  display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:.2rem;
-}
-.eq-badge{
-  background:rgba(255,60,60,.2);border:1px solid rgba(255,60,60,.5);
-  border-radius:5px;padding:1px 6px;font-size:.62rem;color:#ffaaaa;
-}
+/* legacy enemy info (hidden, kept for JS compat) */
+#battle-enemy-info{ display:none }
+#battle-enemy-queue{ display:none }
 
 #pixel-monster{
   display:flex;align-items:flex-end;justify-content:center;
   animation:enemy-idle 2s ease-in-out infinite;
-  filter:drop-shadow(0 8px 16px rgba(0,0,0,.7)) drop-shadow(0 0 8px rgba(255,60,60,.3));
-  cursor:default;
-  image-rendering:pixelated;
-  transform:scaleX(-1);
-  order:1;
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.8)) drop-shadow(0 0 10px rgba(255,60,60,.35));
+  cursor:default;image-rendering:pixelated;
+  transform:scaleX(-1);order:1;
 }
 /* undo flip for animations that need consistent direction */
 #pixel-monster.shake-anim,#pixel-monster.die-anim,#pixel-monster.spawn-anim{transform-origin:center bottom}
@@ -322,9 +319,10 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   z-index:10;top:10%;left:15%;
 }
 
-/* ── Multi-enemy cards — sprite top, info bottom, NO box border ── */
+/* ── Multi-enemy cards ── */
 #enemy-cards-wrap{
-  display:flex;flex-direction:row;gap:.5rem;width:100%;justify-content:center;align-items:flex-end;
+  display:flex;flex-direction:row;gap:.4rem;width:100%;justify-content:center;align-items:flex-end;
+  order:1;
 }
 
 /* default single enemy sprite size */
@@ -389,17 +387,52 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   font-size:.6rem;color:rgba(255,200,60,.9);text-shadow:0 0 6px rgba(255,200,60,.8);
 }
 
-/* Player side (bottom-left) */
+/* ── Player side ── */
 #battle-player-side{
-  display:flex;flex-direction:column;align-items:flex-start;
-  gap:.3rem;width:42%;
+  display:flex;flex-direction:column;align-items:center;
+  gap:.25rem;width:46%;
 }
 #pixel-player{
   display:flex;align-items:flex-end;justify-content:center;
   animation:player-idle 1.6s ease-in-out infinite;
-  filter:drop-shadow(0 6px 14px rgba(0,0,0,.7));
+  filter:drop-shadow(0 6px 16px rgba(0,0,0,.8)) drop-shadow(0 0 10px rgba(100,180,255,.25));
   image-rendering:pixelated;
 }
+
+/* Player info panel */
+#battle-player-info{
+  width:100%;border-radius:10px;padding:.32rem .6rem .28rem;text-align:center;
+  background:rgba(0,0,0,.68);
+  backdrop-filter:blur(6px);
+}
+#battle-player-label{
+  font-family:'Chakra Petch',sans-serif;font-size:.78rem;font-weight:700;
+  color:#88ddff;text-shadow:0 1px 4px #000;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#battle-player-hp-wrap{
+  background:rgba(0,0,0,.5);border-radius:5px;height:9px;
+  overflow:hidden;position:relative;margin:.22rem 0;
+  border:1px solid rgba(100,220,100,.25);
+}
+#battle-player-hp-fill{
+  height:100%;background:linear-gradient(90deg,#22cc44,#44ff88);
+  transition:width .35s;border-radius:5px;
+}
+#battle-player-hp-text{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.56rem;color:#fff;font-family:'Chakra Petch',sans-serif;
+  text-shadow:0 0 3px #000;
+}
+#battle-player-atk-row{
+  display:flex;align-items:center;justify-content:center;gap:.35rem;
+  font-size:.6rem;margin-top:.1rem;
+}
+#battle-player-atk{ color:#aaddff;text-shadow:0 1px 3px #000 }
+#battle-player-status-inline .status-tag{ font-size:.52rem;padding:1px 4px }
+
+/* enemy info panel (used by single-enemy legacy path — keep hidden, multi-enemy cards handle it) */
+#battle-enemy-name,#battle-enemy-type,#battle-enemy-atk{ display:none }
 @keyframes player-idle{
   0%,100%{transform:translateY(0)}
   50%{transform:translateY(-5px)}
@@ -1600,19 +1633,20 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   .pin-sub { font-size: .55rem !important; }
 
   /* ── RPG Battle Scene on mobile ── */
-  #rpg-battle-scene {
-    flex: 1;
-    min-height: 0;
-  }
+  #rpg-battle-scene { flex:1;min-height:0 }
   #battle-fighters {
     height: 65%;
     min-height: 240px;
-    padding: 0 3% 1%;
+    padding: 0 3% 14px;
   }
+  /* both sides equal width on mobile */
+  #battle-enemy-side,
+  #battle-player-side { width: 47% }
+
   #pixel-monster svg,
   #pixel-monster img { width: 110px !important; height: 110px !important; }
   #pixel-player  svg,
-  #pixel-player  img { width: 100px !important; height: 100px !important; }
+  #pixel-player  img { width: 110px !important; height: 110px !important; }
 
   /* enemy cards on mobile */
   #enemy-cards-wrap .enemy-card-sprite svg,
@@ -1621,6 +1655,11 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   #enemy-cards-wrap.enemy-count-2 .enemy-card-sprite img{width:80px!important;height:80px!important}
   #enemy-cards-wrap.enemy-count-3 .enemy-card-sprite svg,
   #enemy-cards-wrap.enemy-count-3 .enemy-card-sprite img{width:64px!important;height:64px!important}
+
+  /* player info panel on mobile */
+  #battle-player-info { padding: .28rem .5rem .22rem }
+  #battle-player-label { font-size:.72rem }
+  #battle-player-atk   { font-size:.58rem }
 
   /* Command menu 4 wide on mobile */
   #rpg-cmd-menu {

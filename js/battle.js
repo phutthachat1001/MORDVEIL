@@ -1623,24 +1623,43 @@ function updateMonsterHpBar() {
 
 function updateBattlePlayerStatus() {
   const cls = CLASSES ? CLASSES.find(c => c.id === G.classId) : null;
+  const eqBonus = (typeof getEquippedStatBonus === 'function') ? getEquippedStatBonus() : { atk:0, def:0 };
+  const playerAtk = G.baseAtk + (eqBonus.atk || 0);
 
-  // New RPG status bar
+  // ── Fighter scene: player info panel ──
+  const pLabel  = document.getElementById('battle-player-label');
+  const pFill   = document.getElementById('battle-player-hp-fill');
+  const pTxt    = document.getElementById('battle-player-hp-text');
+  const pAtkEl  = document.getElementById('battle-player-atk');
+  const pStatus = document.getElementById('battle-player-status-inline');
+  const pct = Math.max(0, (G.hp / G.maxHp) * 100);
+  const hpColor = pct > 50
+    ? 'linear-gradient(90deg,#22cc44,#44ff88)'
+    : pct > 25
+      ? 'linear-gradient(90deg,#cc8800,#ffbb00)'
+      : 'linear-gradient(90deg,#cc2200,#ff4400)';
+  if (pLabel) pLabel.textContent = `${cls ? cls.icon : '⚔'} LV${G.level} ${G.playerName}`;
+  if (pFill)  { pFill.style.width = pct + '%'; pFill.style.background = hpColor; }
+  if (pTxt)   pTxt.textContent = `${G.hp}/${G.maxHp}`;
+  if (pAtkEl) pAtkEl.textContent = `ATK: ${playerAtk}`;
+  if (pStatus) {
+    let sHtml = '';
+    if ((G.playerPoisonTurns||0) > 0) sHtml += `<span class="status-tag poison">☠${G.playerPoisonTurns}</span>`;
+    if ((G.playerBurnTurns||0)   > 0) sHtml += `<span class="status-tag burn">🔥${G.playerBurnTurns}</span>`;
+    if ((_skillBuffs.ironShield||0) > 0) sHtml += `<span class="status-tag shield">🛡${_skillBuffs.ironShield}</span>`;
+    if ((_skillBuffs.lightShield||0) > 0) sHtml += `<span class="status-tag shield">✦${_skillBuffs.lightShield}</span>`;
+    pStatus.innerHTML = sHtml;
+  }
+
+  // ── Bottom UI name bar ──
   const nameEl = document.getElementById('rpg-player-name');
   const fill   = document.getElementById('rpg-player-hp-fill');
   const txt    = document.getElementById('rpg-player-hp-text');
   if (nameEl) nameEl.textContent = `${cls ? cls.icon : '⚔'} LV${G.level} ${G.playerName}`;
-  const pct = Math.max(0, (G.hp / G.maxHp) * 100);
-  if (fill) {
-    fill.style.width = pct + '%';
-    fill.style.background = pct > 50
-      ? 'linear-gradient(90deg,#22cc44,#44ff88)'
-      : pct > 25
-        ? 'linear-gradient(90deg,#cc8800,#ffbb00)'
-        : 'linear-gradient(90deg,#cc2200,#ff4400)';
-  }
-  if (txt) txt.textContent = `${G.hp}/${G.maxHp}`;
+  if (fill)   { fill.style.width = pct + '%'; fill.style.background = hpColor; }
+  if (txt)    txt.textContent = `${G.hp}/${G.maxHp}`;
 
-  // Status tags (burn, poison, shields)
+  // Status tags in bottom bar
   const tags = document.getElementById('rpg-player-status-tags');
   if (tags) {
     let html = '';
@@ -1651,7 +1670,7 @@ function updateBattlePlayerStatus() {
     tags.innerHTML = html;
   }
 
-  // Legacy hidden bar (still in DOM, some paths read it)
+  // Legacy hidden bar
   const legBar = document.getElementById('bps-hp-bar');
   const legTxt = document.getElementById('bps-hp-text');
   if (legBar) legBar.style.width = pct + '%';
