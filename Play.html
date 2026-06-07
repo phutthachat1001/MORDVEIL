@@ -934,11 +934,15 @@
         G.battleInProgress = false;
         document.getElementById('battle-content').style.display    = 'none';
         document.getElementById('monster-list-area').style.display = 'block';
+        document.getElementById('battle-map-wrap').style.display   = 'none';
+        const ba = document.getElementById('battle-arena');
+        if (ba) ba.style.display = '';
         const arena = document.getElementById('pixel-battle-arena');
         if (arena) { arena.innerHTML = ''; arena.style.display = 'none'; }
-        document.getElementById('battle-map-wrap').style.display = 'none';
         const backBtn = document.getElementById('btn-back-map');
         if (backBtn) backBtn.style.display = 'inline-block';
+        const zt = document.getElementById('zone-tabs');
+        if (zt) zt.style.display = 'flex';
         if (typeof renderZoneTabs === 'function') renderZoneTabs();
         if (typeof renderMonsterList === 'function') renderMonsterList();
         if (typeof npcCheckZoneEntry === 'function') npcCheckZoneEntry(p.zone);
