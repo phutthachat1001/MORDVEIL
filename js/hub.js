@@ -191,8 +191,9 @@ function openHub() {
   renderHubScene();
   closeHubDialogue();
   closeHubPanel();
-  document.getElementById('hub-screen').style.display = 'block';
   const s = document.getElementById('hub-screen');
+  if (window.innerWidth <= 700) s.style.bottom = '58px';
+  s.style.display = 'block';
   s.style.opacity = '0';
   s.style.transition = 'opacity .5s';
   requestAnimationFrame(() => { s.style.opacity = '1'; });
@@ -209,7 +210,7 @@ function openHub() {
 function closeHub() {
   const s = document.getElementById('hub-screen');
   s.style.opacity = '0';
-  setTimeout(() => { s.style.display = 'none'; }, 400);
+  setTimeout(() => { s.style.display = 'none'; s.style.bottom = ''; }, 400);
 }
 
 function closeHubDialogue() {

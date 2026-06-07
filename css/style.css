@@ -686,8 +686,8 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 
 /* hub responsive */
 @media(max-width:700px){
-  /* hub-screen: leave space for bottom nav */
-  #hub-screen{bottom:58px!important}
+  /* hub-screen: leave space for bottom nav — pointer-events none on nav area */
+  #hub-screen{bottom:58px!important;pointer-events:auto}
 
   /* hub-scene: positioned at bottom of hub area */
   .hub-scene{height:180px;padding:0;overflow:visible}
@@ -1141,6 +1141,22 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
     padding: .25rem .45rem;
     white-space: nowrap;
   }
+
+  /* map pins smaller on mobile */
+  .pin-label {
+    font-size: .62rem !important;
+    padding: .18rem .45rem !important;
+    border-radius: 5px !important;
+    border-width: 1.5px !important;
+  }
+  .pin-label-hub { font-size: .68rem !important; }
+  .pin-dot {
+    width: 13px !important;
+    height: 13px !important;
+    border-width: 2px !important;
+  }
+  .map-pin-hub .pin-dot { width: 16px !important; height: 16px !important; }
+  .pin-sub { font-size: .55rem !important; }
 }
 
 /* ============================================================
