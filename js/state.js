@@ -96,6 +96,9 @@ let G = {
   // NPC quests
   npcQuestProgress: {},    // questId/seenKey -> progress/true
   _npcQuestDefs: {},       // questId -> quest def (transient, restored on kill)
+  // Multi-enemy battle
+  enemies: [],             // [{...monster, hp, maxHp, poisonTurns, burnTurns}]
+  targetIndex: 0,          // which enemy the player is targeting
 };
 
 let autoAttackInterval = null;

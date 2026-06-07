@@ -83,6 +83,8 @@ function loadGame() {
       if (G.rpgDaily === undefined) G.rpgDaily      = null;
       if (!G.npcQuestProgress)  G.npcQuestProgress  = {};
       if (!G._npcQuestDefs)     G._npcQuestDefs     = {};
+      if (!G.enemies)           G.enemies           = [];
+      if (G.targetIndex === undefined) G.targetIndex = 0;
     }
   } catch(e) {
     console.warn('[LoadGame] failed, trying backup:', e);

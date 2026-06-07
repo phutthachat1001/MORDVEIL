@@ -300,6 +300,55 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 #pixel-monster.spawn-anim{animation:enemy-spawn .4s ease-out}
 @keyframes enemy-spawn{from{opacity:0;transform:translateX(40px) scale(.8)}to{opacity:1;transform:translateX(0) scale(1)}}
 
+/* ── Multi-enemy cards ── */
+#enemy-cards-wrap{
+  display:flex;flex-direction:column;gap:.35rem;width:100%;
+}
+/* when 2-3 enemies: shrink sprite size slightly */
+#enemy-cards-wrap.enemy-count-2 .enemy-card-sprite svg,
+#enemy-cards-wrap.enemy-count-2 .enemy-card-sprite img{width:52px!important;height:52px!important}
+#enemy-cards-wrap.enemy-count-3 .enemy-card-sprite svg,
+#enemy-cards-wrap.enemy-count-3 .enemy-card-sprite img{width:42px!important;height:42px!important}
+
+.enemy-card{
+  display:flex;align-items:center;justify-content:space-between;gap:.4rem;
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,60,60,.35);
+  border-radius:9px;padding:.3rem .55rem;cursor:pointer;
+  transition:border-color .15s,box-shadow .15s;
+  backdrop-filter:blur(4px);
+}
+.enemy-card.targeted{
+  border-color:rgba(255,200,60,.8);
+  box-shadow:0 0 10px rgba(255,200,60,.35);
+}
+.enemy-card:hover:not(.targeted){border-color:rgba(255,100,100,.6)}
+.enemy-card-info{flex:1;min-width:0}
+.enemy-card-name{
+  font-family:'Chakra Petch',sans-serif;font-size:.78rem;
+  color:#ff8888;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.enemy-card-hp-wrap{
+  background:rgba(0,0,0,.5);border-radius:5px;height:7px;
+  overflow:hidden;position:relative;border:1px solid rgba(255,0,0,.3);margin:.2rem 0;
+}
+.enemy-card-hp-fill{height:100%;transition:width .35s ease}
+.enemy-card-hp-text{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.55rem;color:#fff;font-family:'Chakra Petch',sans-serif;
+}
+.enemy-card-atk{font-size:.58rem;color:#ff9988}
+.enemy-card-sprite{
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transform:scaleX(-1);
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.7));
+  image-rendering:pixelated;
+}
+.enemy-card.targeted .enemy-card-sprite{
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.7)) drop-shadow(0 0 6px rgba(255,200,60,.6));
+}
+.enemy-card-sprite.die-anim{animation:enemy-die .5s forwards}
+.enemy-card.shake-anim{animation:enemy-shake .3s}
+
 /* Player side (bottom-left) */
 #battle-player-side{
   display:flex;flex-direction:column;align-items:flex-start;
@@ -1546,6 +1595,13 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   #rpg-battle-log-strip { font-size: .72rem; max-height: 60px; padding: .25rem .5rem .4rem; }
   #battle-enemy-info { padding: .3rem .5rem; }
   #battle-enemy-name { font-size: .78rem; }
+  .enemy-card { padding: .25rem .4rem; gap: .3rem; }
+  .enemy-card-name { font-size: .7rem; }
+  .enemy-card-atk  { font-size: .55rem; }
+  #enemy-cards-wrap.enemy-count-2 .enemy-card-sprite svg,
+  #enemy-cards-wrap.enemy-count-2 .enemy-card-sprite img{width:44px!important;height:44px!important}
+  #enemy-cards-wrap.enemy-count-3 .enemy-card-sprite svg,
+  #enemy-cards-wrap.enemy-count-3 .enemy-card-sprite img{width:34px!important;height:34px!important}
   #rpg-kill-counter { font-size: .62rem; padding: .1rem .45rem; }
 
   /* NPC encounter — bottom sheet on mobile */

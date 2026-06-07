@@ -1368,26 +1368,53 @@ function _rollWaveSize(monster) {
   return 3;
 }
 
+// Build G.enemies[] for a new wave of the given monster type
+function _buildWave(monster) {
+  const waveSize = _rollWaveSize(monster);
+  G.enemies = [];
+  for (let i = 0; i < waveSize; i++) {
+    const stats = getMonsterStats(G.currentZone, monster.tier, monster.isBoss);
+    G.enemies.push({
+      ...monster,
+      zone: G.currentZone,
+      hp: stats.maxHp,
+      maxHp: stats.maxHp,
+      atk: stats.atk,
+      poisonTurns: 0,
+      burnTurns: 0,
+      dead: false,
+    });
+  }
+  G.targetIndex = 0;
+  // legacy compat — keep currentMonster pointing at target
+  _syncLegacyFromTarget();
+  return waveSize;
+}
+
+// Keep legacy G.currentMonster / G.currentMonsterHp in sync with target
+function _syncLegacyFromTarget() {
+  const e = G.enemies[G.targetIndex];
+  if (!e) return;
+  G.currentMonster      = e;
+  G.currentMonsterHp    = e.hp;
+  G.currentMonsterMaxHp = e.maxHp;
+  G.monsterPoisonTurns  = e.poisonTurns;
+  G.monsterBurnTurns    = e.burnTurns;
+}
+
 function startBattle(monster) {
   stopAuto();
-  G.battleInProgress    = false;
-  G.currentMonster      = null;
-  _skillCooldowns  = {};
-  _skillBuffs      = {};
+  G.battleInProgress = false;
+  G.currentMonster   = null;
+  _skillCooldowns    = {};
+  _skillBuffs        = {};
+  G.turnCount        = 0;
+  G.enemyQueue       = []; // legacy clear
 
-  // build enemy queue (boss always 1, others 1-3)
-  const waveSize = _rollWaveSize(monster);
-  G.enemyQueue = [];
-  for (let i = 1; i < waveSize; i++) G.enemyQueue.push({...monster});
+  const waveSize = _buildWave(monster);
+  G.battleInProgress = true;
 
-  const stats = getMonsterStats(G.currentZone, monster.tier, monster.isBoss);
-  G.currentMonster      = {...monster, zone:G.currentZone};
-  G.currentMonsterHp    = stats.maxHp;
-  G.currentMonsterMaxHp = stats.maxHp;
-  G.battleInProgress    = true;
-  G.monsterPoisonTurns  = 0;
-  G.monsterBurnTurns    = 0;
-  G.turnCount           = 0;
+  const stats = { maxHp: G.enemies[0].maxHp, atk: G.enemies[0].atk };
   showBattleContent(monster, stats);
   const waveLabel = waveSize > 1 ? ` (${waveSize} ตัว!)` : '';
   logBattle(`<span class="log-sys">⚔ เริ่มต่อสู้กับ ${monster.name}!${waveLabel} HP:${stats.maxHp} ATK:${stats.atk}</span>`);
@@ -1428,19 +1455,10 @@ function showBattleContent(monster, stats) {
     playerEl.innerHTML = playerSvg;
   }
 
-  // Inject monster sprite
-  const monsterEl = document.getElementById('pixel-monster');
-  if (monsterEl) {
-    monsterEl.innerHTML = getMonsterSprite(monster.name, monster.isBoss, G.currentZone, monster.img);
-    monsterEl.classList.remove('die-anim','shake-anim','spawn-anim');
-  }
+  // Render all enemies
+  renderEnemyCards();
 
-  // Enemy info panel
-  _setEnemyInfo(monster, stats);
-
-  updateMonsterHpBar();
   updateBattlePlayerStatus();
-  renderEnemyQueue();
   document.getElementById('btn-attack').disabled = false;
 
   // Close skill menu if open
@@ -1456,6 +1474,7 @@ function showBattleContent(monster, stats) {
 }
 
 function _setEnemyInfo(monster, stats) {
+  // legacy — kept for skill paths that call it directly
   const nameEl = document.getElementById('battle-enemy-name');
   const typeEl = document.getElementById('battle-enemy-type');
   const atkEl  = document.getElementById('battle-enemy-atk');
@@ -1465,30 +1484,84 @@ function _setEnemyInfo(monster, stats) {
 }
 
 function renderEnemyQueue() {
+  // legacy — not shown in multi-enemy mode (cards replace this)
   const el = document.getElementById('battle-enemy-queue');
-  if (!el) return;
-  const queue = G.enemyQueue || [];
-  if (queue.length === 0) { el.innerHTML = ''; return; }
-  el.innerHTML = queue.map(m =>
-    `<span class="eq-badge">${m.sprite||'👾'} ${m.name}</span>`
-  ).join('');
+  if (el) el.innerHTML = '';
+}
+
+// ── Multi-enemy card rendering ──────────────────────────────────
+function renderEnemyCards() {
+  const container = document.getElementById('battle-enemy-side');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const enemies = G.enemies || [];
+  const alive   = enemies.filter(e => !e.dead);
+  if (alive.length === 0) return;
+
+  // Wrapper for all cards
+  const cardsWrap = document.createElement('div');
+  cardsWrap.id = 'enemy-cards-wrap';
+  cardsWrap.className = `enemy-count-${Math.min(alive.length, 3)}`;
+
+  enemies.forEach((e, idx) => {
+    if (e.dead) return;
+    const isTarget = (idx === G.targetIndex);
+    const pct = Math.max(0, (e.hp / e.maxHp) * 100);
+    const hpColor = pct > 50
+      ? 'linear-gradient(90deg,#cc0000,#ff4444)'
+      : pct > 25
+        ? 'linear-gradient(90deg,#cc6600,#ff9900)'
+        : 'linear-gradient(90deg,#880000,#ff2200)';
+
+    const card = document.createElement('div');
+    card.className = 'enemy-card' + (isTarget ? ' targeted' : '');
+    card.dataset.idx = idx;
+    card.onclick = () => selectTarget(idx);
+
+    card.innerHTML = `
+      <div class="enemy-card-info">
+        <div class="enemy-card-name">${e.name}${e.isBoss ? ' 👑' : ''}</div>
+        <div class="enemy-card-hp-wrap">
+          <div class="enemy-card-hp-fill" style="width:${pct}%;background:${hpColor}"></div>
+          <div class="enemy-card-hp-text">${Math.max(0,e.hp)}/${e.maxHp}</div>
+        </div>
+        <div class="enemy-card-atk">ATK: ${e.atk}${isTarget ? ' 🎯' : ''}</div>
+      </div>
+      <div class="enemy-card-sprite" id="enemy-sprite-${idx}">
+        ${getMonsterSprite(e.name, e.isBoss, G.currentZone, e.img)}
+      </div>`;
+
+    cardsWrap.appendChild(card);
+  });
+
+  container.appendChild(cardsWrap);
+
+  // legacy sync for updateMonsterHpBar() calls in skill paths
+  _syncLegacyFromTarget();
+  const legName = document.getElementById('mon-name'); if (legName) legName.textContent = (G.enemies[G.targetIndex]||{}).name||'';
+}
+
+function selectTarget(idx) {
+  if (!G.enemies[idx] || G.enemies[idx].dead) return;
+  G.targetIndex = idx;
+  _syncLegacyFromTarget();
+  renderEnemyCards();
 }
 
 function hideBattleContent() {
   stopAuto();
-  G.battleInProgress = false;
-  G.currentMonster   = null;
-  G.currentMonsterHp = 0;
+  G.battleInProgress    = false;
+  G.currentMonster      = null;
+  G.currentMonsterHp    = 0;
   G.currentMonsterMaxHp = 0;
-  G.enemyQueue       = [];
-  G.monsterPoisonTurns = 0;
-  G.monsterBurnTurns   = 0;
-  G.turnCount = 0;
+  G.enemyQueue          = [];
+  G.enemies             = [];
+  G.targetIndex         = 0;
+  G.monsterPoisonTurns  = 0;
+  G.monsterBurnTurns    = 0;
+  G.turnCount           = 0;
 
-  const queueEl = document.getElementById('battle-enemy-queue');
-  if (queueEl) queueEl.innerHTML = '';
-
-  // Close skill menu
   const sm = document.getElementById('rpg-skill-menu');
   if (sm) sm.classList.remove('open');
 
@@ -1496,7 +1569,6 @@ function hideBattleContent() {
   document.getElementById('monster-list-area').style.display = 'block';
   document.getElementById('btn-attack').disabled = false;
 
-  // Legacy hidden arena
   const arena = document.getElementById('pixel-battle-arena');
   if (arena) { arena.innerHTML = ''; arena.style.display = 'none'; }
 
@@ -1504,23 +1576,31 @@ function hideBattleContent() {
 }
 
 function updateMonsterHpBar() {
-  const pct = Math.max(0, (G.currentMonsterHp / G.currentMonsterMaxHp) * 100);
-  const fill = document.getElementById('battle-enemy-hp-fill');
-  const txt  = document.getElementById('battle-enemy-hp-text');
-  if (fill) {
-    fill.style.width = pct + '%';
-    fill.style.background = pct > 50
-      ? 'linear-gradient(90deg,#cc0000,#ff4444)'
-      : pct > 25
-        ? 'linear-gradient(90deg,#cc6600,#ff9900)'
-        : 'linear-gradient(90deg,#880000,#ff2200)';
+  // Update the specific targeted enemy card's HP bar in-place
+  const e = G.enemies && G.enemies[G.targetIndex];
+  if (e) {
+    e.hp = G.currentMonsterHp; // write back from legacy field
+    const card = document.querySelector(`.enemy-card[data-idx="${G.targetIndex}"]`);
+    if (card) {
+      const pct = Math.max(0, (e.hp / e.maxHp) * 100);
+      const fill = card.querySelector('.enemy-card-hp-fill');
+      const txt  = card.querySelector('.enemy-card-hp-text');
+      if (fill) {
+        fill.style.width = pct + '%';
+        fill.style.background = pct > 50
+          ? 'linear-gradient(90deg,#cc0000,#ff4444)'
+          : pct > 25
+            ? 'linear-gradient(90deg,#cc6600,#ff9900)'
+            : 'linear-gradient(90deg,#880000,#ff2200)';
+      }
+      if (txt) txt.textContent = `${Math.max(0,e.hp)}/${e.maxHp}`;
+    }
   }
-  if (txt) txt.textContent = `${Math.max(0, G.currentMonsterHp)}/${G.currentMonsterMaxHp}`;
-  // keep legacy hidden elements in sync (some skill paths read mon-hp-bar)
+  // legacy hidden elements sync
   const legBar = document.getElementById('mon-hp-bar');
-  if (legBar) legBar.style.width = pct + '%';
+  if (legBar) legBar.style.width = Math.max(0,(G.currentMonsterHp/G.currentMonsterMaxHp)*100) + '%';
   const legTxt = document.getElementById('mon-hp-text');
-  if (legTxt) legTxt.textContent = `${Math.max(0, G.currentMonsterHp)}/${G.currentMonsterMaxHp}`;
+  if (legTxt) legTxt.textContent = `${Math.max(0,G.currentMonsterHp)}/${G.currentMonsterMaxHp}`;
 }
 
 function updateBattlePlayerStatus() {
@@ -2016,7 +2096,13 @@ function playerAttack() {
   if (_skillBuffs.deathMark > 0) { atk = Math.floor(atk * 4); _skillBuffs.deathMark--; logBattle(`<span class="log-crit">☠ ตราชีวิตระเบิด! ×4 ดาเมจ</span>`); }
   if (isCrit) { atk = Math.floor(atk * 2); G.critCount = (G.critCount || 0) + 1; }
 
-  G.currentMonsterHp -= atk;
+  // Write damage to multi-enemy array
+  if (G.enemies && G.enemies[G.targetIndex]) {
+    G.enemies[G.targetIndex].hp -= atk;
+    G.currentMonsterHp = G.enemies[G.targetIndex].hp; // keep legacy in sync
+  } else {
+    G.currentMonsterHp -= atk;
+  }
   G.turnCount++;
   tickSkillCooldowns();
   if (typeof tickWeatherBuff === 'function') tickWeatherBuff();
@@ -2036,32 +2122,38 @@ function playerAttack() {
   playSound('attack');
   floatDamage(atk, true, isCrit);
 
-  // DoT on monster
+  // DoT on monster (target)
   const monStats = getMonsterStats(G.currentZone, G.currentMonster.tier, G.currentMonster.isBoss);
+  const _applyDoTDmg = (dmg) => {
+    G.currentMonsterHp -= dmg;
+    if (G.enemies && G.enemies[G.targetIndex]) G.enemies[G.targetIndex].hp = G.currentMonsterHp;
+  };
   if (G.monsterPoisonTurns > 0) {
     const pdmg = Math.floor(monStats.maxHp * .05);
-    G.currentMonsterHp -= pdmg;
+    _applyDoTDmg(pdmg);
     logBattle(`<span class="log-dmg">☠ พิษ ${pdmg} ดาเมจ</span>`);
     G.monsterPoisonTurns--;
+    if (G.enemies && G.enemies[G.targetIndex]) G.enemies[G.targetIndex].poisonTurns = G.monsterPoisonTurns;
   }
   if (G.monsterBurnTurns > 0) {
     const bdmg = Math.floor(monStats.maxHp * .05);
-    G.currentMonsterHp -= bdmg;
+    _applyDoTDmg(bdmg);
     logBattle(`<span class="log-dmg">🔥 เผา ${bdmg} ดาเมจ</span>`);
     G.monsterBurnTurns--;
+    if (G.enemies && G.enemies[G.targetIndex]) G.enemies[G.targetIndex].burnTurns = G.monsterBurnTurns;
   }
   if ((_skillBuffs.meteorDoT||0) > 0) {
     const meteorDmg = Math.floor(monStats.maxHp * 0.15);
-    G.currentMonsterHp -= meteorDmg;
+    _applyDoTDmg(meteorDmg);
     logBattle(`<span class="log-dmg">🌠 ดาวตก DoT ${meteorDmg} ดาเมจ</span>`);
     _skillBuffs.meteorDoT--;
   }
 
   updateMonsterHpBar();
 
-  // shake monster sprite
-  const monEl = document.getElementById('pixel-monster');
-  if (monEl) { monEl.classList.add('shake-anim'); setTimeout(() => monEl.classList.remove('shake-anim'), 300); }
+  // shake target enemy sprite
+  const targetCard = document.querySelector(`.enemy-card[data-idx="${G.targetIndex}"]`);
+  if (targetCard) { targetCard.classList.add('shake-anim'); setTimeout(() => targetCard.classList.remove('shake-anim'), 300); }
 
   if (G.currentMonsterHp <= 0) { monsterDie(); return; }
   updateBattlePlayerStatus();
@@ -2072,7 +2164,20 @@ function playerAttack() {
 
 function monsterAttack() {
   if (!G.battleInProgress) return;
-  const stats  = getMonsterStats(G.currentZone, G.currentMonster.tier, G.currentMonster.isBoss);
+
+  // Multi-enemy: each alive enemy attacks once
+  const aliveEnemies = (G.enemies || []).filter(e => !e.dead);
+  if (aliveEnemies.length > 1) {
+    aliveEnemies.forEach(e => _singleMonsterAttack(e));
+    return;
+  }
+  // Single enemy (or fallback): use legacy path
+  _singleMonsterAttack(G.currentMonster);
+}
+
+function _singleMonsterAttack(enemyObj) {
+  if (!G.battleInProgress || G.hp <= 0) return;
+  const stats  = getMonsterStats(G.currentZone, enemyObj.tier, enemyObj.isBoss);
   let monAtk   = stats.atk;
   const weapon = G.equippedWeaponId ? G.inventory.find(i => i.uid === G.equippedWeaponId) : null;
   if (weapon && weapon.effect && weapon.effect.includes('ชะลอ')) monAtk = Math.floor(monAtk * .9);
@@ -2092,6 +2197,7 @@ function monsterAttack() {
   if (_skillBuffs.eternalFortress > 0) {
     const counterDmg = Math.floor((G.baseAtk + ((typeof getEquippedStatBonus==='function'?getEquippedStatBonus():{atk:0}).atk||0)) * 3);
     G.currentMonsterHp -= counterDmg;
+    if (G.enemies && G.enemies[G.targetIndex]) G.enemies[G.targetIndex].hp = G.currentMonsterHp;
     dmgTaken = 0;
     _skillBuffs.eternalFortress--;
     logBattle(`<span class="log-crit">🏯 ปราการตอบโต้! ${counterDmg} ดาเมจ (บล็อกดาเมจ)</span>`);
@@ -2099,6 +2205,7 @@ function monsterAttack() {
   if (_skillBuffs.divineRadiance > 0) {
     const radDmg = Math.floor((G.baseAtk + ((typeof getEquippedStatBonus==='function'?getEquippedStatBonus():{atk:0}).atk||0)) * 2);
     G.currentMonsterHp -= radDmg;
+    if (G.enemies && G.enemies[G.targetIndex]) G.enemies[G.targetIndex].hp = G.currentMonsterHp;
     dmgTaken = Math.floor(dmgTaken * 0.3);
     _skillBuffs.divineRadiance--;
     logBattle(`<span class="log-crit">☀️ แสงตอบโต้! ${radDmg} ดาเมจ (-70% DMG รับ)</span>`);
@@ -2106,10 +2213,10 @@ function monsterAttack() {
   G.hp = Math.max(0, G.hp - dmgTaken);
   if (dmgTaken > 0) {
     G.totalDmgTaken = (G.totalDmgTaken || 0) + dmgTaken;
-    logBattle(`<span class="log-dmg">💔 ${G.currentMonster.name} โจมตี ${dmgTaken} ดาเมจ${_skillBuffs.ironShield > 0 ? ' (Iron Shield)' : ''}</span>`);
+    logBattle(`<span class="log-dmg">💔 ${enemyObj.name} โจมตี ${dmgTaken} ดาเมจ${_skillBuffs.ironShield > 0 ? ' (Iron Shield)' : ''}</span>`);
     _flashArena('#ff0000');
   } else {
-    logBattle(`<span class="log-heal">🛡 หลบการโจมตีของ ${G.currentMonster.name}!</span>`);
+    logBattle(`<span class="log-heal">🛡 หลบการโจมตีของ ${enemyObj.name}!</span>`);
   }
   playSound('hit');
   floatDamage(dmgTaken, false, false);
@@ -2174,6 +2281,12 @@ function monsterAttack() {
 function monsterDie() {
   G.battleInProgress = false;
   const monster = G.currentMonster;
+
+  // Mark this enemy as dead in the multi-enemy array
+  if (G.enemies && G.enemies[G.targetIndex]) {
+    G.enemies[G.targetIndex].dead = true;
+  }
+
   const key = `${G.currentZone}_${monster.tier}`;
   G.defeatedMonsters[key] = true;
   G.totalKills++;
@@ -2241,12 +2354,16 @@ function monsterDie() {
   updateDailyQuestProgress('dailyKills');
   if (monster.isBoss) updateDailyQuestProgress('dailyBossKills');
 
-  // monster die animation + particle burst
-  const monEl = document.getElementById('pixel-monster');
-  if (monEl) {
-    monEl.classList.add('die-anim');
-    _spawnKillParticles(monEl, monster.isBoss);
+  // monster die animation + particle burst on the target card
+  const dyingCard = document.querySelector(`.enemy-card[data-idx="${G.targetIndex}"]`);
+  const dyingSprite = dyingCard ? dyingCard.querySelector('.enemy-card-sprite') : null;
+  if (dyingSprite) {
+    dyingSprite.classList.add('die-anim');
+    _spawnKillParticles(dyingSprite, monster.isBoss);
   }
+  // legacy element (some paths reference pixel-monster)
+  const monEl = document.getElementById('pixel-monster');
+  if (monEl) monEl.classList.add('die-anim');
 
   logBattle(`<span class="log-exp">🏆 ${monster.name} ตาย! +${expGain} EXP 💰+${goldGain}${dropChest ? ` 📦 หีบ${dropChest==='boss'?'บอส':dropChest==='rare'?'หายาก':dropChest==='uncommon'?'พิเศษ':'ธรรมดา'}` : ''} [Kill #${G.sessionKills}]</span>`);
 
@@ -2265,16 +2382,29 @@ function monsterDie() {
 
   setTimeout(() => {
     if (G.hp > 0) {
-      if (G.enemyQueue && G.enemyQueue.length > 0) {
-        // next enemy in this wave
-        const next = G.enemyQueue.shift();
-        spawnNextEnemy(next, monster);
+      const aliveRemaining = (G.enemies || []).filter(e => !e.dead);
+      if (aliveRemaining.length > 0) {
+        // More enemies still alive in this wave — switch target to first alive
+        const nextIdx = G.enemies.findIndex(e => !e.dead);
+        G.targetIndex = nextIdx;
+        _syncLegacyFromTarget();
+        G.battleInProgress = true;
+        renderEnemyCards();
+        document.getElementById('btn-attack').disabled = false;
+        renderSkillBar();
+        logBattle(`<span class="log-sys">⚔ เหลือ ${aliveRemaining.length} ตัว! เลือกเป้าหมาย</span>`);
       } else {
-        // wave clear — start new wave with same monster type
-        const waveSize = _rollWaveSize(monster);
-        G.enemyQueue = [];
-        for (let i = 1; i < waveSize; i++) G.enemyQueue.push({...monster});
-        spawnSameMonster(monster);
+        // All dead — spawn new wave
+        _buildWave(monster);
+        G.battleInProgress = true;
+        const stats = { maxHp: G.enemies[0].maxHp, atk: G.enemies[0].atk };
+        const waveSize = G.enemies.length;
+        renderEnemyCards();
+        updateBattlePlayerStatus();
+        document.getElementById('btn-attack').disabled = false;
+        renderSkillBar();
+        const waveLabel = waveSize > 1 ? ` (${waveSize} ตัว!)` : '';
+        logBattle(`<span class="log-sys">⚔ ${monster.name} เกิดใหม่!${waveLabel} HP:${stats.maxHp}</span>`);
       }
     } else {
       hideBattleContent();
