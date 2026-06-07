@@ -16,7 +16,7 @@ function giveExp(amount) {
     G.hp = Math.min(G.hp + 10, G.maxHp);
     G.baseAtk += 2;
     G.baseDef += 1;
-    G.skillPoints++;
+    if (typeof refreshSkillPoints === 'function') refreshSkillPoints();
     leveled = true;
     logBattle(`<span class="log-sys">⭐ เลเวลอัพ! ตอนนี้ LV ${G.level}!</span>`);
     showLevelUpEffect();
