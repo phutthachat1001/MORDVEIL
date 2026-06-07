@@ -23,6 +23,8 @@ body{
 h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 
 /* SCREEN MANAGEMENT */
+/* body starts invisible — JS removes this after layout is determined to prevent flash */
+body.preload{visibility:hidden}
 .screen{display:none;min-height:100vh}
 .screen.active{display:flex}
 

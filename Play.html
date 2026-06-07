@@ -20,6 +20,7 @@
 
     // ── swap video sources for mobile ──
     const homeSrc = document.getElementById('bg-home-src');
+
     if (homeSrc && isMob) {
       homeSrc.src = 'assets/bg/bg_home_mb.mp4';
     }
@@ -53,6 +54,9 @@
         v._fading = false;
       }, 80);
     });
+
+    // Layout is ready — reveal the page (prevents desktop→mobile flash)
+    document.body.classList.remove('preload');
   });
 })();
 </script>
@@ -108,7 +112,7 @@
   .btn-img-only:active { transform: scale(0.97); }
 </style>
 </head>
-<body>
+<body class="preload">
 
 <!-- ===== FADE OVERLAY ===== -->
 <div id="fade-overlay" style="display:none;position:fixed;inset:0;background:#000;z-index:9999;opacity:0;transition:opacity .6s ease;pointer-events:none"></div>
