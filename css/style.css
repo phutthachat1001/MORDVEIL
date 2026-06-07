@@ -686,15 +686,24 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 
 /* hub responsive */
 @media(max-width:700px){
-  .hub-scene{height:210px;padding:0;overflow:hidden}
+  /* hub-screen: leave space for bottom nav */
+  #hub-screen{bottom:58px!important}
+
+  /* hub-scene: positioned at bottom of hub area */
+  .hub-scene{height:180px;padding:0;overflow:visible}
+
+  /* hub video: cover + anchor to bottom so the NPC/street area is always visible */
+  #hub-bg-video{object-fit:cover!important;object-position:center bottom!important}
+
   .hub-building{width:80px!important;height:100px!important}
-  /* NPC sprite — img and svg both 72px on mobile */
-  .hub-npc-sprite svg{width:54px!important;height:86px!important}
-  .hub-npc-sprite img{width:72px!important;height:72px!important}
+  /* NPC sprite — img 68px, svg 50px on mobile */
+  .hub-npc-sprite svg{width:50px!important;height:80px!important}
+  .hub-npc-sprite img{width:68px!important;height:68px!important}
   .hub-dlg-portrait-wrap{width:90px;min-width:90px}
   .hub-dlg-portrait svg{width:42px!important;height:66px!important}
-  .hub-panel{width:92%;right:4%;top:8%}
-  .hub-town-name{font-size:1.1rem}
+  .hub-panel{width:92%;right:4%;top:4%;max-height:80vh;overflow-y:auto}
+  .hub-town-title{top:1%}
+  .hub-town-name{font-size:1rem}
   .hub-town-sub{display:none}
   .hub-bg-sun{width:55px;height:55px}
   .hub-cloud{filter:blur(5px)}
@@ -702,13 +711,13 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   .hub-person{display:none}
   .hub-cart{display:none}
   .hub-lamp{display:none}
-  /* NPC name tag — small, fits under 72px sprite */
-  .hub-npc-name-tag{font-size:.56rem!important;margin-top:.1rem;padding:.06rem .22rem!important;
-    -webkit-text-stroke:1px #000!important;background:rgba(0,0,0,.55)!important;border-radius:3px}
-  /* Hide role-tag on mobile to save vertical space */
+  /* NPC name tag */
+  .hub-npc-name-tag{font-size:.56rem!important;margin-top:.08rem;padding:.05rem .2rem!important;
+    -webkit-text-stroke:1px #000!important;background:rgba(0,0,0,.6)!important;border-radius:3px}
   .hub-npc-role-tag{display:none}
-  /* shadow smaller */
-  .hub-npc-shadow{width:40px!important;height:8px!important}
+  .hub-npc-shadow{width:38px!important;height:7px!important}
+  /* dialogue box: taller on mobile so actions visible */
+  .hub-dialogue-box{max-height:50vh;overflow-y:auto}
 }
 
 /* LEVEL UP */
@@ -1075,14 +1084,22 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
     overflow-y: auto;
     padding: .5rem;
   }
-  /* world map wrap — shrink to fit, don't push arena down */
+  /* world map wrap — fixed height, no overflow */
   #battle-map-wrap {
     flex-shrink: 0;
-    max-height: 38vh;
+    max-height: 42vh;
     overflow: hidden;
   }
   #battle-map-wrap .map-container {
-    max-height: 34vh;
+    max-height: 42vh;
+    overflow: hidden;
+  }
+  #battle-map-wrap .map-img {
+    width: 100%;
+    height: auto;
+    max-height: 40vh;
+    object-fit: contain;
+    display: block;
   }
 
   /* quest panel pane heights */

@@ -1129,10 +1129,12 @@ function renderHubScene() {
   scene.innerHTML = '';
 
   const mob = window.innerWidth <= 700;
-  // on mobile: evenly space 5 NPCs at 10%, 28%, 48%, 68%, 88%
-  // bottom adjusted so sprite+name fits inside hub-scene (210px)
-  const mobilePos  = ['10%','28%','48%','68%','88%'];
-  const bottomPx   = mob ? 42 : 80;
+  // mobile: video 1280x720 cover on portrait → shows ~center 390px of 1398px render width
+  // visible horizontal range ≈ px 504–894 of original 1280px video
+  // NPC positions calculated as % of screen width to match building locations in video
+  // Building A (left) center ≈ screen 15–20%, Building B (right) center ≈ screen 58–65%
+  const mobilePos  = ['12%','27%','48%','63%','80%'];
+  const bottomPx   = mob ? 35 : 80;
   // name tag inline style — smaller on mobile
   const nameStyle  = mob
     ? `color:${'{color}'};font-size:.62rem;font-weight:700;-webkit-text-stroke:1.5px #000;paint-order:stroke fill;text-shadow:0 1px 6px #000;background:rgba(0,0,0,.55);padding:.06rem .28rem;border-radius:3px;`
