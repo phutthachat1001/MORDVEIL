@@ -53,9 +53,17 @@ function renderMonsterList() {
       ? `<img src="assets/sprites/${m.img}.png" style="width:48px;height:48px;object-fit:contain;display:block;margin:0 auto" onerror="this.outerHTML='${m.sprite}'">`
       : m.sprite;
     btn.innerHTML  = `${monIcon}<br>${m.name}${m.isBoss ? '<br>👑BOSS' : ''}`;
-    btn.onclick    = () => startBattle(m);
-    btn.onmouseenter = () => _showMonsterDropTooltip(btn, m);
-    btn.onmouseleave = () => hideDropTooltip();
+    // long-press to show drop rates (works on both mobile touch and desktop)
+    let _lpTimer = null;
+    const _lpStart = () => { _lpTimer = setTimeout(() => _showMonsterDropTooltip(btn, m), 400); };
+    const _lpEnd   = () => { clearTimeout(_lpTimer); };
+    btn.addEventListener('mousedown',   _lpStart);
+    btn.addEventListener('touchstart',  _lpStart, {passive:true});
+    btn.addEventListener('mouseup',     _lpEnd);
+    btn.addEventListener('mouseleave',  () => { _lpEnd(); hideDropTooltip(); });
+    btn.addEventListener('touchend',    () => { _lpEnd(); setTimeout(hideDropTooltip, 1500); });
+    btn.addEventListener('touchcancel', _lpEnd);
+    btn.onclick = () => startBattle(m);
     grid.appendChild(btn);
   });
   area.innerHTML = '';
@@ -1530,16 +1538,16 @@ function renderEnemyCards() {
     card.onclick = () => selectTarget(idx);
 
     card.innerHTML = `
+      <div class="enemy-card-sprite" id="enemy-sprite-${idx}">
+        ${getMonsterSprite(e.name, e.isBoss, G.currentZone, e.img)}
+      </div>
       <div class="enemy-card-info">
         <div class="enemy-card-name">${e.name}${e.isBoss ? ' 👑' : ''}</div>
         <div class="enemy-card-hp-wrap">
           <div class="enemy-card-hp-fill" style="width:${pct}%;background:${hpColor}"></div>
           <div class="enemy-card-hp-text">${Math.max(0,e.hp)}/${e.maxHp}</div>
         </div>
-        <div class="enemy-card-atk">ATK: ${e.atk}${isTarget ? ' 🎯' : ''}</div>
-      </div>
-      <div class="enemy-card-sprite" id="enemy-sprite-${idx}">
-        ${getMonsterSprite(e.name, e.isBoss, G.currentZone, e.img)}
+        <div class="enemy-card-atk">ATK: ${e.atk}</div>
       </div>`;
 
     cardsWrap.appendChild(card);
@@ -2161,9 +2169,24 @@ function playerAttack() {
 
   updateMonsterHpBar();
 
-  // shake target enemy sprite
+  // shake + hit flash on target enemy card
   const targetCard = document.querySelector(`.enemy-card[data-idx="${G.targetIndex}"]`);
-  if (targetCard) { targetCard.classList.add('shake-anim'); setTimeout(() => targetCard.classList.remove('shake-anim'), 300); }
+  if (targetCard) {
+    targetCard.classList.add('shake-anim');
+    setTimeout(() => targetCard.classList.remove('shake-anim'), 300);
+    // flash white on sprite
+    const sprite = targetCard.querySelector('.enemy-card-sprite');
+    if (sprite) {
+      sprite.classList.add('hit-flash');
+      setTimeout(() => sprite.classList.remove('hit-flash'), 350);
+    }
+    // slash fx overlay
+    const slash = document.createElement('span');
+    slash.className = 'slash-fx';
+    slash.textContent = '⚡';
+    targetCard.appendChild(slash);
+    setTimeout(() => slash.remove(), 400);
+  }
 
   if (G.currentMonsterHp <= 0) { monsterDie(); return; }
   updateBattlePlayerStatus();
