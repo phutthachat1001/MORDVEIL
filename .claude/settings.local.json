@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(\\(Get-Content \"c:\\\\Work Adventure\\\\css\\\\style.css\" | Measure-Object -Line\\).Lines)",
+      "PowerShell(node -e \"require\\('fs'\\).readFileSync\\('c:/Users/dorlo/Desktop/Work Adventure/js/hub.js','utf8'\\)\" 2>&1)",
+      "PowerShell(node --check \"c:/Users/dorlo/Desktop/Work Adventure/js/hub.js\" 2>&1)",
+      "PowerShell(node --check \"c:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\js\\\\battle.js\" 2>&1)",
+      "PowerShell(if \\($?\\) { \"OK: battle.js\" } else { \"ERROR: battle.js\" })",
+      "PowerShell(node --check \"c:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\js\\\\inventory.js\" 2>&1)",
+      "PowerShell(if \\($?\\) { \"OK: inventory.js\" } else { \"ERROR: inventory.js\" })",
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\css\\\\style.css\"\\).Count)",
+      "PowerShell(Select-String -Path \"c:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\js\\\\cosmetic.js\" -Pattern \"function \" | Select-Object -First 20 | ForEach-Object { $_.Line.Trim\\(\\) })",
+      "PowerShell(Select-String -Path \"c:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\Play.html\" -Pattern \"char-avatar\" | ForEach-Object { \"$\\($_.LineNumber\\): $\\($_.Line.Trim\\(\\)\\)\" })",
+      "PowerShell(Start-Process \"C:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\Play.html\")",
+      "PowerShell(Start-Process \"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" -ArgumentList \"--new-window `\"C:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\Play.html`\"\" -ErrorAction SilentlyContinue)",
+      "PowerShell(Start-Process \"msedge.exe\" -ArgumentList \"--new-window `\"C:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\Play.html`\"\" -ErrorAction SilentlyContinue)",
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "PowerShell(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\assets\\\\icons\")",
+      "PowerShell(Start-Process \"c:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\assets\\\\icons\\\\gen-icons.html\")",
+      "PowerShell(Start-Process powershell -ArgumentList \"-NoExit -Command `\"& 'c:\\\\Users\\\\dorlo\\\\Desktop\\\\Work Adventure\\\\serve.ps1'`\"\")"
+    ]
+  }
+}

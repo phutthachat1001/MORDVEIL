@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mordveil">
+<meta name="theme-color" content="#1a0a2e">
+<title>Mordveil — Work Quest RPG</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    const v = document.getElementById('bg-video');
+    if (!v) return;
+
+    // Smooth loop: start fading 1.2s before end, seek to start, fade back in
+    v.addEventListener('timeupdate', function(){
+      if (!v.duration) return;
+      const remaining = v.duration - v.currentTime;
+      if (remaining <= 1.2 && !v._fading) {
+        v._fading = true;
+        v.classList.add('fade-out');
+      }
+    });
+
+    v.addEventListener('ended', function(){
+      v.currentTime = 0;
+      v.play();
+      // Small delay so seek settles, then fade back in
+      setTimeout(function(){
+        v.classList.remove('fade-out');
+        v._fading = false;
+      }, 80);
+    });
+  });
+})();
+</script>
+<style>
+  .intro-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0;
+    position: fixed;
+    bottom: 2vh;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #continue-hint {
+    position: fixed;
+    bottom: 0.3vh;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .btn-continue-main {
+    background: linear-gradient(135deg, #1a3a1a, #0f2e0f) !important;
+    border: 2px solid #4caf50 !important;
+    color: #7dff7d !important;
+    box-shadow: 0 0 18px rgba(76,175,80,.35);
+    min-width: 260px;
+  }
+  .btn-continue-main:hover {
+    background: linear-gradient(135deg, #224422, #173017) !important;
+    box-shadow: 0 0 28px rgba(76,175,80,.6);
+  }
+  .btn-newgame-main {
+    background: linear-gradient(135deg, #2d1b4e, #1a0f2e) !important;
+    border: 2px solid var(--purple) !important;
+    opacity: .85;
+    min-width: 260px;
+  }
+  .btn-newgame-main:hover { opacity: 1; }
+  .btn-img-only {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform .15s, filter .15s;
+  }
+  .btn-img-only img {
+    width: 220px;
+    display: block;
+  }
+  .btn-img-only:hover { transform: scale(1.05); filter: brightness(1.15); }
+  .btn-img-only:active { transform: scale(0.97); }
+</style>
+</head>
+<body>
+
+<!-- ===== FADE OVERLAY ===== -->
+<div id="fade-overlay" style="display:none;position:fixed;inset:0;background:#000;z-index:9999;opacity:0;transition:opacity .6s ease;pointer-events:none"></div>
+
+<!-- ===== BG VIDEO ===== -->
+<video id="bg-video" autoplay muted playsinline preload="auto">
+  <source src="assets/bg/bg_home.mp4" type="video/mp4">
+</video>
+
+<!-- ===== LORE POPUP ===== -->
+<div id="lore-popup-overlay" onclick="closeLorePopup()">
+  <div class="intro-stone">
+    <svg class="intro-stone-img" viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <ellipse cx="170" cy="215" rx="148" ry="7" fill="#000" opacity=".5"/>
+      <rect x="12" y="18" width="316" height="190" rx="6" fill="#3a3020"/>
+      <path d="M12,60 Q12,18 60,18 L280,18 Q328,18 328,60" fill="#3a3020"/>
+      <rect x="20" y="26" width="300" height="174" rx="4" fill="#4a3e28"/>
+      <path d="M20,64 Q20,26 60,26 L280,26 Q320,26 320,64" fill="#4a3e28"/>
+      <rect x="30" y="36" width="280" height="155" rx="3" fill="#3e3220"/>
+      <rect x="20" y="26" width="300" height="2" rx="1" fill="#6a5a38" opacity=".7"/>
+      <rect x="20" y="26" width="2" height="174" rx="1" fill="#6a5a38" opacity=".5"/>
+      <rect x="20" y="198" width="300" height="2" rx="1" fill="#1a1208" opacity=".8"/>
+      <rect x="318" y="26" width="2" height="174" rx="1" fill="#1a1208" opacity=".6"/>
+      <line x1="200" y1="40" x2="210" y2="70" stroke="#2a2010" stroke-width="1" opacity=".6"/>
+      <line x1="100" y1="110" x2="108" y2="140" stroke="#2a2010" stroke-width="1" opacity=".4"/>
+      <rect x="32" y="38" width="3" height="2" fill="#3a5020" opacity=".6"/>
+      <rect x="36" y="40" width="2" height="2" fill="#4a6030" opacity=".5"/>
+      <rect x="300" y="180" width="4" height="2" fill="#3a5020" opacity=".5"/>
+      <rect x="298" y="183" width="3" height="2" fill="#4a6030" opacity=".4"/>
+      <text x="170" y="56" text-anchor="middle" font-size="9" fill="#8a7040" opacity=".8" font-family="serif">— ✦ จารึกแห่งนักผจญภัย ✦ —</text>
+      <text x="170" y="186" text-anchor="middle" font-size="8" fill="#7a6030" opacity=".7" font-family="serif">⚔ ✧ ⚔ ✧ ⚔ ✧ ⚔</text>
+    </svg>
+    <div class="intro-stone-text">
+      <div class="stone-title">— คำจารึก —</div>
+      <p>ในยุคที่ <b>ความขยัน</b> คือพลังแท้จริง...</p>
+      <p>โลกแห่ง<b>ความสงบ</b>ถูกกลืนกินโดยความมืด</p>
+      <p>มอนสเตอร์ผุดขึ้นทุกแห่งหน</p>
+      <p>แต่มีผู้เลือก — <b>นักผจญภัย</b></p>
+      <p style="margin-top:.4rem;color:#c8a860;font-size:.82rem">ผู้ทำงานจริง จะได้พลังจริง</p>
+      <p style="margin-top:.6rem;color:#8a7050;font-size:.75rem">— แตะเพื่อปิด —</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== INTRO ===== -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-buttons">
+    <button class="btn-img-only" id="btn-continue" onclick="continueGame()" style="display:none"><img src="assets/button/playnext.png" alt="เล่นต่อ"></button>
+    <button class="btn-img-only" id="btn-new-adventure" onclick="confirmNewGame()"><img src="assets/button/newgame.png" alt="เริ่มใหม่"></button>
+  </div>
+  <div style="color:#c8b880;font-size:.85rem;text-shadow:0 1px 4px #000" id="continue-hint"></div>
+</div>
+
+<!-- ===== MODE SELECT ===== -->
+<div id="screen-mode" class="screen">
+  <h2 style="font-size:1.6rem;margin-bottom:.3rem">⚔ เลือกโหมดการเล่น</h2>
+  <p class="sub" style="margin-bottom:1.8rem">เลือกประสบการณ์ที่ตรงกับสไตล์ของคุณ</p>
+  <div class="mode-select-grid">
+
+    <div class="mode-card" id="mode-card-working" onclick="selectMode('working')">
+      <div class="mode-icon">💼</div>
+      <div class="mode-name">RPG Working</div>
+      <div class="mode-tag" style="background:#1a3a1a;border-color:#4a9;color:#7dff7d">โหมดดั้งเดิม</div>
+      <ul class="mode-features">
+        <li>✅ เพิ่มงานจริงเพื่อรับ EXP</li>
+        <li>✅ Task deadline bonus</li>
+        <li>✅ Streak จากทำงานต่อเนื่อง</li>
+        <li>✅ Daily quests รายวัน</li>
+        <li>✅ ผสม productivity + RPG</li>
+        <li>⚔ EXP จาก kill มอน (เสริม)</li>
+      </ul>
+      <div class="mode-desc">เล่น RPG ขณะทำงานจริง — ทำงานเสร็จ รับ EXP และสู้มอนสเตอร์</div>
+    </div>
+
+    <div class="mode-card mode-card-rpg" id="mode-card-fullrpg" onclick="selectMode('fullrpg')">
+      <div class="mode-icon">🐉</div>
+      <div class="mode-name">Full RPG</div>
+      <div class="mode-tag" style="background:#2a1a00;border-color:#fa0;color:#fa0">โหมดใหม่!</div>
+      <ul class="mode-features">
+        <li>✅ EXP จาก kill มอนสเตอร์</li>
+        <li>✅ ระบบเควสจาก NPC</li>
+        <li>✅ Grind &amp; สำรวจโลก</li>
+        <li>✅ สมดุล EXP curve แยก</li>
+        <li>✅ เล่นได้ตลอดเวลา</li>
+        <li>❌ ไม่มีระบบ Task / Work</li>
+      </ul>
+      <div class="mode-desc">เล่น RPG แบบเต็มรูปแบบ — รับเควส ล่ามอน เก็บเวล ไม่ต้องมีงานจริง</div>
+    </div>
+
+  </div>
+  <p style="color:var(--text2);font-size:.78rem;margin-top:1.2rem;text-align:center">⚠ โหมดที่เลือกจะใช้ตลอด save นี้ ไม่สามารถเปลี่ยนได้ภายหลัง</p>
+</div>
+
+<!-- ===== CLASS SELECT ===== -->
+<div id="screen-class" class="screen">
+  <h2>⚔ เลือกคลาสตัวละคร</h2>
+  <p class="sub">คลาสที่เลือกจะกำหนดสไตล์การเล่นตลอดเกม</p>
+  <div class="name-row">
+    <label style="color:var(--text2)">ชื่อนักผจญภัย:</label>
+    <input id="player-name-input" type="text" placeholder="ใส่ชื่อของคุณ" maxlength="20">
+  </div>
+  <div class="class-grid" id="class-grid"></div>
+  <button class="btn-confirm" id="btn-confirm-class" disabled onclick="confirmClass()">เริ่มการผจญภัย →</button>
+</div>
+
+<!-- ===== MAIN GAME ===== -->
+<div id="screen-game" class="screen">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <span class="player-name" id="tb-name">นักผจญภัย</span>
+    <span class="level-badge">⭐ LV <span id="tb-level">1</span></span>
+    <div class="exp-bar-wrap" title="EXP">
+      <div class="exp-bar-fill" id="exp-bar" style="width:0%"></div>
+      <div class="exp-text" id="exp-text">0/100</div>
+    </div>
+    <div class="hp-bar-wrap" title="HP">
+      <div class="hp-bar-fill" id="hp-bar" style="width:100%"></div>
+      <div class="hp-text" id="hp-text">100/100</div>
+    </div>
+    <span class="stat-pill">⚔ ATK: <span id="tb-atk">10</span></span>
+    <span class="stat-pill">🛡 DEF: <span id="tb-def">5</span></span>
+    <span class="stat-pill">💰 <span id="tb-gold">0</span></span>
+    <span class="topbar weapon-eq">🗡 <b id="tb-weapon">ไม่มีอาวุธ</b></span>
+    <span id="mode-badge" style="font-size:.75rem;font-weight:700;padding:.15rem .5rem;border-radius:4px;background:rgba(0,0,0,.3);border:1px solid currentColor;margin-left:auto">💼 RPG Working</span>
+    <button onclick="showStats()"        style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">สถิติ</button>
+    <button onclick="showAchievements()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">ความสำเร็จ</button>
+    <button onclick="openMap()" style="background:linear-gradient(135deg,#0f1a30,#1a2a40);border:2px solid #4488ff;color:#88aaff;padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🗺 แผนที่</button>
+    <button onclick="toggleInventoryPopup()" id="topbar-bag-btn" style="background:linear-gradient(135deg,#1a1a10,#2a2010);border:2px solid var(--gold);color:var(--gold);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🎒 กระเป๋า <span style="font-size:.72rem;color:var(--text2)">หีบ:<span id="chest-count-display">0</span> ของ:<span id="inv-count">0</span>/50<span id="inv-full-badge" style="display:none;background:#ff8800;color:#000;border-radius:4px;padding:0 3px;font-size:.6rem;font-weight:700;margin-left:2px">เต็ม!</span></span></button>
+    <button onclick="openShop()" style="background:linear-gradient(135deg,#1a2a40,#0f1a2e);border:2px solid var(--gold);color:var(--gold);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🏪 ร้านค้า</button>
+    <button id="btn-manualsave" onclick="manualSave()" style="background:linear-gradient(135deg,#1a3a1a,#0f2e0f);border:2px solid #4caf50;color:#7dff7d;padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">💾 เซฟ</button>
+    <button class="btn-newgame" onclick="confirmNewGame()">🔄 เริ่มใหม่</button>
+    <button onclick="toggleEventLog()" style="background:linear-gradient(135deg,#1a0f2e,#2a1a4e);border:2px solid var(--purple);color:var(--purple);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem;position:relative">
+      🎲 เหตุการณ์<span id="ev-bag-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:red;color:#fff;border-radius:50%;width:14px;height:14px;font-size:.6rem;text-align:center;line-height:14px">!</span>
+    </button>
+  </div>
+
+  <!-- EVENT: urgent banner -->
+  <div id="ev-urgent-banner" style="display:none;background:linear-gradient(90deg,#3a0000,#1a0000);border-bottom:2px solid #ff4444;color:#ff8888;padding:.3rem 1rem;font-size:.82rem;font-weight:600;text-align:center;cursor:pointer" onclick="switchTab('char')"></div>
+
+  <!-- EVENT: active buffs row (desktop only) -->
+  <div id="ev-active-buffs" style="display:flex;flex-wrap:wrap;gap:.3rem;padding:.3rem 1rem;min-height:28px" class="desktop-only"></div>
+
+  <!-- MOBILE ACTION BAR (ปุ่มที่ซ่อนจาก topbar) -->
+  <div id="mobile-action-bar">
+    <button onclick="showStats()"             style="border-color:var(--border2)">📊 สถิติ</button>
+    <button onclick="showAchievements()"      style="border-color:var(--border2)">🏆 ความสำเร็จ</button>
+    <button onclick="openMap()"               style="border-color:#4488ff;color:#88aaff">🗺 แผนที่</button>
+    <button onclick="toggleInventoryPopup()"  style="border-color:var(--gold);color:var(--gold)">🎒 กระเป๋า <span id="mob-chest-count" style="font-size:.65rem;color:var(--text2)"></span></button>
+    <button onclick="openShop()"              style="border-color:var(--gold);color:var(--gold)">🏪 ร้านค้า</button>
+    <button onclick="manualSave()"            style="border-color:#4caf50;color:#7dff7d">💾 เซฟ</button>
+    <button onclick="confirmNewGame()"        style="border-color:var(--red);color:var(--red)">🔄 เริ่มใหม่</button>
+    <button onclick="toggleEventLog()"        style="border-color:var(--purple);color:var(--purple);position:relative">🎲 เหตุการณ์<span id="mob-ev-badge" style="display:none;position:absolute;top:2px;right:2px;background:red;color:#fff;border-radius:50%;width:10px;height:10px;font-size:.5rem;text-align:center;line-height:10px">!</span></button>
+    <span id="mode-badge-mob" style="font-size:.7rem;font-weight:700;padding:.25rem .5rem;border-radius:4px;background:rgba(0,0,0,.3);border:1px solid;align-self:center;flex-shrink:0">💼 RPG Working</span>
+  </div>
+
+  <div class="main-layout">
+
+    <!-- LEFT: RPG QUEST PANEL (fullrpg mode only) -->
+    <div class="panel" id="panel-rpg-quests" style="display:none">
+      <div class="panel-header" style="display:flex;gap:.3rem;padding:.3rem .4rem">
+        <button class="rpq-tab active" id="rpq-tab-main"  onclick="rpqSwitchTab('main')" >📜 เควส</button>
+        <button class="rpq-tab"        id="rpq-tab-daily" onclick="rpqSwitchTab('daily')">⭐ วันนี้</button>
+      </div>
+      <div class="panel-body" style="padding:.4rem">
+        <div id="rpq-pane-main" style="overflow-y:auto;max-height:calc(100vh - 200px)">
+          <div id="rpg-quest-panel">
+            <div style="color:var(--text2);text-align:center;padding:2rem;font-size:.85rem">กำลังโหลดเควส...</div>
+          </div>
+        </div>
+        <div id="rpq-pane-daily" style="display:none;overflow-y:auto;max-height:calc(100vh - 200px)">
+          <div id="rpg-daily-panel">
+            <div style="color:var(--text2);text-align:center;padding:2rem;font-size:.85rem">กำลังโหลดภารกิจวันนี้...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEFT: TASK PANEL -->
+    <div class="panel" id="panel-left">
+      <div class="panel-header">📋 ภารกิจ</div>
+      <div class="panel-body">
+        <div class="streak-info">
+          🔥 Streak: <span class="streak-val" id="streak-display">0</span> วัน &nbsp;|&nbsp;
+          วันนี้: <span id="today-count">0</span> งาน
+          <span id="streak-bonus-display" style="color:var(--gold);margin-left:.3rem"></span>
+        </div>
+        <div class="task-form">
+          <input id="task-name" type="text" placeholder="ชื่องาน..." maxlength="50">
+          <div class="task-row">
+            <select id="task-diff" style="flex:1" onchange="updateDiffLabel()">
+              <option value="easy">ง่าย (+500–1000 EXP)</option>
+              <option value="medium">ปานกลาง (+1500–2000 EXP)</option>
+              <option value="hard">ยาก (+3000–5000 EXP)</option>
+              <option value="epic">มหาโหด (+6000–12000 EXP)</option>
+            </select>
+            <div id="diff-level-hint" style="font-size:.72rem;color:var(--gold);margin-top:.2rem"></div>
+            <input id="task-deadline" type="date" style="flex:1">
+          </div>
+          <button class="btn-add"       onclick="addTask()">+ เพิ่มงาน</button>
+          <button class="btn-emergency" onclick="addTask(true)">⚡ ภารกิจฉุกเฉิน (+50% EXP รับประกันหีบ)</button>
+        </div>
+        <div class="section-sep"></div>
+        <div class="task-list" id="task-list">
+          <div style="color:var(--text2);text-align:center;font-size:.85rem;padding:1rem">ยังไม่มีงาน เพิ่มงานแรกเลย!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: BATTLE PANEL -->
+    <div class="panel battle-panel" style="border-right:none">
+      <div class="panel-header" style="display:flex;align-items:center;gap:.5rem">
+        <span>⚔ สนามรบ</span>
+        <button id="btn-back-map" onclick="showBattleMap()" style="display:none;margin-left:auto;background:rgba(68,136,255,.15);border:1px solid #4488ff;color:#88aaff;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">🗺 แผนที่</button>
+      </div>
+      <div class="zone-tabs" id="zone-tabs" style="display:none"></div>
+      <!-- WORLD MAP embedded in battle panel -->
+      <div id="battle-map-wrap">
+        <div class="map-container">
+          <img src="assets/bg/map.png" class="map-img" alt="World Map">
+          <svg id="map-path-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible"></svg>
+          <div id="map-pins"></div>
+        </div>
+        <!-- monster list panel ใต้แมพ -->
+        <div id="map-monster-panel" style="display:none;background:rgba(0,0,0,.85);border-top:2px solid var(--border2);padding:.6rem .8rem">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+            <span id="map-monster-zone-label" style="font-family:'Chakra Petch',sans-serif;color:var(--gold);font-size:.9rem;font-weight:700"></span>
+            <button onclick="closeMapMonsterPanel()" style="background:none;border:1px solid var(--border2);color:var(--text2);padding:.1rem .5rem;border-radius:4px;cursor:pointer;font-size:.8rem">✕ ปิด</button>
+          </div>
+          <div id="map-monster-list" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
+        </div>
+      </div>
+      <div class="panel-body battle-arena" id="battle-arena">
+
+        <!-- monster list (แสดงตอนยังไม่เลือกมอน) -->
+        <div id="monster-list-area" style="width:100%;display:block"></div>
+
+        <!-- battle content (ซ่อนจนกว่าจะเลือกมอน) -->
+        <div id="battle-content" style="width:100%;display:none">
+          <!-- pixel art arena -->
+          <div id="pixel-battle-arena" style="display:none"></div>
+          <!-- monster info -->
+          <div class="monster-display">
+            <span class="monster-sprite" id="mon-sprite" style="display:none">👹</span>
+            <div class="monster-name" id="mon-name">มอนสเตอร์</div>
+            <div class="monster-type" id="mon-type">ศัตรู</div>
+            <div class="mon-hp-bar">
+              <div class="mon-hp-fill" id="mon-hp-bar" style="width:100%"></div>
+              <div class="mon-hp-text" id="mon-hp-text">100/100</div>
+            </div>
+            <div class="mon-stats" id="mon-stats">ATK: 10</div>
+          </div>
+          <div class="kill-counter">💀 Kill Count: <span id="kill-counter">0</span></div>
+          <div class="battle-actions">
+            <button class="btn-attack" id="btn-attack" onclick="playerAttack()">⚔ โจมตี</button>
+            <button class="btn-auto"   id="btn-auto"   onclick="toggleAuto()">🤖 Auto</button>
+            <button class="btn-flee"                   onclick="fleeBattle()">🏃 หนี</button>
+          </div>
+          <div class="skill-bar" id="skill-bar"></div>
+        </div>
+
+        <div class="battle-log" id="battle-log">
+          <div class="log-sys">ยินดีต้อนรับสู่ Work Quest! เพิ่มงาน ทำงานเสร็จ รับ EXP แล้วมาสู้มอนสเตอร์!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: CHARACTER PANEL -->
+    <div class="panel" id="panel-char" style="border-left:1px solid var(--border)">
+      <div class="panel-header">👤 ตัวละคร</div>
+      <div class="panel-body">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('char')">สถานะ</div>
+          <div class="tab"        onclick="switchTab('daily')">ภารกิจวัน</div>
+        </div>
+        <!-- TAB: สถานะ -->
+        <div class="tab-content active" id="tab-char">
+          <div class="char-avatar" id="char-avatar">⚔</div>
+          <div class="char-class"  id="char-class-label">คลาส</div>
+          <div id="cosm-tier-badge" style="font-size:.72rem;color:#aaa;text-align:center;margin-bottom:.2rem;cursor:pointer" onclick="openCosmeticFromChar()"></div>
+          <div id="prestige-badge-area"></div>
+          <div class="stat-grid">
+            <div class="stat-box">❤ HP<br><span class="sval" id="stat-hp">100/100</span></div>
+            <div class="stat-box">⚔ ATK<br><span class="sval" id="stat-atk">10</span></div>
+            <div class="stat-box">🛡 DEF<br><span class="sval" id="stat-def">5</span></div>
+            <div class="stat-box">💀 KO<br><span class="sval" id="stat-kills">0</span></div>
+          </div>
+          <div class="section-title">⚡ วิวัฒนาการคลาส</div>
+          <div id="evolution-btn-area" style="margin-bottom:.5rem"></div>
+          <div class="section-title">🌳 Skill Tree</div>
+          <div id="skill-tree-area" style="margin-bottom:.5rem"></div>
+          <div class="section-title">🎴 ชุดเซ็ต</div>
+          <div id="set-progress-area" style="margin-bottom:.5rem"></div>
+          <div class="section-title">🛡 อุปกรณ์ที่สวมใส่</div>
+          <div id="equip-slots-grid" class="equip-slots-grid"></div>
+          <div class="section-title" style="margin-top:.6rem">🗡 อาวุธ</div>
+          <div class="equipped-weapon" id="equipped-weapon-display">
+            <div style="color:var(--text2);font-size:.85rem">ไม่มีอาวุธ</div>
+          </div>
+          <div class="section-title">⭐ ความสำเร็จล่าสุด</div>
+          <div id="recent-ach" style="font-size:.8rem;color:var(--text2)">ยังไม่มี</div>
+        </div>
+        <!-- TAB: ภารกิจวัน -->
+        <div class="tab-content" id="tab-daily">
+          <div class="section-title">🎯 ภารกิจประจำวัน</div>
+          <div class="daily-quests" id="daily-quests"></div>
+          <div class="section-title" style="margin-top:1rem">🏆 Prestige</div>
+          <div id="prestige-info" style="font-size:.82rem;color:var(--text2)">ถึงเลเวล 100 เพื่อ Prestige</div>
+          <button id="btn-prestige" onclick="doPrestige()"
+            style="display:none;background:linear-gradient(135deg,#402000,#600000);border:2px solid var(--legend);
+                   color:var(--legend);padding:.6rem 1rem;border-radius:8px;cursor:pointer;
+                   font-family:'Chakra Petch',sans-serif;width:100%;margin-top:.5rem">✨ PRESTIGE</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main-layout -->
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav id="mobile-nav" aria-label="mobile navigation">
+    <button class="mnav-btn active" id="mnav-left"   onclick="switchMobileTab('left')">
+      <span class="mnav-icon">📋</span><span id="mnav-left-label">ภารกิจ</span>
+    </button>
+    <button class="mnav-btn"        id="mnav-battle" onclick="switchMobileTab('battle')">
+      <span class="mnav-icon">⚔</span><span>สนามรบ</span>
+    </button>
+    <button class="mnav-btn"        id="mnav-char"   onclick="switchMobileTab('char')">
+      <span class="mnav-icon">👤</span><span>ตัวละคร</span>
+    </button>
+    <button class="mnav-btn"        id="mnav-hub"    onclick="openHub()">
+      <span class="mnav-icon">🏙</span><span>Hub</span>
+    </button>
+  </nav>
+
+</div><!-- end screen-game -->
+
+<!-- WORLD MAP POPUP removed — map is now embedded in battle panel -->
+
+<!-- ===== INVENTORY POPUP ===== -->
+<div id="inv-popup-overlay" onclick="if(event.target===this)closeInventoryPopup()">
+  <div class="inv-popup-box" onclick="event.stopPropagation()">
+    <div class="inv-popup-header">
+      <span class="inv-popup-title">🎒 กระเป๋าสัมภาระ</span>
+      <button class="inv-popup-close" onclick="closeInventoryPopup()">✕</button>
+    </div>
+    <div class="inv-popup-body">
+      <div class="chest-open-area inv-popup-chests" id="chest-open-area"></div>
+      <div id="inv-filter-bar" class="inv-filter-bar inv-popup-filter"></div>
+      <div class="inv-grid inv-popup-grid" id="inv-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FLASH OVERLAY (event flash) ===== -->
+<div id="ev-flash" style="position:fixed;inset:0;pointer-events:none;opacity:0;z-index:9998;transition:opacity .35s"></div>
+
+<!-- ===== EVENT POPUP OVERLAY ===== -->
+<div class="overlay ev-popup-overlay" id="ev-popup-overlay">
+  <div class="ev-popup-box" onclick="event.stopPropagation()">
+    <div class="ev-popup-icon" id="ev-popup-icon">⚡</div>
+    <div class="ev-popup-title" id="ev-popup-title">เหตุการณ์พิเศษ!</div>
+    <div class="ev-popup-desc"  id="ev-popup-desc"></div>
+    <div class="ev-countdown"   id="ev-countdown" style="display:none"></div>
+    <div class="ev-popup-actions">
+      <button class="ev-btn-a" id="ev-btn-a">ตกลง</button>
+      <button class="ev-btn-b" id="ev-btn-b" style="display:none">ปฏิเสธ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EVENT LOG OVERLAY ===== -->
+<div class="overlay" id="ev-log-overlay" onclick="toggleEventLog()">
+  <div class="modal ev-log-modal" onclick="event.stopPropagation()" style="max-width:480px;width:95%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem">
+      <h2 style="color:var(--purple)">🎲 ประวัติเหตุการณ์</h2>
+      <button onclick="toggleEventLog()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .7rem;border-radius:6px;cursor:pointer">✕</button>
+    </div>
+    <div id="event-log-list" class="ev-log-list"></div>
+  </div>
+</div>
+
+<!-- ===== LEVEL UP OVERLAY ===== -->
+<div class="levelup-overlay" id="levelup-overlay">
+  <div class="levelup-anim levelup-text" id="levelup-text"></div>
+</div>
+
+<!-- ===== ACHIEVEMENT TOAST ===== -->
+<div id="ach-toast" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999;pointer-events:none;text-align:center">
+  <div id="ach-toast-inner" style="background:linear-gradient(135deg,#1a1a2e,#2a1a4e);border:2px solid #ffd700;border-radius:16px;padding:1.2rem 2rem;box-shadow:0 0 40px #ffd70088">
+    <div style="font-size:.75rem;color:#ffd700;letter-spacing:2px;margin-bottom:.3rem">🏆 ACHIEVEMENT UNLOCKED</div>
+    <div id="ach-toast-icon" style="font-size:2.5rem;line-height:1.2"></div>
+    <div id="ach-toast-name" style="font-size:1.1rem;font-weight:bold;color:#fff;margin:.2rem 0"></div>
+    <div id="ach-toast-desc" style="font-size:.75rem;color:#aaa"></div>
+  </div>
+</div>
+
+<!-- ===== GACHA / CHEST OVERLAY ===== -->
+<div class="overlay" id="chest-overlay">
+  <div class="gacha-modal">
+    <div class="gacha-title" id="gacha-title">เปิดหีบสมบัติ</div>
+
+    <!-- spinning reel -->
+    <div class="gacha-reel-wrap">
+      <div class="gacha-reel-window">
+        <div class="gacha-reel" id="gacha-reel"></div>
+      </div>
+      <div class="gacha-pointer"></div>
+    </div>
+
+    <!-- result (shown after spin stops) -->
+    <div class="gacha-result" id="gacha-result" style="display:none">
+      <div class="gacha-result-flash" id="gacha-result-flash"></div>
+      <div class="chest-result-icon" id="chest-item-icon">⚔</div>
+      <div class="chest-result-name" id="chest-item-name"></div>
+      <div id="chest-item-rarity"></div>
+      <div class="chest-result-stats" id="chest-item-stats"></div>
+      <div class="chest-result-effect" id="chest-item-effect"></div>
+      <div class="gacha-btns">
+        <button class="btn-equip-modal" onclick="equipFromChest()">⚔ สวมใส่ทันที</button>
+        <button class="btn-close-modal" onclick="closeChestModal()">เก็บลงกระเป๋า</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DROP INFO TOOLTIP ===== -->
+<div id="drop-tooltip" class="drop-tooltip" style="display:none"></div>
+
+<!-- ===== ITEM TOOLTIP ===== -->
+<div class="tooltip-overlay" id="tooltip-overlay" onclick="closeTooltip()">
+  <div class="tooltip-box" onclick="event.stopPropagation()">
+    <div class="tooltip-name"   id="tt-name"></div>
+    <div class="tooltip-rarity" id="tt-rarity"></div>
+    <div class="tooltip-stats"  id="tt-stats"></div>
+    <div class="tooltip-effect" id="tt-effect"></div>
+    <div class="tooltip-class-req" id="tt-class-req" style="font-size:.8rem;margin:.3rem 0"></div>
+    <div class="tooltip-actions">
+      <button class="btn-tooltip-equip"   onclick="equipItem(currentTooltipItem)">⚔ สวมใส่</button>
+      <button class="btn-tooltip-discard" onclick="discardItem(currentTooltipItem)">🗑 ทิ้ง</button>
+      <button class="btn-tooltip-close"   onclick="closeTooltip()">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STATS MODAL ===== -->
+<div class="overlay" id="stats-overlay" onclick="this.classList.remove('active')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:400px">
+    <h2 style="color:var(--gold);margin-bottom:1rem">📊 สถิติ</h2>
+    <div id="stats-content" style="text-align:left;line-height:2;font-size:.9rem;color:var(--text2)"></div>
+    <button class="btn-close-modal" onclick="document.getElementById('stats-overlay').classList.remove('active')">ปิด</button>
+  </div>
+</div>
+
+<!-- ===== EVOLUTION MODAL ===== -->
+<div class="overlay" id="evo-overlay" onclick="this.classList.remove('active')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:360px;text-align:center">
+    <div style="font-size:3rem" id="evo-modal-icon">✨</div>
+    <div style="font-size:1.4rem;font-weight:bold;margin:.4rem 0" id="evo-modal-name"></div>
+    <div style="color:var(--text2);margin-bottom:.6rem" id="evo-modal-tier"></div>
+    <div style="color:var(--gold);font-size:.9rem;margin-bottom:1rem" id="evo-modal-bonuses"></div>
+    <button class="btn-close-modal" onclick="document.getElementById('evo-overlay').classList.remove('active')">ปิด</button>
+  </div>
+</div>
+
+<!-- ===== ACHIEVEMENTS MODAL ===== -->
+<div class="overlay" id="ach-overlay" onclick="this.classList.remove('active')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:500px">
+    <h2 style="color:var(--gold);margin-bottom:1rem">🏆 ความสำเร็จ</h2>
+    <div class="ach-list" id="ach-list"></div>
+    <button class="btn-close-modal" onclick="document.getElementById('ach-overlay').classList.remove('active')">ปิด</button>
+  </div>
+</div>
+
+<!-- ===== SHOP MODAL ===== -->
+<div class="overlay" id="shop-overlay" onclick="this.classList.remove('active')">
+  <div class="modal shop-modal" onclick="event.stopPropagation()" style="max-width:600px;width:95%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h2 style="color:var(--gold)">🏪 ร้านค้า</h2>
+      <button onclick="closeShop()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.3rem .8rem;border-radius:6px;cursor:pointer">✕ ปิด</button>
+    </div>
+    <div class="shop-gold-display">💰 ทองของคุณ: <span id="shop-gold-display" style="color:var(--gold);font-weight:700">0</span></div>
+    <div class="shop-tabs">
+      <button class="shop-tab active" data-tab="sell" onclick="switchShopTab('sell')">📤 ขายของ</button>
+      <button class="shop-tab" data-tab="buy" onclick="switchShopTab('buy')">📥 ซื้อของ</button>
+    </div>
+    <!-- sell panel -->
+    <div id="shop-sell-panel" style="margin-top:.6rem">
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem">
+        <button class="btn-shop-action" onclick="sellNonClassItems()">🔒 ขายของคลาสอื่น</button>
+        <button class="btn-shop-action" onclick="sellAllExceptEquipped()">💸 ขายทั้งหมด (ยกเว้นสวมอยู่)</button>
+      </div>
+      <div id="shop-sell-list" class="shop-sell-list"></div>
+    </div>
+    <!-- buy panel -->
+    <div id="shop-buy-panel" style="display:none;margin-top:.6rem">
+      <div id="shop-buy-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HUB FULL-SCREEN SCENE ===== -->
+<div id="hub-screen" style="display:none;position:fixed;inset:0;z-index:500;overflow:hidden">
+
+  <!-- ── HUB VIDEO BG ── -->
+  <video id="hub-bg-video" muted playsinline preload="auto" loop
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:1;">
+    <source src="assets/bg/bg_hub.mp4" type="video/mp4">
+  </video>
+  <!-- light overlay -->
+  <div style="position:absolute;inset:0;z-index:1;background:rgba(0,0,0,.10);pointer-events:none"></div>
+
+
+  <!-- ── TOWN TITLE ── -->
+  <div class="hub-town-title">
+    <div class="hub-town-name">🏡 เมืองพักแรม</div>
+    <div class="hub-town-sub">Restville — ดินแดนแห่งการพักใจ</div>
+  </div>
+
+  <!-- ── CLOSE BUTTON ── -->
+  <button class="hub-close-btn" onclick="closeHub()">✕ ออก</button>
+
+  <!-- ── NPC SCENE LAYER ── -->
+  <div class="hub-scene" id="hub-scene">
+    <!-- NPC slots injected by JS -->
+  </div>
+
+  <!-- ── DIALOGUE BOX (RPG style) ── -->
+  <div class="hub-dialogue-box" id="hub-dlg" style="display:none">
+    <div class="hub-dlg-portrait-wrap">
+      <div class="hub-dlg-portrait" id="hub-dlg-portrait"></div>
+      <div class="hub-dlg-portrait-name" id="hub-dlg-portrait-name"></div>
+    </div>
+    <div class="hub-dlg-right">
+      <div class="hub-dlg-text" id="hub-dlg-text"></div>
+      <div class="hub-dlg-actions" id="hub-dlg-actions"></div>
+    </div>
+  </div>
+
+  <!-- ── PANEL (quests / gear check) ── -->
+  <div class="hub-panel" id="hub-panel" style="display:none">
+    <div class="hub-panel-header">
+      <span id="hub-panel-title">📜 เควส</span>
+      <button onclick="closeHubPanel()" class="hub-panel-close">✕</button>
+    </div>
+    <div class="hub-panel-body" id="hub-panel-body"></div>
+  </div>
+
+</div>
+
+<!-- ===== NEW GAME CONFIRM ===== -->
+<div id="newgame-overlay">
+  <div class="newgame-modal">
+    <h3>⚠ เริ่มเล่นใหม่?</h3>
+    <p>ข้อมูลทั้งหมดจะถูกลบถาวร<br>เลเวล, อาวุธ, และความสำเร็จทั้งหมดจะหายไป</p>
+    <button class="btn-newgame-confirm" onclick="doNewGame()">✓ ยืนยัน ลบข้อมูล</button>
+    <button class="btn-newgame-cancel"  onclick="cancelNewGame()">✕ ยกเลิก</button>
+  </div>
+</div>
+
+<!-- ===== BRANCH PICKER OVERLAY ===== -->
+<div id="branch-picker-overlay" style="display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.85);align-items:center;justify-content:center;flex-direction:column"></div>
+
+<!-- ===== SCRIPTS (โหลดตามลำดับ dependency) ===== -->
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/save.js"></script>
+<script src="js/achievements.js"></script>
+<script src="js/daily.js"></script>
+<script src="js/evolution.js"></script>
+<script src="js/skilltree.js"></script>
+<script src="js/exp.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/events.js"></script>
+<script src="js/cosmetic.js"></script>
+<script src="js/rpg-quests.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/tasks.js"></script>
+<script src="js/hub.js"></script>
+<script src="js/intro.js"></script>
+<script src="js/ui.js"></script>
+<script>
+  // Override window.onload to handle both buttons properly
+  window.onload = () => {
+    loadGame();
+    const btnContinue = document.getElementById('btn-continue');
+    const hint        = document.getElementById('continue-hint');
+
+    // ถ้ามาจาก doNewGame() จะมี sessionStorage flag → ไปเลือกโหมดก่อน
+    if (sessionStorage.getItem('wq_newgame') === '1') {
+      sessionStorage.removeItem('wq_newgame');
+      showModeSelect();
+      return;
+    }
+
+    if (G.classId) {
+      // มีเซฟ: ปุ่มเล่นต่อ active
+      btnContinue.style.display  = 'inline-block';
+      btnContinue.disabled       = false;
+      btnContinue.style.opacity  = '1';
+      btnContinue.style.cursor   = 'pointer';
+      hint.textContent = 'มีข้อมูลเซฟอยู่ — กด "เล่นต่อ" เพื่อเล่นต่อ';
+      // init event system
+      migrateEventState();
+      scheduleNextCombatEvent();
+      startEventTimers();
+      renderActiveBuffs();
+    } else {
+      // ไม่มีเซฟ: แสดงปุ่มแต่ greyed out กดไม่ได้
+      btnContinue.style.display  = 'inline-block';
+      btnContinue.disabled       = true;
+      btnContinue.style.opacity  = '0.35';
+      btnContinue.style.cursor   = 'not-allowed';
+      btnContinue.style.filter   = 'grayscale(1)';
+      hint.textContent           = 'ยังไม่มีข้อมูลเซฟ';
+    }
+  };
+
+  function manualSave() {
+    saveGame();
+    const btn = document.getElementById("btn-manualsave");
+    const orig = btn.textContent;
+    btn.textContent = "✅ เซฟแล้ว!";
+    btn.style.borderColor = "#7dff7d";
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  }
+
+  // re-apply layout on resize/orientation change
+  window.addEventListener('resize', function() {
+    if (typeof applyMobileLayout === 'function') applyMobileLayout();
+    if (typeof applyGameModeLayout === 'function') applyGameModeLayout();
+  });
+
+  // override doNewGame — ใช้ sessionStorage flag (ใช้ได้กับ file://)
+  function doNewGame() {
+    try {
+      localStorage.removeItem('workquest_save');
+      localStorage.removeItem('workquest_save_backup');
+      sessionStorage.setItem('wq_newgame', '1');
+    } catch(e) {}
+    window.location.reload();
+  }
+
+  // ── Inventory popup ──
+  function toggleInventoryPopup() {
+    const ov = document.getElementById('inv-popup-overlay');
+    if (ov.classList.contains('active')) {
+      closeInventoryPopup();
+    } else {
+      ov.classList.add('active');
+      if (typeof renderInventory === 'function') renderInventory();
+    }
+  }
+
+  function closeInventoryPopup() {
+    document.getElementById('inv-popup-overlay').classList.remove('active');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeInventoryPopup();
+  });
+</script>
+
+<script>
+  // ── WORLD MAP (embedded in battle panel) ──
+  const MAP_PINS = [
+    { type:'hub',  label:'🏡 หมู่บ้าน', left:'10%', top:'28%', color:'#ffdd66' },
+    { zone:1, icon:'🌲', label:'ป่ากอบลิน',      sub:'Lv 1',  left:'35%', top:'25%', color:'#44ff88' },
+    { zone:2, icon:'🪦', label:'หุบเขาซอมบี้',   sub:'Lv 10', left:'28%', top:'70%', color:'#44ccff' },
+    { zone:3, icon:'🐉', label:'ถ้ำมังกร',        sub:'Lv 25', left:'64%', top:'22%', color:'#ff7744' },
+    { zone:4, icon:'💀', label:'ซากอสูร',         sub:'Lv 40', left:'85%', top:'26%', color:'#dd88ff' },
+    { zone:5, icon:'🏰', label:'ปราสาทมืด',       sub:'Lv 60', left:'60%', top:'70%', color:'#99aaff' },
+    { zone:6, icon:'🌀', label:'อาณาจักรโกลาหล', sub:'Lv 80', left:'83%', top:'72%', color:'#ffaa00' },
+  ];
+
+  function renderMapPins() {
+    const container = document.getElementById('map-pins');
+    if (!container) return;
+    container.innerHTML = '';
+
+    // draw SVG path line between zone pins
+    const svg = document.getElementById('map-path-svg');
+    if (svg) {
+      svg.setAttribute('viewBox', '0 0 100 100');
+      svg.setAttribute('preserveAspectRatio', 'none');
+      const zonePins = MAP_PINS.filter(p => p.zone);
+      let pathD = '';
+      zonePins.forEach((p, i) => {
+        const x = parseFloat(p.left);
+        const y = parseFloat(p.top);
+        pathD += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
+      });
+      svg.innerHTML = `
+        <defs>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="1.5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <path d="${pathD}" fill="none" stroke="rgba(255,180,50,.15)" stroke-width="2" stroke-linecap="round"/>
+        <path d="${pathD}" fill="none" stroke="rgba(255,180,50,.5)"  stroke-width=".8" stroke-linecap="round" filter="url(#glow)"/>
+        <path d="${pathD}" fill="none" stroke="rgba(255,220,120,.9)" stroke-width=".3" stroke-dasharray="1.5 1" stroke-linecap="round" filter="url(#glow)"/>`;
+    }
+
+    MAP_PINS.forEach(p => {
+      const pin = document.createElement('div');
+      if (p.type === 'hub') {
+        pin.className = 'map-pin map-pin-hub';
+        pin.style.cssText = `left:${p.left};top:${p.top};color:${p.color}`;
+        pin.innerHTML = `<div class="pin-label pin-label-hub">${p.label}</div><div class="pin-dot"></div>`;
+        pin.onclick = () => openHub();
+        container.appendChild(pin);
+        return;
+      }
+      const zone = ZONES.find(z => z.id === p.zone);
+      if (!zone) return;
+      const locked  = G.level < zone.reqLevel;
+      const current = G.currentZone === p.zone;
+      pin.className = 'map-pin' + (locked ? ' locked' : '') + (current ? ' current' : '');
+      pin.style.cssText = `left:${p.left};top:${p.top};color:${locked ? '#666' : p.color}`;
+      pin.innerHTML = `
+        <div class="pin-label">${p.icon} ${p.label}<span class="pin-sub">${p.sub}</span></div>
+        <div class="pin-dot"></div>`;
+      if (!locked) pin.onclick = () => {
+        G.currentZone = p.zone;
+        G.currentMonster = null;
+        if (typeof stopAuto === 'function') stopAuto();
+        G.battleInProgress = false;
+        document.getElementById('battle-content').style.display    = 'none';
+        document.getElementById('monster-list-area').style.display = 'block';
+        const arena = document.getElementById('pixel-battle-arena');
+        if (arena) { arena.innerHTML = ''; arena.style.display = 'none'; }
+        document.getElementById('battle-map-wrap').style.display = 'none';
+        const backBtn = document.getElementById('btn-back-map');
+        if (backBtn) backBtn.style.display = 'inline-block';
+        if (typeof renderZoneTabs === 'function') renderZoneTabs();
+        if (typeof renderMonsterList === 'function') renderMonsterList();
+      };
+      container.appendChild(pin);
+    });
+  }
+
+  function showBattleMap() {
+    document.getElementById('battle-map-wrap').style.display = 'block';
+    document.getElementById('battle-content').style.display  = 'none';
+    document.getElementById('monster-list-area').style.display = 'none';
+    const panel = document.getElementById('map-monster-panel');
+    if (panel) panel.style.display = 'none';
+    const backBtn = document.getElementById('btn-back-map');
+    if (backBtn) backBtn.style.display = 'none';
+    renderMapPins();
+  }
+
+  function closeMapMonsterPanel() {
+    const panel = document.getElementById('map-monster-panel');
+    if (panel) panel.style.display = 'none';
+  }
+
+  function openMap() { showBattleMap(); }
+  function closeMap() {}
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+</script>
+
+</body>
+</html>

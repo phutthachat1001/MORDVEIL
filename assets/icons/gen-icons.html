@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Generate Icons</title></head>
+<body>
+<canvas id="c192" width="192" height="192" style="border:1px solid #333;display:block;margin:8px"></canvas>
+<canvas id="c512" width="512" height="512" style="border:1px solid #333;display:block;margin:8px"></canvas>
+<button onclick="download(192)">Download icon-192.png</button>
+<button onclick="download(512)">Download icon-512.png</button>
+<script>
+function drawIcon(canvas, size) {
+  const ctx = canvas.getContext('2d');
+  const s = size;
+
+  // Background gradient (dark purple)
+  const bg = ctx.createRadialGradient(s/2, s/2, 0, s/2, s/2, s/2);
+  bg.addColorStop(0, '#2a1040');
+  bg.addColorStop(1, '#0a0612');
+  ctx.fillStyle = bg;
+  ctx.roundRect(0, 0, s, s, s * 0.18);
+  ctx.fill();
+
+  // Border glow
+  ctx.strokeStyle = '#8833cc';
+  ctx.lineWidth = s * 0.025;
+  ctx.roundRect(s*0.03, s*0.03, s*0.94, s*0.94, s*0.15);
+  ctx.stroke();
+
+  // Lightning bolt
+  const cx = s / 2;
+  ctx.strokeStyle = '#cc88ff';
+  ctx.lineWidth = s * 0.03;
+  ctx.shadowColor = '#aa44ff';
+  ctx.shadowBlur = s * 0.08;
+  ctx.beginPath();
+  ctx.moveTo(cx + s*0.05, s*0.12);
+  ctx.lineTo(cx - s*0.08, s*0.48);
+  ctx.lineTo(cx + s*0.04, s*0.48);
+  ctx.lineTo(cx - s*0.05, s*0.88);
+  ctx.lineTo(cx + s*0.12, s*0.45);
+  ctx.lineTo(cx - s*0.02, s*0.45);
+  ctx.closePath();
+  ctx.fillStyle = '#dd99ff';
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // "M" letter at top
+  ctx.font = `bold ${s*0.18}px serif`;
+  ctx.fillStyle = '#ffdd88';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = '#ffaa00';
+  ctx.shadowBlur = s * 0.05;
+  ctx.fillText('M', cx, s * 0.22);
+  ctx.shadowBlur = 0;
+
+  // Stars
+  [[0.15,0.18],[0.82,0.25],[0.12,0.72],[0.88,0.68],[0.25,0.88],[0.75,0.85]].forEach(([x,y]) => {
+    ctx.fillStyle = `rgba(255,255,200,${Math.random()*0.5+0.4})`;
+    ctx.beginPath();
+    ctx.arc(x*s, y*s, s*0.012, 0, Math.PI*2);
+    ctx.fill();
+  });
+}
+
+drawIcon(document.getElementById('c192'), 192);
+drawIcon(document.getElementById('c512'), 512);
+
+function download(size) {
+  const canvas = document.getElementById('c' + size);
+  const a = document.createElement('a');
+  a.download = 'icon-' + size + '.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+</script>
+</body>
+</html>

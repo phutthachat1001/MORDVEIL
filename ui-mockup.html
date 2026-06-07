@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work Quest UI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --gold: #c9a227;
+    --gold-light: #f0c040;
+    --gold-dark: #8a6a10;
+    --bg-dark: #0d0b0f;
+    --bg-panel: #13111a;
+    --bg-card: #1a1626;
+    --bg-hover: #221e30;
+    --border-gold: rgba(201,162,39,0.4);
+    --border-gold-bright: rgba(201,162,39,0.8);
+    --text-white: #e8e0d0;
+    --text-dim: #8a7a6a;
+    --text-gold: #c9a227;
+    --red: #e04040;
+    --green: #4ade80;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+    --boss-red: #c0392b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-white);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== TOP BAR ===== */
+  #topbar {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(180deg, #1a1520 0%, #110f18 100%);
+    border-bottom: 1px solid var(--border-gold);
+    padding: 0 12px;
+    height: 72px;
+    flex-shrink: 0;
+    gap: 0;
+  }
+
+  .player-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 200px;
+    padding-right: 16px;
+    border-right: 1px solid var(--border-gold);
+  }
+
+  .player-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #2a2438 0%, #161220 100%);
+    border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .player-meta { flex: 1; }
+  .player-name { font-size: 14px; font-weight: 700; color: var(--text-white); }
+  .player-level {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; color: var(--gold); margin: 2px 0;
+  }
+  .player-level .diamond { color: var(--gold-light); font-size: 9px; }
+  .player-exp-bar {
+    height: 4px; background: #2a2438; border-radius: 2px; margin-top: 4px; width: 100%;
+  }
+  .player-exp-fill {
+    height: 100%; background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+    border-radius: 2px; width: 1%;
+  }
+  .exp-label { font-size: 9px; color: var(--text-dim); }
+
+  .stats-bar {
+    display: flex; align-items: center; gap: 8px;
+    flex: 1; padding: 0 16px;
+  }
+
+  .stat-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 13px; font-weight: 600;
+  }
+  .stat-pill .icon { font-size: 14px; }
+  .stat-pill .val { color: var(--text-white); }
+  .stat-pill .add-btn {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(201,162,39,0.2);
+    border: 1px solid var(--gold);
+    color: var(--gold); font-size: 13px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    margin-left: 2px;
+    transition: background 0.2s;
+  }
+  .stat-pill .add-btn:hover { background: rgba(201,162,39,0.4); }
+
+  .stat-pill.hp .icon { color: #e74c3c; }
+  .stat-pill.energy .icon { color: #f39c12; }
+  .stat-pill.gold-stat .icon { color: #f1c40f; }
+  .stat-pill.gems .icon { color: #3498db; }
+
+  .nav-tabs {
+    display: flex; align-items: center;
+    border-left: 1px solid var(--border-gold);
+    padding-left: 8px;
+    height: 100%;
+  }
+
+  .nav-tab {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    height: 100%;
+    justify-content: center;
+    gap: 3px;
+    min-width: 64px;
+    position: relative;
+  }
+  .nav-tab:hover { background: rgba(201,162,39,0.06); }
+  .nav-tab.active {
+    border-bottom-color: var(--gold);
+    background: rgba(201,162,39,0.08);
+  }
+  .nav-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 1px;
+    background: var(--gold);
+  }
+  .nav-tab .tab-icon { font-size: 20px; line-height: 1; }
+  .nav-tab .tab-label { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+  .nav-tab.active .tab-label { color: var(--gold); }
+  .nav-tab.active .tab-icon { filter: drop-shadow(0 0 6px var(--gold)); }
+
+  /* ===== MAIN CONTENT ===== */
+  #main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ===== LEFT PANEL — QUESTS ===== */
+  #panel-quest {
+    width: 272px;
+    background: rgba(10,8,16,0.95);
+    border-right: 1px solid var(--border-gold);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .panel-section-title {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 16px 8px;
+    font-size: 14px; font-weight: 700; color: var(--gold);
+    border-bottom: 1px solid rgba(201,162,39,0.15);
+  }
+
+  .main-quest-block { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+  .mq-header {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  .streak-info { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+  .streak-info span { color: #f39c12; }
+
+  .quest-desc { font-size: 11px; color: var(--text-dim); font-style: italic; margin-bottom: 10px; }
+
+  .reward-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .reward-chip {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 7px; border-radius: 10px;
+    font-size: 11px; font-weight: 600;
+  }
+  .reward-chip.green { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .reward-chip.yellow { background: rgba(241,196,15,0.15); color: #f1c40f; }
+
+  .btn-claim {
+    width: 100%; padding: 8px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    border: 1px solid #3b82f6;
+    border-radius: 6px;
+    color: white; font-size: 12px; font-weight: 700; font-family: 'Sarabun', sans-serif;
+    cursor: pointer; margin-bottom: 6px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .btn-claim:hover { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+
+  .btn-add-work {
+    width: 100%; padding: 8px;
+    background: linear-gradient(135deg, #5a1e0a 0%, #c0392b 100%);
+    border: 1px solid #e74c3c;
+    border-radius: 6px;
+    color: white; font-size: 12px; font-weight: 700; font-family: 'Sarabun', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .btn-add-work:hover { filter: brightness(1.15); }
+
+  .daily-quests-block { padding: 10px 16px; flex: 1; }
+
+  .dq-title {
+    font-size: 12px; font-weight: 700; color: var(--gold);
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .dq-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dq-item.done { opacity: 0.6; }
+
+  .dq-check {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--text-dim);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 10px;
+    transition: all 0.2s;
+  }
+  .dq-check.checked { background: var(--green); border-color: var(--green); color: white; }
+
+  .dq-content { flex: 1; }
+  .dq-name { font-size: 11px; font-weight: 600; color: var(--text-white); }
+  .dq-progress { font-size: 10px; color: var(--text-dim); }
+  .dq-progress-bar { height: 3px; background: #2a2438; border-radius: 2px; margin-top: 3px; }
+  .dq-progress-fill { height: 100%; background: var(--green); border-radius: 2px; }
+
+  .dq-rewards { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .dq-reward-item { font-size: 10px; color: var(--text-dim); display: flex; align-items: center; gap: 2px; }
+
+  .dq-go-btn {
+    padding: 4px 10px;
+    background: rgba(201,162,39,0.15);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    color: var(--gold); font-size: 10px; font-family: 'Sarabun', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .dq-go-btn:hover { background: rgba(201,162,39,0.3); }
+
+  .reset-timer {
+    padding: 8px 16px;
+    font-size: 10px; color: var(--text-dim);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* ===== CENTER ===== */
+  #panel-center {
+    flex: 1;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .zone-header {
+    padding: 10px 16px 6px;
+    font-size: 13px; font-weight: 700; color: var(--gold);
+    border-bottom: 1px solid var(--border-gold);
+    background: rgba(10,8,16,0.9);
+    flex-shrink: 0;
+  }
+
+  .difficulty-tabs {
+    display: flex; gap: 0;
+    padding: 10px 16px 0;
+    background: rgba(10,8,16,0.9);
+    flex-shrink: 0;
+  }
+
+  .diff-tab {
+    padding: 7px 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    font-size: 12px; font-weight: 600; font-family: 'Sarabun', sans-serif;
+    cursor: pointer;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.03);
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+    margin-right: 2px;
+  }
+  .diff-tab:hover { color: var(--text-white); background: rgba(255,255,255,0.06); }
+  .diff-tab.active {
+    background: linear-gradient(180deg, rgba(201,162,39,0.2) 0%, rgba(201,162,39,0.05) 100%);
+    border-color: var(--border-gold-bright);
+    color: var(--gold);
+  }
+  .diff-tab .lock-icon { font-size: 11px; opacity: 0.5; }
+
+  .zone-area {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(180deg, #1a1020 0%, #0d0a14 100%);
+  }
+
+  .zone-bg {
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='60%25'%3E%3Cstop offset='0' stop-color='%23231030'/%3E%3Cstop offset='1' stop-color='%230a0810'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='100%25' height='100%25'/%3E%3C/svg%3E");
+    background-size: cover;
+  }
+
+  .zone-cards-wrapper {
+    position: relative; z-index: 1;
+    display: flex; align-items: center;
+    height: 100%;
+    padding: 0 20px;
+    gap: 12px;
+    overflow-x: auto;
+  }
+
+  .zone-card {
+    flex-shrink: 0;
+    width: 148px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(10,8,20,0.8);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    align-self: stretch;
+    display: flex; flex-direction: column;
+  }
+  .zone-card:hover { transform: translateY(-4px); border-color: var(--border-gold); }
+  .zone-card.selected {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(201,162,39,0.3), 0 0 40px rgba(201,162,39,0.15);
+    transform: translateY(-6px) scale(1.04);
+    z-index: 2;
+  }
+  .zone-card.boss-card {
+    width: 172px;
+    border-color: var(--boss-red);
+    box-shadow: 0 0 24px rgba(192,57,43,0.4), 0 0 48px rgba(192,57,43,0.2);
+    transform: translateY(-8px) scale(1.06);
+    z-index: 3;
+  }
+
+  .zone-card-bg {
+    height: 160px;
+    background: linear-gradient(180deg, #1a1020 0%, #2a1530 100%);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .zone-art {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .zone-card-num {
+    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    font-size: 24px; font-weight: 700; color: rgba(255,255,255,0.15);
+    font-family: 'Cinzel', serif;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .boss-badge {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(192,57,43,0.85);
+    border: 1px solid #e74c3c;
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 10px; font-weight: 700; color: white;
+    display: flex; align-items: center; gap: 4px;
+    white-space: nowrap;
+  }
+
+  .zone-diamond-top {
+    position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+    width: 14px; height: 14px;
+    background: var(--gold);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  }
+
+  .zone-card-body {
+    padding: 8px 10px;
+    flex: 1;
+    display: flex; flex-direction: column;
+  }
+
+  .zone-num-small { font-size: 10px; color: var(--text-dim); text-align: center; }
+  .zone-name {
+    font-size: 13px; font-weight: 700; text-align: center;
+    color: var(--text-white); margin: 4px 0;
+    line-height: 1.3;
+  }
+  .zone-name.boss-name { color: #e74c3c; font-size: 14px; }
+
+  .zone-stars {
+    display: flex; justify-content: center; gap: 3px;
+    font-size: 14px; margin: 4px 0;
+    color: #f1c40f;
+  }
+  .zone-stars .star-empty { color: #3a3040; }
+
+  .zone-status {
+    text-align: center; font-size: 10px; color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .zone-status.perfect { color: var(--gold); }
+
+  .boss-tip {
+    font-size: 10px; color: #fda085; text-align: center;
+    margin-top: 4px;
+  }
+  .boss-rewards {
+    display: flex; justify-content: center; gap: 6px;
+    margin-top: 6px;
+  }
+  .boss-reward-chip {
+    display: flex; flex-direction: column; align-items: center;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 4px 6px;
+    min-width: 44px;
+  }
+  .boss-reward-chip .br-icon { font-size: 14px; }
+  .boss-reward-chip .br-val { font-size: 10px; font-weight: 700; color: var(--text-white); }
+  .boss-reward-chip .br-label { font-size: 9px; color: var(--text-dim); }
+
+  .zone-locked {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%;
+    color: var(--text-dim); font-size: 11px;
+    gap: 6px;
+  }
+  .zone-locked .lock-big { font-size: 28px; opacity: 0.3; }
+
+  /* Bottom action bar */
+  .zone-action-bar {
+    padding: 10px 16px;
+    background: rgba(10,8,16,0.95);
+    border-top: 1px solid var(--border-gold);
+    display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .bonus-info {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    background: rgba(167,139,250,0.1);
+    border: 1px solid rgba(167,139,250,0.3);
+    border-radius: 8px;
+    flex: 1;
+  }
+  .bonus-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: radial-gradient(circle, #5b21b6, #3b0764);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .bonus-label { font-size: 11px; font-weight: 700; color: var(--purple); }
+  .bonus-desc { font-size: 10px; color: var(--text-dim); }
+
+  .btn-battle {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #8b1a1a 0%, #c0392b 50%, #8b1a1a 100%);
+    border: 2px solid var(--boss-red);
+    border-radius: 8px;
+    color: white; font-size: 15px; font-weight: 700; font-family: 'Sarabun', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 0 20px rgba(192,57,43,0.4);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-battle:hover { filter: brightness(1.2); transform: scale(1.02); }
+
+  .btn-team {
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: var(--text-dim); font-size: 12px; font-family: 'Sarabun', sans-serif;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .btn-team:hover { border-color: var(--border-gold); color: var(--gold); }
+
+  /* ===== RIGHT PANEL ===== */
+  #panel-right {
+    width: 280px;
+    background: rgba(10,8,16,0.95);
+    border-left: 1px solid var(--border-gold);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .char-header {
+    padding: 10px 14px 8px;
+    border-bottom: 1px solid var(--border-gold);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .char-title {
+    font-size: 12px; font-weight: 700; color: var(--gold);
+    display: flex; align-items: center; gap: 6px; flex: 1;
+  }
+  .char-config-btn {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .char-config-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .char-portrait {
+    display: flex; justify-content: center; align-items: flex-end;
+    height: 220px; overflow: hidden; position: relative;
+    background: radial-gradient(ellipse at 50% 80%, rgba(201,162,39,0.08) 0%, transparent 70%);
+  }
+
+  .char-portrait-img {
+    height: 100%;
+    filter: drop-shadow(0 0 20px rgba(201,162,39,0.3));
+    object-fit: contain;
+  }
+
+  /* Placeholder character art using SVG */
+  .char-art-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .char-level-bar {
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .lv-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .lv-text { font-size: 13px; font-weight: 700; color: var(--text-white); }
+  .lv-exp { font-size: 11px; color: var(--text-dim); }
+  .lv-up-btn {
+    padding: 3px 10px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    border: none; border-radius: 4px;
+    color: #000; font-size: 11px; font-weight: 700; font-family: 'Sarabun', sans-serif;
+    cursor: pointer;
+  }
+  .lv-bar { height: 5px; background: #2a2438; border-radius: 3px; }
+  .lv-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dark), var(--gold-light)); border-radius: 3px; }
+
+  .char-stats {
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .stat-row {
+    display: flex; align-items: center;
+    padding: 4px 0;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--text-dim); display: flex; align-items: center; gap: 5px; flex: 1; }
+  .stat-label .si { font-size: 13px; }
+  .stat-value { font-weight: 700; color: var(--text-white); }
+  .stat-row.hp .stat-label .si { color: #e74c3c; }
+  .stat-row.atk .stat-label .si { color: #f39c12; }
+  .stat-row.def .stat-label .si { color: #3498db; }
+  .stat-row.ko .stat-label .si { color: #e74c3c; }
+
+  .equip-section {
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .equip-title { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+
+  .equip-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+  }
+
+  .equip-slot {
+    aspect-ratio: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .equip-slot:hover { border-color: var(--border-gold); }
+  .equip-slot.filled { border-color: rgba(201,162,39,0.3); }
+  .equip-slot.locked { opacity: 0.3; cursor: not-allowed; }
+  .equip-slot .slot-label {
+    position: absolute; bottom: 2px; left: 0; right: 0;
+    text-align: center; font-size: 8px; color: var(--text-dim);
+  }
+
+  .char-footer {
+    padding: 8px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; color: var(--text-dim);
+  }
+  .diff-stars { display: flex; align-items: center; gap: 3px; }
+  .diff-stars span { color: #f1c40f; font-size: 12px; }
+  .char-type { display: flex; align-items: center; gap: 4px; }
+
+  /* ===== BOTTOM BAR ===== */
+  #bottombar {
+    display: flex;
+    height: 88px;
+    border-top: 1px solid var(--border-gold);
+    background: linear-gradient(180deg, #13111a 0%, #0d0b10 100%);
+    flex-shrink: 0;
+  }
+
+  /* Inventory section */
+  #inventory-bar {
+    flex: 1;
+    display: flex; align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    border-right: 1px solid var(--border-gold);
+    overflow-x: auto;
+  }
+
+  .inv-header {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 4px 10px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+    gap: 2px;
+  }
+  .inv-icon { font-size: 22px; }
+  .inv-label { font-size: 9px; color: var(--text-dim); }
+  .inv-count { font-size: 9px; color: var(--text-dim); }
+
+  .inv-item {
+    position: relative;
+    width: 52px; height: 52px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .inv-item:hover { border-color: var(--border-gold); }
+  .inv-item .item-icon { font-size: 22px; }
+  .inv-item .item-count {
+    position: absolute; bottom: 2px; right: 4px;
+    font-size: 10px; font-weight: 700; color: var(--text-white);
+  }
+  .inv-item.rare { border-color: rgba(167,139,250,0.4); }
+  .inv-item.epic { border-color: rgba(245,101,101,0.4); }
+
+  .inv-add-btn {
+    width: 52px; height: 52px;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed rgba(255,255,255,0.12);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: var(--text-dim); cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .inv-add-btn:hover { border-color: var(--border-gold); color: var(--gold); }
+
+  /* Bottom nav tabs */
+  #bottom-nav {
+    display: flex; align-items: center;
+    padding: 0 8px;
+    gap: 2px;
+  }
+
+  .bottom-tab {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 14px;
+    cursor: pointer; border-radius: 6px;
+    transition: all 0.2s;
+    min-width: 72px; gap: 4px;
+  }
+  .bottom-tab:hover { background: rgba(255,255,255,0.05); }
+  .bottom-tab.active {
+    background: rgba(201,162,39,0.12);
+    border: 1px solid var(--border-gold);
+  }
+  .bottom-tab .bt-icon { font-size: 20px; }
+  .bottom-tab .bt-label { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+  .bottom-tab.active .bt-label { color: var(--gold); }
+
+  /* ===== SVG KNIGHT ART ===== */
+  .knight-svg { width: 100%; height: 100%; }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+  ::-webkit-scrollbar-thumb { background: rgba(201,162,39,0.3); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(201,162,39,0.5); }
+
+  /* zone art gradients as color-coded backgrounds */
+  .zone-art-1 { background: linear-gradient(180deg, #1a2f1a 0%, #0a1a0a 50%, #0d0814 100%); }
+  .zone-art-2 { background: linear-gradient(180deg, #3a2010 0%, #8b4513 30%, #1a0a0a 100%); }
+  .zone-art-3 { background: linear-gradient(180deg, #102030 0%, #0a3048 30%, #040f1a 100%); }
+  .zone-art-4 { background: linear-gradient(180deg, #1a1030 0%, #2d1040 30%, #0d0820 100%); }
+  .zone-art-5 { background: linear-gradient(180deg, #3a0808 0%, #700a0a 30%, #1a0000 100%); }
+
+  .tooltip {
+    display: none;
+    position: absolute; z-index: 100;
+    background: #1a1626; border: 1px solid var(--border-gold);
+    border-radius: 6px; padding: 6px 10px;
+    font-size: 11px; color: var(--text-white);
+    white-space: nowrap; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .inv-item:hover .tooltip { display: block; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="player-info">
+    <div class="player-avatar">⚔️</div>
+    <div class="player-meta">
+      <div class="player-name">นักผจญภัย</div>
+      <div class="player-level"><span class="diamond">◆</span> Lv. 1 <span style="color:#555;font-size:9px">▲</span></div>
+      <div class="player-exp-bar"><div class="player-exp-fill" id="exp-fill"></div></div>
+      <div class="exp-label">EXP  1/100</div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-pill hp">
+      <span class="icon">❤️</span>
+      <span class="val">110/110</span>
+      <button class="add-btn">+</button>
+    </div>
+    <div class="stat-pill energy">
+      <span class="icon">⚡</span>
+      <span class="val">10/10</span>
+      <button class="add-btn">+</button>
+    </div>
+    <div class="stat-pill gold-stat">
+      <span class="icon">🪙</span>
+      <span class="val">10,250</span>
+      <button class="add-btn">+</button>
+    </div>
+    <div class="stat-pill gems">
+      <span class="icon">💎</span>
+      <span class="val">2,450</span>
+      <button class="add-btn">+</button>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="setTab(this)">
+      <span class="tab-icon">⚜️</span>
+      <span class="tab-label">หน้าหลัก</span>
+    </div>
+    <div class="nav-tab" onclick="setTab(this)">
+      <span class="tab-icon">🦸</span>
+      <span class="tab-label">ฮีโร่</span>
+    </div>
+    <div class="nav-tab" onclick="setTab(this)">
+      <span class="tab-icon">🎒</span>
+      <span class="tab-label">กระเป๋า</span>
+    </div>
+    <div class="nav-tab" onclick="setTab(this)">
+      <span class="tab-icon">🏪</span>
+      <span class="tab-label">ร้านค้า</span>
+    </div>
+    <div class="nav-tab" onclick="setTab(this)">
+      <span class="tab-icon">🛡️</span>
+      <span class="tab-label">กิลด์</span>
+    </div>
+    <div class="nav-tab" onclick="setTab(this)">
+      <span class="tab-icon">📋</span>
+      <span class="tab-label">ภารกิจ</span>
+    </div>
+    <div class="nav-tab" onclick="setTab(this)">
+      <span class="tab-icon">⚙️</span>
+      <span class="tab-label">ตั้งค่า</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- LEFT: QUESTS -->
+  <div id="panel-quest">
+    <div class="panel-section-title">📋 ภารกิจ</div>
+
+    <div class="main-quest-block">
+      <div class="mq-header">🔥 ภารกิจหลัก</div>
+      <div class="streak-info">Streak: <span>0 วัน</span> | วันนี้: <span>0 งาน</span></div>
+      <div class="quest-desc">เขียรวราม...</div>
+      <div class="reward-row">รางวัล:
+        <span class="reward-chip green">🌿 500</span>
+        <span class="reward-chip yellow">🪙 10,000</span>
+      </div>
+      <button class="btn-claim" onclick="alert('รับรางวัลแล้ว!')">🎁 รับรางวัลทั้งหมด</button>
+      <button class="btn-add-work" onclick="alert('เพิ่มงาน!')">⬆️ เพิ่มงาน  ( +500–1000 EXP)</button>
+    </div>
+
+    <div class="daily-quests-block">
+      <div class="dq-title">🔒 ภารกิจรายวัน</div>
+
+      <div class="dq-item" id="dq1" onclick="toggleQuest('dq1')">
+        <div class="dq-check checked" id="dq1-check">✓</div>
+        <div class="dq-content">
+          <div class="dq-name">กำจัดมอนสเตอร์ 25 ตัว (0/25)</div>
+          <div class="dq-progress">0/25</div>
+          <div class="dq-progress-bar"><div class="dq-progress-fill" style="width:0%"></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="dq-reward-item">🌿 200</div>
+          <div class="dq-reward-item">💎 10</div>
+          <button class="dq-go-btn" onclick="event.stopPropagation()">ไปทันที</button>
+        </div>
+      </div>
+
+      <div class="dq-item" id="dq2" onclick="toggleQuest('dq2')">
+        <div class="dq-check checked" id="dq2-check">✓</div>
+        <div class="dq-content">
+          <div class="dq-name">เคลียร์ด่านเงิน 2 ครั้ง (0/2)</div>
+          <div class="dq-progress">0/2</div>
+          <div class="dq-progress-bar"><div class="dq-progress-fill" style="width:0%"></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="dq-reward-item">🌿 300</div>
+          <div class="dq-reward-item">💎 15</div>
+          <button class="dq-go-btn" onclick="event.stopPropagation()">ไปทันที</button>
+        </div>
+      </div>
+
+      <div class="dq-item" id="dq3" onclick="toggleQuest('dq3')">
+        <div class="dq-check" id="dq3-check"></div>
+        <div class="dq-content">
+          <div class="dq-name">อัปเกรดอุปกรณ์ 1 ครั้ง (0/1)</div>
+          <div class="dq-progress">0/1</div>
+          <div class="dq-progress-bar"><div class="dq-progress-fill" style="width:0%"></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="dq-reward-item">🌿 250</div>
+          <div class="dq-reward-item">💎 10</div>
+          <button class="dq-go-btn" onclick="event.stopPropagation()">ไปทันที</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="reset-timer">🕐 รีเซ็ตรายวัน: <span id="timer">12:34:56</span></div>
+  </div>
+
+  <!-- CENTER: ZONE SELECT -->
+  <div id="panel-center">
+    <div class="zone-header">เลือกด่าน / การต่อสู้</div>
+
+    <div class="difficulty-tabs">
+      <div class="diff-tab active" onclick="setDiff(this)">ปกติ</div>
+      <div class="diff-tab" onclick="setDiff(this)"><span class="lock-icon">🔒</span> ยาก</div>
+      <div class="diff-tab" onclick="setDiff(this)"><span class="lock-icon">🔒</span> หายนะ</div>
+      <div class="diff-tab" onclick="setDiff(this)"><span class="lock-icon">🔒</span> ฟันร้าย</div>
+      <div class="diff-tab" onclick="setDiff(this)"><span class="lock-icon">🔒</span> นรก</div>
+    </div>
+
+    <div class="zone-area">
+      <div class="zone-bg"></div>
+      <div class="zone-cards-wrapper">
+
+        <!-- Zone 1 -->
+        <div class="zone-card" onclick="selectZone(this,1)">
+          <div class="zone-card-bg zone-art-1">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.3">🌲</div>
+            <div class="zone-diamond-top"></div>
+            <div class="zone-card-num" style="position:absolute;top:30px;">01</div>
+          </div>
+          <div class="zone-card-body">
+            <div class="zone-name">ป่าหมอกมืด</div>
+            <div class="zone-stars">★★★</div>
+            <div class="zone-status perfect">สเตจสมบูรณ์</div>
+          </div>
+        </div>
+
+        <!-- Zone 2 -->
+        <div class="zone-card" onclick="selectZone(this,2)">
+          <div class="zone-card-bg zone-art-2">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.3">🐉</div>
+            <div class="zone-diamond-top" style="background:#c0a030"></div>
+            <div class="zone-card-num" style="position:absolute;top:30px;color:rgba(255,200,100,0.2)">02</div>
+          </div>
+          <div class="zone-card-body">
+            <div class="zone-name" style="color:#f0c040">หุบเขาอสูร</div>
+            <div class="zone-stars">★★★</div>
+            <div class="zone-status perfect">สเตจสมบูรณ์</div>
+          </div>
+        </div>
+
+        <!-- Zone 3 -->
+        <div class="zone-card" onclick="selectZone(this,3)">
+          <div class="zone-card-bg zone-art-3">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.3">🐲</div>
+            <div class="zone-diamond-top"></div>
+            <div class="zone-card-num" style="position:absolute;top:30px">03</div>
+          </div>
+          <div class="zone-card-body">
+            <div class="zone-name">ถ้ำมังกรโบราณ</div>
+            <div class="zone-stars">★★★</div>
+            <div class="zone-status perfect">สเตจสมบูรณ์</div>
+          </div>
+        </div>
+
+        <!-- Zone 4 -->
+        <div class="zone-card" onclick="selectZone(this,4)">
+          <div class="zone-card-bg zone-art-4">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.3">🏰</div>
+            <div class="zone-diamond-top"></div>
+            <div class="zone-card-num" style="position:absolute;top:30px">04</div>
+          </div>
+          <div class="zone-card-body">
+            <div class="zone-name">ปราสาทอันชาก</div>
+            <div class="zone-stars">★★★</div>
+            <div class="zone-status perfect">สเตจสมบูรณ์</div>
+          </div>
+        </div>
+
+        <!-- Zone 5 BOSS (selected) -->
+        <div class="zone-card boss-card" id="zone5" onclick="selectZone(this,5)">
+          <div class="zone-card-bg zone-art-5" style="height:190px">
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:60px;opacity:0.25">💀</div>
+            <div class="boss-badge">💀 BOSS</div>
+            <div style="position:absolute;top:36px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(255,120,100,0.7);font-weight:700">05</div>
+          </div>
+          <div class="zone-card-body">
+            <div class="zone-name boss-name">ราชาเด่นลีน</div>
+            <div class="boss-tip">แนะนำเลเวล 1</div>
+            <div class="boss-tip" style="color:#f1c40f">รางวัลพิเศษ</div>
+            <div class="boss-rewards">
+              <div class="boss-reward-chip">
+                <span class="br-icon">⭐</span>
+                <span class="br-val">1,000</span>
+                <span class="br-label">EXP</span>
+              </div>
+              <div class="boss-reward-chip">
+                <span class="br-icon">🪙</span>
+                <span class="br-val">50,000</span>
+              </div>
+              <div class="boss-reward-chip">
+                <span class="br-icon">📦</span>
+                <span class="br-val">ลัง</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zone 6 LOCKED -->
+        <div class="zone-card" onclick="alert('ปลดล็อกที่ Lv.10')">
+          <div class="zone-card-bg" style="background:#0d0a14">
+            <div class="zone-locked">
+              <span class="lock-big">🔒</span>
+            </div>
+          </div>
+          <div class="zone-card-body">
+            <div class="zone-num-small">06</div>
+            <div class="zone-name" style="color:#3a3040">เจ้าแห่งหายนะ</div>
+            <div class="zone-stars"><span class="star-empty">☆</span><span class="star-empty">☆</span><span class="star-empty">☆</span></div>
+            <div class="zone-status">ปลดล็อกที่ Lv.10</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ACTION BAR -->
+    <div class="zone-action-bar">
+      <div class="bonus-info">
+        <div class="bonus-icon">💜</div>
+        <div>
+          <div class="bonus-label">โบนัส Work Quest</div>
+          <div class="bonus-desc">ทำงานเสร็จ +50% EXP เมื่อเล่นด่าน</div>
+        </div>
+      </div>
+      <button class="btn-battle" onclick="startBattle()">⚔️ เริ่มการต่อสู้</button>
+      <button class="btn-team" onclick="alert('จัดทีม')">🛡️ จัดทีม</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: CHARACTER PANEL -->
+  <div id="panel-right">
+    <div class="char-header">
+      <div class="char-title">⚙️ อัศวินศักดิ์สิทธิ์ (Tier 1)</div>
+      <div class="char-config-btn">⚙</div>
+    </div>
+
+    <!-- Character portrait (SVG knight placeholder) -->
+    <div class="char-portrait">
+      <svg viewBox="0 0 200 320" class="knight-svg" xmlns="http://www.w3.org/2000/svg">
+        <!-- Glow -->
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="80%">
+            <stop offset="0%" stop-color="#c9a22760"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </radialGradient>
+          <linearGradient id="armorGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f0c040"/>
+            <stop offset="50%" stop-color="#c9a227"/>
+            <stop offset="100%" stop-color="#8a6a10"/>
+          </linearGradient>
+          <linearGradient id="armorSilver" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#e0d8c0"/>
+            <stop offset="100%" stop-color="#b0a880"/>
+          </linearGradient>
+        </defs>
+        <!-- Base glow -->
+        <ellipse cx="100" cy="300" rx="80" ry="20" fill="url(#glow)" opacity="0.5"/>
+        <!-- Legs -->
+        <rect x="72" y="220" width="24" height="70" rx="4" fill="url(#armorGold)"/>
+        <rect x="104" y="220" width="24" height="70" rx="4" fill="url(#armorGold)"/>
+        <!-- Boot details -->
+        <rect x="70" y="270" width="28" height="24" rx="4" fill="#8a6a10"/>
+        <rect x="102" y="270" width="28" height="24" rx="4" fill="#8a6a10"/>
+        <!-- Torso -->
+        <rect x="62" y="130" width="76" height="96" rx="8" fill="url(#armorGold)"/>
+        <!-- Chest cross -->
+        <rect x="96" y="138" width="8" height="48" rx="2" fill="#3b82f6" opacity="0.9"/>
+        <rect x="80" y="155" width="40" height="8" rx="2" fill="#3b82f6" opacity="0.9"/>
+        <!-- Shoulder pads -->
+        <ellipse cx="55" cy="148" rx="22" ry="16" fill="url(#armorGold)"/>
+        <ellipse cx="145" cy="148" rx="22" ry="16" fill="url(#armorGold)"/>
+        <!-- Crown on shoulders -->
+        <rect x="42" y="136" width="26" height="6" rx="2" fill="#f0c040"/>
+        <rect x="132" y="136" width="26" height="6" rx="2" fill="#f0c040"/>
+        <!-- Arms -->
+        <rect x="28" y="150" width="22" height="65" rx="6" fill="url(#armorGold)"/>
+        <rect x="150" y="150" width="22" height="65" rx="6" fill="url(#armorGold)"/>
+        <!-- Left hand: HAMMER -->
+        <rect x="20" y="210" width="12" height="40" rx="3" fill="#8a6a10"/>
+        <rect x="8" y="205" width="36" height="18" rx="4" fill="url(#armorGold)"/>
+        <!-- Right hand: SHIELD -->
+        <rect x="152" y="208" width="30" height="40" rx="5" fill="#1e40af"/>
+        <rect x="154" y="210" width="26" height="36" rx="4" fill="#2563eb"/>
+        <ellipse cx="167" cy="228" rx="8" ry="8" fill="#c9a227"/>
+        <rect x="165" y="218" width="4" height="20" rx="2" fill="#f0c040"/>
+        <rect x="159" y="226" width="16" height="4" rx="2" fill="#f0c040"/>
+        <!-- Cape -->
+        <path d="M62 148 Q40 200 50 300 L80 295 Q70 210 76 148" fill="white" opacity="0.85"/>
+        <!-- Neck -->
+        <rect x="88" y="110" width="24" height="24" rx="4" fill="#c0a030"/>
+        <!-- HEAD / HELMET -->
+        <ellipse cx="100" cy="90" rx="36" ry="38" fill="url(#armorGold)"/>
+        <!-- Visor -->
+        <rect x="76" y="86" width="48" height="18" rx="4" fill="#1a1020"/>
+        <rect x="78" y="88" width="44" height="14" rx="3" fill="#0d0814" opacity="0.9"/>
+        <!-- Helmet crest -->
+        <rect x="94" y="55" width="12" height="20" rx="2" fill="#f0c040"/>
+        <ellipse cx="100" cy="54" rx="10" ry="6" fill="#c9a227"/>
+        <!-- Helmet decorations -->
+        <path d="M64 80 Q50 65 58 50 Q70 72 76 80" fill="url(#armorGold)" opacity="0.7"/>
+        <path d="M136 80 Q150 65 142 50 Q130 72 124 80" fill="url(#armorGold)" opacity="0.7"/>
+        <!-- Eye slit glint -->
+        <rect x="80" y="92" width="16" height="3" rx="1" fill="#60a5fa" opacity="0.6"/>
+        <rect x="104" y="92" width="16" height="3" rx="1" fill="#60a5fa" opacity="0.6"/>
+        <!-- Ambient sparkle -->
+        <circle cx="150" cy="70" r="2" fill="#f0c040" opacity="0.8"/>
+        <circle cx="155" cy="80" r="1.5" fill="#f0c040" opacity="0.5"/>
+        <circle cx="45" cy="75" r="2" fill="#f0c040" opacity="0.6"/>
+      </svg>
+    </div>
+
+    <div class="char-level-bar">
+      <div class="lv-row">
+        <span class="lv-text">Lv. 1/20</span>
+        <span class="lv-exp">0/120</span>
+        <button class="lv-up-btn">▲</button>
+      </div>
+      <div class="lv-bar"><div class="lv-bar-fill" style="width:0.8%"></div></div>
+    </div>
+
+    <div class="char-stats">
+      <div class="stat-row hp">
+        <div class="stat-label"><span class="si">❤️</span> HP</div>
+        <div class="stat-value">110/110</div>
+        <div style="width:16px"></div>
+        <div class="stat-label"><span class="si" style="color:#f39c12">⚡</span> ATK</div>
+        <div class="stat-value">10</div>
+      </div>
+      <div class="stat-row def">
+        <div class="stat-label"><span class="si">🛡️</span> DEF</div>
+        <div class="stat-value">5</div>
+        <div style="width:16px"></div>
+        <div class="stat-label"><span class="si" style="color:#e74c3c">💀</span> KO</div>
+        <div class="stat-value">1</div>
+      </div>
+    </div>
+
+    <div class="equip-section">
+      <div class="equip-title">⚔️ อุปกรณ์สวมใส่</div>
+      <div class="equip-grid" id="equip-grid">
+        <div class="equip-slot filled" onclick="showEquip('อาวุธ')">🔨<div class="slot-label">อาวุธ</div></div>
+        <div class="equip-slot filled" onclick="showEquip('หมวก')">⛑️<div class="slot-label">หมวก</div></div>
+        <div class="equip-slot filled" onclick="showEquip('เกราะ')">🦺<div class="slot-label">เกราะ</div></div>
+        <div class="equip-slot filled" onclick="showEquip('ถุงมือ')">🧤<div class="slot-label">ถุงมือ</div></div>
+        <div class="equip-slot filled" onclick="showEquip('กางเกง')">👖<div class="slot-label">กางเกง</div></div>
+        <div class="equip-slot filled" onclick="showEquip('รองเท้า')">👢<div class="slot-label">รองเท้า</div></div>
+      </div>
+    </div>
+
+    <div class="char-footer">
+      <div class="diff-stars">ความหายาก <span>★</span> 1</div>
+      <div class="char-type">ประเภท 🛡️ นักรบ</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM BAR -->
+<div id="bottombar">
+  <div id="inventory-bar">
+    <div class="inv-header">
+      <span class="inv-icon">🎒</span>
+      <span class="inv-label">กระเป๋า</span>
+      <span class="inv-count">ของ: 12/50</span>
+    </div>
+
+    <div class="inv-item" style="border-color:rgba(201,162,39,0.4)">
+      <span class="item-icon">⚜️</span>
+      <span class="item-count">25</span>
+      <div class="tooltip">ตราสัญลักษณ์</div>
+    </div>
+    <div class="inv-item">
+      <span class="item-icon">🧪</span>
+      <span class="item-count" style="color:#e74c3c">10</span>
+      <div class="tooltip">ยาฟื้นฟู HP</div>
+    </div>
+    <div class="inv-item">
+      <span class="item-icon">💧</span>
+      <span class="item-count" style="color:#3498db">15</span>
+      <div class="tooltip">ยาฟื้นฟู MP</div>
+    </div>
+    <div class="inv-item rare">
+      <span class="item-icon">💜</span>
+      <span class="item-count">5</span>
+      <div class="tooltip">อัญมณีหายาก</div>
+    </div>
+    <div class="inv-item">
+      <span class="item-icon">🌿</span>
+      <span class="item-count">2</span>
+      <div class="tooltip">สมุนไพร</div>
+    </div>
+    <div class="inv-item epic">
+      <span class="item-icon">💎</span>
+      <span class="item-count" style="color:#e74c3c">3</span>
+      <div class="tooltip">คริสตัลโบราณ</div>
+    </div>
+    <div class="inv-item" style="border-color:rgba(241,196,15,0.4)">
+      <span class="item-icon">🪙</span>
+      <span class="item-count">1</span>
+      <div class="tooltip">เหรียญโบราณ</div>
+    </div>
+    <div class="inv-item">
+      <span class="item-icon">🛡️</span>
+      <span class="item-count">1</span>
+      <div class="tooltip">โล่เก่า</div>
+    </div>
+    <div class="inv-add-btn" onclick="alert('เพิ่มไอเทม')">+</div>
+    <div class="inv-add-btn" onclick="alert('เพิ่มไอเทม')">+</div>
+    <div class="inv-add-btn" onclick="alert('เพิ่มไอเทม')">+</div>
+  </div>
+
+  <div id="bottom-nav">
+    <div class="bottom-tab active" onclick="setBottomTab(this)">
+      <span class="bt-icon">🎒</span>
+      <span class="bt-label">กระเป๋า</span>
+    </div>
+    <div class="bottom-tab" onclick="setBottomTab(this)">
+      <span class="bt-icon">⚔️</span>
+      <span class="bt-label">อุปกรณ์</span>
+    </div>
+    <div class="bottom-tab" onclick="setBottomTab(this)">
+      <span class="bt-icon">⬆️</span>
+      <span class="bt-label">อัปเกรด</span>
+    </div>
+    <div class="bottom-tab" onclick="setBottomTab(this)">
+      <span class="bt-icon">🏪</span>
+      <span class="bt-label">ร้านค้า</span>
+    </div>
+    <div class="bottom-tab" onclick="setBottomTab(this)">
+      <span class="bt-icon">🛡️</span>
+      <span class="bt-label">กิลด์</span>
+    </div>
+    <div class="bottom-tab" onclick="setBottomTab(this)">
+      <span class="bt-icon">🎖️</span>
+      <span class="bt-label">อันดับ</span>
+    </div>
+    <div class="bottom-tab" onclick="setBottomTab(this)">
+      <span class="bt-icon">✉️</span>
+      <span class="bt-label">จดหมาย</span>
+    </div>
+    <div class="bottom-tab" onclick="setBottomTab(this)">
+      <span class="bt-icon">⚙️</span>
+      <span class="bt-label">ตั้งค่า</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Nav tab switching
+  function setTab(el) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function setDiff(el) {
+    if (el.querySelector('.lock-icon')) { alert('ยังไม่ปลดล็อก'); return; }
+    document.querySelectorAll('.diff-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function selectZone(el, num) {
+    document.querySelectorAll('.zone-card').forEach(c => {
+      c.classList.remove('selected');
+      if (!c.classList.contains('boss-card')) c.style.transform = '';
+    });
+    el.classList.add('selected');
+  }
+
+  function setBottomTab(el) {
+    document.querySelectorAll('.bottom-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function toggleQuest(id) {
+    const check = document.getElementById(id + '-check');
+    const item = document.getElementById(id);
+    if (check.classList.contains('checked')) {
+      check.classList.remove('checked');
+      check.textContent = '';
+      item.classList.remove('done');
+    } else {
+      check.classList.add('checked');
+      check.textContent = '✓';
+      item.classList.add('done');
+    }
+  }
+
+  function startBattle() {
+    const sel = document.querySelector('.zone-card.selected, .zone-card.boss-card');
+    const name = sel ? sel.querySelector('.zone-name').textContent : 'ด่าน';
+    alert(`เริ่มการต่อสู้ที่: ${name}`);
+  }
+
+  function showEquip(slot) {
+    alert(`เปิดหน้าต่างอุปกรณ์: ${slot}`);
+  }
+
+  // Timer countdown
+  let timerSecs = 12 * 3600 + 34 * 60 + 56;
+  function updateTimer() {
+    timerSecs--;
+    if (timerSecs < 0) timerSecs = 86400;
+    const h = Math.floor(timerSecs / 3600);
+    const m = Math.floor((timerSecs % 3600) / 60);
+    const s = timerSecs % 60;
+    document.getElementById('timer').textContent =
+      String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }
+  setInterval(updateTimer, 1000);
+
+  // Select boss zone by default
+  document.getElementById('zone5').classList.add('selected');
+</script>
+</body>
+</html>
