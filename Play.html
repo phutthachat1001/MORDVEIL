@@ -16,8 +16,23 @@
 <script>
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
+    const isMob = window.innerWidth <= 700;
+
+    // ── swap video sources for mobile ──
+    const homeSrc = document.getElementById('bg-home-src');
+    if (homeSrc && isMob) {
+      homeSrc.src = 'assets/bg/bg_home_mb.mp4';
+    }
+    const hubSrc = document.getElementById('hub-bg-src');
+    if (hubSrc && isMob) {
+      hubSrc.src = 'assets/bg/bg_hub_mb.mp4';
+      const hv = document.getElementById('hub-bg-video');
+      if (hv) hv.load();
+    }
+
     const v = document.getElementById('bg-video');
     if (!v) return;
+    if (isMob) v.load();
 
     // Smooth loop: start fading 1.2s before end, seek to start, fade back in
     v.addEventListener('timeupdate', function(){
@@ -100,7 +115,7 @@
 
 <!-- ===== BG VIDEO ===== -->
 <video id="bg-video" autoplay muted playsinline preload="auto">
-  <source src="assets/bg/bg_home.mp4" type="video/mp4">
+  <source id="bg-home-src" src="assets/bg/bg_home.mp4" type="video/mp4">
 </video>
 
 <!-- ===== LORE POPUP ===== -->
@@ -600,7 +615,7 @@
   <!-- ── HUB VIDEO BG ── -->
   <video id="hub-bg-video" muted playsinline preload="auto" loop
     style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:1;">
-    <source src="assets/bg/bg_hub.mp4" type="video/mp4">
+    <source id="hub-bg-src" src="assets/bg/bg_hub.mp4" type="video/mp4">
   </video>
   <!-- light overlay -->
   <div style="position:absolute;inset:0;z-index:1;background:rgba(0,0,0,.10);pointer-events:none"></div>

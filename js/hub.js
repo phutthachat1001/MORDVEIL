@@ -1128,22 +1128,33 @@ function renderHubScene() {
   const scene = document.getElementById('hub-scene');
   scene.innerHTML = '';
 
-  HUB_NPCS.forEach(npc => {
+  const mob = window.innerWidth <= 700;
+  // on mobile: evenly space 5 NPCs at 10%, 28%, 48%, 68%, 88%
+  // bottom adjusted so sprite+name fits inside hub-scene (210px)
+  const mobilePos  = ['10%','28%','48%','68%','88%'];
+  const bottomPx   = mob ? 42 : 80;
+  // name tag inline style — smaller on mobile
+  const nameStyle  = mob
+    ? `color:${'{color}'};font-size:.62rem;font-weight:700;-webkit-text-stroke:1.5px #000;paint-order:stroke fill;text-shadow:0 1px 6px #000;background:rgba(0,0,0,.55);padding:.06rem .28rem;border-radius:3px;`
+    : `color:${'{color}'};font-size:1.1rem;font-weight:700;-webkit-text-stroke:2px #000;paint-order:stroke fill;text-shadow:0 2px 8px #000,0 0 16px ${'{color}'}cc;background:rgba(0,0,0,.45);padding:.15rem .5rem;border-radius:4px;`;
+
+  HUB_NPCS.forEach((npc, idx) => {
     const slot = document.createElement('div');
     slot.className = 'hub-npc-slot';
     slot.id = `hub-npc-${npc.id}`;
-    const bottomPx = window.innerWidth <= 700 ? 50 : 80;
-    slot.style.cssText = `position:absolute;bottom:${bottomPx}px;left:${npc.pos || '50%'};transform:translateX(-50%);`;
+    const posLeft = mob ? mobilePos[idx] : (npc.pos || '50%');
+    slot.style.cssText = `position:absolute;bottom:${bottomPx}px;left:${posLeft};transform:translateX(-50%);`;
 
     const sprite = HUB_NPC_SPRITES[npc.id] || HUB_NPC_SPRITES.innkeeper;
+    const ns = nameStyle.replace(/\{color\}/g, npc.color);
 
     slot.innerHTML = `
       <div class="hub-npc-label">${npc.name}</div>
       <div class="hub-npc-sprite hub-npc-float"
            style="--float-dur:${npc.floatDur};--float-del:${npc.floatDel}">${sprite}</div>
       <div class="hub-npc-shadow" style="--float-dur:${npc.floatDur};--float-del:${npc.floatDel}"></div>
-      <div class="hub-npc-name-tag" style="color:${npc.color};font-size:1.1rem;font-weight:700;-webkit-text-stroke:2px #000;paint-order:stroke fill;text-shadow:0 2px 8px #000,0 0 16px ${npc.color}cc;background:rgba(0,0,0,.45);padding:.15rem .5rem;border-radius:4px;">${npc.name}</div>
-      <div class="hub-npc-role-tag" style="color:#fff;font-size:.72rem;-webkit-text-stroke:.8px #000;paint-order:stroke fill;text-shadow:0 1px 4px #000,0 1px 4px #000;">${npc.title}</div>
+      <div class="hub-npc-name-tag" style="${ns}">${npc.name}</div>
+      <div class="hub-npc-role-tag" style="color:#fff;font-size:.72rem;-webkit-text-stroke:.8px #000;paint-order:stroke fill;text-shadow:0 1px 4px #000;">${npc.title}</div>
     `;
     slot.onclick = () => openHubNpc(npc.id);
     scene.appendChild(slot);
