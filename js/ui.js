@@ -132,12 +132,15 @@ function showStats() {
 }
 
 function logBattle(msg) {
-  const log  = document.getElementById('battle-log');
+  // Primary: new RPG scene log strip
+  const rpgLog = document.getElementById('rpg-battle-log-strip');
+  const target = rpgLog || document.getElementById('battle-log');
+  if (!target) return;
   const line = document.createElement('div');
   line.innerHTML = msg;
-  log.appendChild(line);
-  log.scrollTop = log.scrollHeight;
-  if (log.children.length > 100) log.removeChild(log.firstChild);
+  target.appendChild(line);
+  target.scrollTop = target.scrollHeight;
+  if (target.children.length > 60) target.removeChild(target.firstChild);
 }
 
 function renderAll() {

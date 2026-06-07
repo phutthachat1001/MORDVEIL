@@ -169,82 +169,371 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
 .streak-info .streak-val{color:var(--gold);font-size:1.1rem;font-weight:600}
 .section-sep{height:1px;background:var(--border);margin:.8rem 0}
 
-/* BATTLE PANEL */
+/* ===================================================
+   BATTLE PANEL — Full RPG Scene Style
+   =================================================== */
 .battle-panel{border-left:1px solid var(--border);border-right:1px solid var(--border)}
 .zone-tabs{display:flex;gap:.3rem;padding:.5rem;background:var(--bg3);border-bottom:1px solid var(--border);flex-wrap:wrap}
 .zone-tab{background:var(--bg4);border:1px solid var(--border);color:var(--text2);padding:.3rem .7rem;border-radius:6px;cursor:pointer;font-size:.8rem;font-family:'Chakra Petch',sans-serif;transition:all .2s}
 .zone-tab.active{border-color:var(--gold);color:var(--gold);background:var(--bg3);box-shadow:0 0 8px var(--gold)44}
 .zone-tab.locked{opacity:.4;cursor:not-allowed}
-.battle-arena{padding:1rem;display:flex;flex-direction:column;align-items:center;overflow-y:auto;flex:1}
-.monster-display{text-align:center;margin-bottom:1rem;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.5rem;width:100%}
-.monster-sprite{font-size:4rem;display:block;margin-bottom:.5rem;filter:drop-shadow(0 0 10px #00000088)}
-.monster-sprite.shake{animation:shake .3s}
-.monster-sprite.dead{animation:fadeOut .5s forwards}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-@keyframes fadeOut{to{opacity:0;transform:scale(.5) translateY(-20px)}}
-.monster-name{font-family:'Chakra Petch',sans-serif;font-size:1.1rem;color:var(--red);margin-bottom:.3rem}
-.monster-type{font-size:.75rem;color:var(--text2);margin-bottom:.5rem}
-.mon-hp-bar{background:var(--bg4);border-radius:8px;height:12px;overflow:hidden;border:1px solid var(--border);position:relative}
-.mon-hp-fill{height:100%;background:linear-gradient(90deg,#cc2222,#ff4444);transition:width .4s ease;border-radius:8px;position:relative}
-.mon-hp-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.15),transparent);border-radius:8px}
-.mon-hp-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#fff}
-.mon-stats{font-size:.75rem;color:var(--text2);margin-top:.4rem}
-.monster-select{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;width:100%;margin-bottom:1rem}
+.battle-arena{padding:0;display:flex;flex-direction:column;align-items:center;overflow-y:auto;flex:1}
+.monster-select{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;width:100%;margin-bottom:1rem;padding:.8rem}
 .mon-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:.4rem .3rem;border-radius:6px;cursor:pointer;font-size:.75rem;text-align:center;transition:all .2s}
 .mon-btn:hover{border-color:var(--red);color:var(--text);transform:scale(1.04);box-shadow:0 0 10px var(--red)33}
 .mon-btn.boss{border-color:var(--orange);color:var(--orange);box-shadow:0 0 8px var(--orange)33}
 .mon-btn.defeated{opacity:.55;border-color:var(--green) !important;color:var(--green) !important}
-.battle-actions{display:flex;gap:.5rem;width:100%;margin-bottom:1rem;flex-wrap:wrap}
-.btn-attack,.btn-flee,.btn-auto,.skill-btn{
+.no-monster{text-align:center;color:var(--text2);padding:2rem;font-size:.9rem}
+
+/* ── RPG Battle Scene ── */
+#rpg-battle-scene{
+  width:100%;display:flex;flex-direction:column;flex:1;min-height:0;
+  background:#0a0a14;position:relative;overflow:hidden;
+}
+
+/* Scene background — full-width art behind fighters */
+#battle-scene-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#0a0a2e 0%,#1a1030 40%,#2a1a0a 70%,#1a1008 100%);
+  z-index:0;transition:background .6s;
+}
+#battle-scene-bg.zone-1{background:linear-gradient(180deg,#0a1a0a 0%,#0d2a0d 40%,#1a3a08 70%,#0d1a08 100%)}
+#battle-scene-bg.zone-2{background:linear-gradient(180deg,#1a0d1a 0%,#2a1022 40%,#1a1a0a 70%,#0a0a08 100%)}
+#battle-scene-bg.zone-3{background:linear-gradient(180deg,#1a0a00 0%,#2a1400 40%,#3a1a00 70%,#1a0a00 100%)}
+#battle-scene-bg.zone-4{background:linear-gradient(180deg,#1a0000 0%,#2a0808 40%,#1a0000 70%,#0a0000 100%)}
+#battle-scene-bg.zone-5{background:linear-gradient(180deg,#0a0a1a 0%,#0d0d2a 40%,#1a1022 70%,#0a0a14 100%)}
+#battle-scene-bg.zone-6{background:linear-gradient(180deg,#0d001a 0%,#1a002a 40%,#0a0014 70%,#05000a 100%)}
+
+/* Ground line */
+#battle-scene-bg::after{
+  content:'';position:absolute;bottom:32%;left:0;right:0;
+  height:2px;background:rgba(255,255,255,.06);
+}
+
+/* Scene image (user-provided BG) */
+#battle-bg-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;z-index:1;opacity:.35;
+  image-rendering:pixelated;
+  display:none;
+}
+#battle-bg-img.active{display:block}
+
+/* Stars / particles overlay */
+#battle-scene-bg::before{
+  content:'';position:absolute;inset:0;z-index:2;
+  background:radial-gradient(1px 1px at 20% 15%,rgba(255,255,255,.6),transparent),
+             radial-gradient(1px 1px at 60% 8%,rgba(255,255,255,.4),transparent),
+             radial-gradient(1px 1px at 80% 20%,rgba(255,255,255,.5),transparent),
+             radial-gradient(1px 1px at 40% 5%,rgba(255,255,255,.3),transparent),
+             radial-gradient(1px 1px at 92% 12%,rgba(255,255,255,.4),transparent);
+}
+
+/* ── Fighter Stage — enemy top, player bottom ── */
+#battle-fighters{
+  position:relative;z-index:3;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 5% 2%;
+  height:52%;min-height:170px;flex-shrink:0;
+}
+
+/* Enemy side (top-right) */
+#battle-enemy-side{
+  display:flex;flex-direction:column;align-items:flex-end;
+  gap:.3rem;width:55%;
+}
+#battle-enemy-info{
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,60,60,.4);
+  border-radius:10px;padding:.4rem .7rem;text-align:right;width:100%;
+  backdrop-filter:blur(4px);
+}
+#battle-enemy-name{
+  font-family:'Chakra Petch',sans-serif;font-size:.9rem;
+  color:#ff8888;font-weight:700;line-height:1.2;
+}
+#battle-enemy-type{font-size:.65rem;color:#ff6666;margin-bottom:.3rem}
+#battle-enemy-hp-wrap{
+  background:rgba(0,0,0,.5);border-radius:6px;height:10px;
+  overflow:hidden;position:relative;border:1px solid rgba(255,0,0,.3);
+}
+#battle-enemy-hp-fill{
+  height:100%;background:linear-gradient(90deg,#cc0000,#ff4444);
+  transition:width .4s ease;
+}
+#battle-enemy-hp-text{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;color:#fff;font-family:'Chakra Petch',sans-serif;
+}
+#battle-enemy-atk{font-size:.62rem;color:#ff9988;margin-top:.25rem;text-align:right}
+#battle-enemy-queue{
+  display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;margin-top:.2rem;
+}
+.eq-badge{
+  background:rgba(255,60,60,.2);border:1px solid rgba(255,60,60,.5);
+  border-radius:5px;padding:1px 6px;font-size:.62rem;color:#ffaaaa;
+}
+
+#pixel-monster{
+  display:flex;align-items:flex-end;justify-content:center;
+  animation:enemy-idle 2s ease-in-out infinite;
+  filter:drop-shadow(0 8px 16px rgba(0,0,0,.7)) drop-shadow(0 0 8px rgba(255,60,60,.3));
+  cursor:default;
+  image-rendering:pixelated;
+  transform:scaleX(-1);
+}
+/* undo flip for animations that need consistent direction */
+#pixel-monster.shake-anim,#pixel-monster.die-anim,#pixel-monster.spawn-anim{transform-origin:center bottom}
+@keyframes enemy-idle{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+#pixel-monster.shake-anim{animation:enemy-shake .35s;animation-fill-mode:forwards}
+@keyframes enemy-shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-10px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-6px)}
+  80%{transform:translateX(4px)}
+}
+#pixel-monster.die-anim{animation:enemy-die .5s forwards}
+@keyframes enemy-die{to{opacity:0;transform:translateY(30px) scale(.5)}}
+#pixel-monster.spawn-anim{animation:enemy-spawn .4s ease-out}
+@keyframes enemy-spawn{from{opacity:0;transform:translateX(40px) scale(.8)}to{opacity:1;transform:translateX(0) scale(1)}}
+
+/* Player side (bottom-left) */
+#battle-player-side{
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:.3rem;width:42%;
+}
+#pixel-player{
+  display:flex;align-items:flex-end;justify-content:center;
+  animation:player-idle 1.6s ease-in-out infinite;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.7));
+  image-rendering:pixelated;
+}
+@keyframes player-idle{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
+}
+#pixel-player.attack-anim{
+  animation:player-attack .5s ease-in-out;
+}
+@keyframes player-attack{
+  0%{transform:translateX(0)}
+  30%{transform:translateX(30px) scaleX(1.1)}
+  60%{transform:translateX(50px)}
+  100%{transform:translateX(0)}
+}
+#pixel-player.hurt-anim{animation:player-hurt .35s;animation-fill-mode:forwards}
+@keyframes player-hurt{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-8px)}
+  75%{transform:translateX(6px)}
+}
+
+/* ── RPG-style Status Bars (bottom half) ── */
+#rpg-battle-ui{
+  position:relative;z-index:4;
+  background:rgba(8,8,20,.95);
+  border-top:2px solid rgba(100,100,200,.3);
+  display:flex;flex-direction:column;
+  flex-shrink:0;
+}
+
+/* Player status strip */
+#rpg-player-status{
+  display:flex;align-items:center;gap:.6rem;
+  padding:.5rem .8rem .3rem;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+#rpg-player-name{
+  font-family:'Chakra Petch',sans-serif;font-size:.82rem;
+  color:var(--gold);white-space:nowrap;flex-shrink:0;min-width:80px;
+}
+.rpg-hp-wrap{
+  flex:1;display:flex;flex-direction:column;gap:2px;
+}
+.rpg-hp-label{font-size:.58rem;color:#88aabb;letter-spacing:1px;font-family:'Chakra Petch',sans-serif}
+.rpg-hp-track{
+  height:11px;background:rgba(0,0,0,.6);border-radius:5px;
+  overflow:hidden;position:relative;border:1px solid rgba(100,200,100,.25);
+}
+#rpg-player-hp-fill{
+  height:100%;background:linear-gradient(90deg,#22cc44,#44ff88);
+  transition:width .3s;border-radius:5px;
+}
+#rpg-player-hp-text{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;color:#fff;font-family:'Chakra Petch',sans-serif;
+  text-shadow:0 0 4px #000;
+}
+#rpg-player-status-tags{
+  display:flex;gap:3px;flex-shrink:0;
+}
+.status-tag{
+  font-size:.6rem;padding:1px 5px;border-radius:4px;font-weight:700;
+}
+.status-tag.burn{background:#5a1500;color:#ff6600;border:1px solid #ff6600}
+.status-tag.poison{background:#1a3a00;color:#88ff00;border:1px solid #88ff00}
+.status-tag.shield{background:#001a4a;color:#4488ff;border:1px solid #4488ff}
+
+/* ── Command Menu (FF-style) ── */
+#rpg-cmd-menu{
+  display:grid;grid-template-columns:1fr 1fr;gap:.35rem;
+  padding:.4rem .8rem;
+}
+.rpg-cmd-btn{
+  -webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  background:rgba(20,20,40,.9);
+  border:1px solid rgba(100,100,200,.4);
+  color:#c8c8e8;
+  font-family:'Chakra Petch',sans-serif;font-size:.82rem;
+  padding:.5rem .8rem;border-radius:7px;cursor:pointer;
+  display:flex;align-items:center;gap:.4rem;
+  transition:all .15s;
+  position:relative;overflow:hidden;
+}
+.rpg-cmd-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),transparent);
+  pointer-events:none;
+}
+.rpg-cmd-btn:hover:not(:disabled){
+  background:rgba(60,60,100,.9);
+  border-color:rgba(150,150,255,.7);
+  color:#fff;
+  box-shadow:0 0 10px rgba(100,100,255,.3);
+  transform:translateY(-1px);
+}
+.rpg-cmd-btn:active:not(:disabled){transform:translateY(0) scale(.98)}
+.rpg-cmd-btn:disabled{opacity:.35;cursor:not-allowed}
+.rpg-cmd-btn.cmd-attack{border-color:rgba(255,80,80,.5);color:#ff9988}
+.rpg-cmd-btn.cmd-attack:hover:not(:disabled){background:rgba(80,20,20,.9);border-color:#ff4444;box-shadow:0 0 12px rgba(255,60,60,.3)}
+.rpg-cmd-btn.cmd-auto{border-color:rgba(80,200,80,.4);color:#88ff88}
+.rpg-cmd-btn.cmd-auto.on{background:rgba(10,40,10,.9);border-color:#44ff88;box-shadow:0 0 10px rgba(68,255,136,.3);color:#44ff88}
+.rpg-cmd-btn.cmd-flee{border-color:rgba(100,100,200,.4);color:#aaaadd}
+.rpg-cmd-btn.cmd-skills{border-color:rgba(150,80,255,.5);color:#cc88ff}
+.rpg-cmd-btn.cmd-skills:hover:not(:disabled){background:rgba(40,10,60,.9);border-color:#aa44ff;box-shadow:0 0 12px rgba(170,68,255,.3)}
+.rpg-cmd-icon{font-size:1rem;flex-shrink:0}
+.rpg-cmd-label{line-height:1.1}
+.rpg-cmd-sub{font-size:.6rem;color:#888;margin-top:.05rem;font-family:'Sarabun',sans-serif}
+
+/* Skills submenu */
+#rpg-skill-menu{
+  display:none;grid-template-columns:1fr 1fr;gap:.3rem;
+  padding:.3rem .8rem .5rem;
+  border-top:1px solid rgba(170,68,255,.2);
+}
+#rpg-skill-menu.open{display:grid}
+.skill-btn{
   -webkit-user-select:none;user-select:none;
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
 }
-.btn-attack{background:linear-gradient(135deg,#402010,#601020);border:1px solid var(--red);color:var(--red);padding:.7rem 1rem;border-radius:8px;cursor:pointer;font-family:'Chakra Petch',sans-serif;font-size:.9rem;flex:1;transition:all .2s}
-.btn-attack:hover:not(:disabled){box-shadow:0 0 12px #ff444444;transform:scale(1.02)}
-.btn-attack:disabled{opacity:.4;cursor:not-allowed}
-.btn-flee{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.7rem 1rem;border-radius:8px;cursor:pointer;font-size:.9rem;flex:1;transition:all .2s}
-.btn-flee:hover{border-color:var(--blue);color:var(--blue)}
-.btn-auto{background:var(--bg3);border:2px solid var(--border2);color:var(--text2);padding:.7rem 1rem;border-radius:8px;cursor:pointer;font-family:'Chakra Petch',sans-serif;font-size:.9rem;flex:1;transition:all .2s}
-.btn-auto.on{background:linear-gradient(135deg,#0d2010,#1a3020);border-color:var(--green);color:var(--green);box-shadow:0 0 10px #44ff8844}
-/* player status bar in battle */
-#battle-player-status{
-  display:flex;align-items:center;gap:.5rem;
-  background:var(--bg3);border:1px solid var(--border);border-radius:8px;
-  padding:.35rem .7rem;width:100%;margin-bottom:.4rem;box-sizing:border-box;
+
+/* Battle log strip */
+#rpg-battle-log-strip{
+  padding:.3rem .8rem .5rem;
+  font-size:.78rem;color:var(--text2);
+  border-top:1px solid rgba(255,255,255,.06);
+  min-height:38px;
+  max-height:80px;overflow-y:auto;
+  line-height:1.5;
 }
-#bps-name{
-  font-family:'Chakra Petch',sans-serif;font-size:.78rem;color:var(--gold);
-  white-space:nowrap;flex-shrink:0;
+#rpg-battle-log-strip::-webkit-scrollbar{width:2px}
+#rpg-battle-log-strip::-webkit-scrollbar-thumb{background:var(--border2)}
+
+/* Kill counter pill */
+#rpg-kill-counter{
+  position:absolute;top:.5rem;left:.8rem;z-index:5;
+  background:rgba(0,0,0,.7);border:1px solid rgba(255,60,60,.4);
+  border-radius:20px;padding:.15rem .6rem;font-size:.7rem;
+  color:#ff8888;font-family:'Chakra Petch',sans-serif;
 }
-.bps-hp-bar{
-  flex:1;height:10px;background:rgba(255,255,255,.1);
-  border-radius:6px;overflow:hidden;position:relative;
-}
-.bps-hp-fill{
-  height:100%;border-radius:6px;
-  background:linear-gradient(90deg,#22cc44,#44ff88);
-  transition:width .3s;
-}
-.bps-hp-text{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:.62rem;font-family:'Chakra Petch',sans-serif;color:#fff;
-  text-shadow:0 0 4px #000;
-}
-.kill-counter{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:.4rem .8rem;text-align:center;font-size:.82rem;width:100%;margin-bottom:.5rem}
-.kill-counter span{color:var(--red);font-family:'Chakra Petch',sans-serif;font-size:1rem;font-weight:600}
+
+/* Legacy battle-log for non-battle pages */
 .battle-log{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.8rem;width:100%;max-height:220px;overflow-y:auto;font-size:.82rem;line-height:1.65;scroll-behavior:smooth}
 .battle-log::-webkit-scrollbar{width:3px}
 .battle-log::-webkit-scrollbar-thumb{background:var(--border2)}
+
+/* Shared log colors */
 .log-dmg{color:var(--red)}
 .log-heal{color:var(--green)}
 .log-exp{color:var(--gold)}
 .log-loot{color:var(--purple)}
 .log-sys{color:var(--blue)}
 .log-crit{color:#ff8800;font-weight:600}
+
+/* Damage numbers float */
 .damage-float{position:fixed;pointer-events:none;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.2rem;animation:floatUp .8s forwards;z-index:9999}
 @keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-60px)}}
-.no-monster{text-align:center;color:var(--text2);padding:2rem;font-size:.9rem}
+@keyframes arenaFlash{0%{opacity:.3}100%{opacity:0}}
+
+/* ── NPC Encounter Dialogue (zone entry) ── */
+#npc-encounter-overlay{
+  position:fixed;inset:0;z-index:600;
+  background:rgba(0,0,0,.75);
+  display:none;align-items:flex-end;justify-content:center;
+  padding-bottom:2rem;
+  animation:fadeIn .3s ease;
+}
+#npc-encounter-overlay.active{display:flex}
+#npc-encounter-box{
+  width:min(640px,95vw);
+  background:linear-gradient(180deg,#0d0d1e,#12122a);
+  border:2px solid rgba(100,100,255,.5);
+  border-radius:14px;
+  padding:1rem 1.2rem;
+  box-shadow:0 0 40px rgba(80,80,255,.25);
+  animation:slideUp .35s cubic-bezier(.22,1,.36,1);
+}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.npc-enc-top{display:flex;gap:.8rem;align-items:flex-start;margin-bottom:.6rem}
+.npc-enc-portrait{
+  width:64px;height:64px;flex-shrink:0;
+  background:rgba(255,255,255,.05);border:2px solid rgba(150,100,255,.5);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:2.4rem;overflow:hidden;
+}
+.npc-enc-portrait img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+.npc-enc-right{flex:1}
+.npc-enc-name{
+  font-family:'Chakra Petch',sans-serif;color:var(--gold);
+  font-size:.88rem;margin-bottom:.3rem;
+}
+.npc-enc-text{
+  font-size:.84rem;color:var(--text);line-height:1.6;
+  min-height:3rem;
+}
+.npc-enc-cursor{
+  display:inline-block;animation:blink .7s step-end infinite;
+  color:var(--gold);margin-left:2px;
+}
+@keyframes blink{50%{opacity:0}}
+.npc-enc-actions{
+  display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;
+}
+.npc-enc-btn{
+  background:rgba(60,40,100,.8);border:1px solid rgba(150,100,255,.6);
+  color:#cc99ff;padding:.35rem .9rem;border-radius:7px;cursor:pointer;
+  font-family:'Chakra Petch',sans-serif;font-size:.8rem;
+  transition:all .15s;
+}
+.npc-enc-btn:hover{background:rgba(100,60,160,.9);border-color:#aa66ff;color:#fff}
+.npc-enc-btn.primary{background:rgba(40,80,40,.9);border-color:#44ff88;color:#44ff88}
+.npc-enc-btn.primary:hover{background:rgba(60,120,60,.9);color:#fff}
+
+/* ── Old #battle-player-status still referenced in JS (keep hidden, JS uses rpg-player-status now) ── */
+#battle-player-status{display:none}
+.bps-hp-bar,.bps-hp-fill,.bps-hp-text{display:none}
+.monster-display{display:none}
+.battle-actions{display:none}
+.monster-sprite{display:none}
+
+/* ── kill counter (legacy id kept) ── */
+.kill-counter{display:none}
 
 /* RIGHT PANEL - CHARACTER */
 .char-avatar{
@@ -1220,6 +1509,48 @@ h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
   }
   .map-pin-hub .pin-dot { width: 16px !important; height: 16px !important; }
   .pin-sub { font-size: .55rem !important; }
+
+  /* ── RPG Battle Scene on mobile ── */
+  #rpg-battle-scene {
+    /* fill available space in panel */
+    flex: 1;
+    min-height: 0;
+  }
+  #battle-fighters {
+    height: 44%;
+    min-height: 130px;
+    padding: 0 3% 1%;
+  }
+  #pixel-monster svg,
+  #pixel-monster img { width: 60px !important; height: 60px !important; }
+  #pixel-player  svg,
+  #pixel-player  img { width: 56px !important; height: 56px !important; }
+
+  /* Command menu 4 wide on mobile */
+  #rpg-cmd-menu {
+    grid-template-columns: 1fr 1fr;
+    gap: .25rem;
+    padding: .3rem .5rem;
+  }
+  .rpg-cmd-btn {
+    padding: .45rem .5rem;
+    font-size: .76rem;
+  }
+  #rpg-skill-menu {
+    grid-template-columns: 1fr 1fr;
+    padding: .25rem .5rem .4rem;
+    gap: .25rem;
+  }
+  #rpg-player-status { padding: .4rem .5rem .25rem; gap: .4rem; }
+  #rpg-player-name { font-size: .74rem; min-width: 65px; }
+  #rpg-battle-log-strip { font-size: .72rem; max-height: 60px; padding: .25rem .5rem .4rem; }
+  #battle-enemy-info { padding: .3rem .5rem; }
+  #battle-enemy-name { font-size: .78rem; }
+  #rpg-kill-counter { font-size: .62rem; padding: .1rem .45rem; }
+
+  /* NPC encounter — bottom sheet on mobile */
+  #npc-encounter-overlay { padding-bottom: 68px; }
+  #npc-encounter-box { border-radius: 12px 12px 0 0; }
 }
 
 /* ============================================================

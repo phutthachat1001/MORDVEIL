@@ -27,6 +27,7 @@ function renderZoneTabs() {
       renderZoneTabs();
       renderMonsterList();
       if (typeof rpgOnExplore === 'function') rpgOnExplore(z.id);
+      if (typeof npcCheckZoneEntry === 'function') npcCheckZoneEntry(z.id);
     };
     tabs.appendChild(tab);
   });
@@ -1400,58 +1401,79 @@ function showBattleContent(monster, stats) {
   const stonePanel = document.getElementById('stone-lore-panel');
   if (stonePanel) stonePanel.style.display = 'none';
 
-  // แสดง pixel art arena
-  const arena = document.getElementById('pixel-battle-arena');
-  if (arena) {
-    const cls = CLASSES ? CLASSES.find(c => c.id === G.classId) : null;
-    const playerSvg  = (typeof getPlayerSpriteWithCosmetic !== 'undefined')
-      ? getPlayerSpriteWithCosmetic(G.classId || 'warrior', G.classTier || 1, G.cosmeticTier || 1)
-      : getPlayerSprite(G.classId || 'warrior', G.classTier || 1);
-    const monsterSvg = getMonsterSprite(monster.name, monster.isBoss, G.currentZone, monster.img);
-    arena.innerHTML = `
-      <div id="pixel-player" class="pixel-fighter pixel-player-side">${playerSvg}</div>
-      <div class="pixel-vs">⚔</div>
-      <div id="pixel-monster" class="pixel-fighter pixel-monster-side">${monsterSvg}</div>
-    `;
-    arena.style.display = 'flex';
-  if (monster.isBoss) {
-    arena.style.boxShadow = '0 0 30px rgba(255,100,0,.3) inset, 0 0 60px rgba(255,50,0,.15)';
-    arena.style.borderColor = '#ff6600';
-  } else {
-    arena.style.boxShadow = '';
-    arena.style.borderColor = '';
-  }
+  // ── RPG Scene setup ──
+  // Set zone background class
+  const sceneBg = document.getElementById('battle-scene-bg');
+  if (sceneBg) {
+    sceneBg.className = 'zone-' + (G.currentZone || 1);
+    if (monster.isBoss) sceneBg.style.filter = 'brightness(1.15) saturate(1.3)';
+    else sceneBg.style.filter = '';
   }
 
-  document.getElementById('mon-sprite').style.display = 'none';
-  document.getElementById('mon-name').textContent    = monster.name + (monster.isBoss ? ' 👑' : '');
-  document.getElementById('mon-type').textContent    = monster.isBoss ? '🔴 บอสศัตรู' : 'ศัตรูทั่วไป';
-  document.getElementById('mon-stats').textContent   = `ATK: ${stats.atk}`;
+  // Boss glow on the scene
+  const scene = document.getElementById('rpg-battle-scene');
+  if (scene) {
+    scene.style.boxShadow = monster.isBoss
+      ? 'inset 0 0 60px rgba(255,80,0,.2)'
+      : '';
+  }
+
+  // Inject player sprite
+  const playerEl = document.getElementById('pixel-player');
+  if (playerEl) {
+    const playerSvg = (typeof getPlayerSpriteWithCosmetic !== 'undefined')
+      ? getPlayerSpriteWithCosmetic(G.classId || 'warrior', G.classTier || 1, G.cosmeticTier || 1)
+      : getPlayerSprite(G.classId || 'warrior', G.classTier || 1);
+    playerEl.innerHTML = playerSvg;
+  }
+
+  // Inject monster sprite
+  const monsterEl = document.getElementById('pixel-monster');
+  if (monsterEl) {
+    monsterEl.innerHTML = getMonsterSprite(monster.name, monster.isBoss, G.currentZone, monster.img);
+    monsterEl.classList.remove('die-anim','shake-anim','spawn-anim');
+  }
+
+  // Enemy info panel
+  _setEnemyInfo(monster, stats);
+
   updateMonsterHpBar();
   updateBattlePlayerStatus();
   renderEnemyQueue();
   document.getElementById('btn-attack').disabled = false;
+
+  // Close skill menu if open
+  const sm = document.getElementById('rpg-skill-menu');
+  if (sm) sm.classList.remove('open');
+
   renderSkillBar();
+
+  // Legacy hidden elements (JS still reads them in some paths)
+  const nm = document.getElementById('mon-name'); if (nm) nm.textContent = monster.name;
+  const mt = document.getElementById('mon-type'); if (mt) mt.textContent = monster.isBoss ? 'บอส' : 'ศัตรู';
+  const ms = document.getElementById('mon-stats'); if (ms) ms.textContent = `ATK: ${stats.atk}`;
+}
+
+function _setEnemyInfo(monster, stats) {
+  const nameEl = document.getElementById('battle-enemy-name');
+  const typeEl = document.getElementById('battle-enemy-type');
+  const atkEl  = document.getElementById('battle-enemy-atk');
+  if (nameEl) nameEl.textContent = monster.name + (monster.isBoss ? ' 👑' : '');
+  if (typeEl) typeEl.textContent = monster.isBoss ? '🔴 บอสศัตรู' : '⚔ ศัตรูทั่วไป';
+  if (atkEl)  atkEl.textContent  = `ATK: ${stats.atk}`;
 }
 
 function renderEnemyQueue() {
-  let el = document.getElementById('enemy-queue-row');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'enemy-queue-row';
-    el.style.cssText = 'display:flex;gap:6px;align-items:center;justify-content:center;margin-bottom:.3rem;min-height:22px';
-    const nameEl = document.getElementById('mon-name');
-    if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(el, nameEl.nextSibling);
-  }
+  const el = document.getElementById('battle-enemy-queue');
+  if (!el) return;
   const queue = G.enemyQueue || [];
   if (queue.length === 0) { el.innerHTML = ''; return; }
   el.innerHTML = queue.map(m =>
-    `<span style="background:rgba(255,60,60,.18);border:1px solid #ff4444;border-radius:5px;padding:1px 7px;font-size:.7rem;color:#ffaaaa">${m.sprite||'👾'} ${m.name}</span>`
-  ).join('<span style="color:#888;font-size:.7rem">▶</span>');
+    `<span class="eq-badge">${m.sprite||'👾'} ${m.name}</span>`
+  ).join('');
 }
 
 function hideBattleContent() {
-  // reset combat state ทั้งหมด
   stopAuto();
   G.battleInProgress = false;
   G.currentMonster   = null;
@@ -1461,47 +1483,80 @@ function hideBattleContent() {
   G.monsterPoisonTurns = 0;
   G.monsterBurnTurns   = 0;
   G.turnCount = 0;
-  const queueEl = document.getElementById('enemy-queue-row');
+
+  const queueEl = document.getElementById('battle-enemy-queue');
   if (queueEl) queueEl.innerHTML = '';
+
+  // Close skill menu
+  const sm = document.getElementById('rpg-skill-menu');
+  if (sm) sm.classList.remove('open');
 
   document.getElementById('battle-content').style.display    = 'none';
   document.getElementById('monster-list-area').style.display = 'block';
   document.getElementById('btn-attack').disabled = false;
 
+  // Legacy hidden arena
   const arena = document.getElementById('pixel-battle-arena');
   if (arena) { arena.innerHTML = ''; arena.style.display = 'none'; }
 
-  document.getElementById('mon-sprite').style.display = '';
   renderMonsterList();
 }
 
 function updateMonsterHpBar() {
-  const pct  = Math.max(0, (G.currentMonsterHp / G.currentMonsterMaxHp) * 100);
-  const bar  = document.getElementById('mon-hp-bar');
-  bar.style.width = pct + '%';
-  bar.style.background = pct > 50
-    ? 'linear-gradient(90deg,#cc2222,#ff4444)'
-    : pct > 25
-      ? 'linear-gradient(90deg,#cc6600,#ff9900)'
-      : 'linear-gradient(90deg,#880000,#ff2200)';
-  document.getElementById('mon-hp-text').textContent = `${Math.max(0, G.currentMonsterHp)}/${G.currentMonsterMaxHp}`;
+  const pct = Math.max(0, (G.currentMonsterHp / G.currentMonsterMaxHp) * 100);
+  const fill = document.getElementById('battle-enemy-hp-fill');
+  const txt  = document.getElementById('battle-enemy-hp-text');
+  if (fill) {
+    fill.style.width = pct + '%';
+    fill.style.background = pct > 50
+      ? 'linear-gradient(90deg,#cc0000,#ff4444)'
+      : pct > 25
+        ? 'linear-gradient(90deg,#cc6600,#ff9900)'
+        : 'linear-gradient(90deg,#880000,#ff2200)';
+  }
+  if (txt) txt.textContent = `${Math.max(0, G.currentMonsterHp)}/${G.currentMonsterMaxHp}`;
+  // keep legacy hidden elements in sync (some skill paths read mon-hp-bar)
+  const legBar = document.getElementById('mon-hp-bar');
+  if (legBar) legBar.style.width = pct + '%';
+  const legTxt = document.getElementById('mon-hp-text');
+  if (legTxt) legTxt.textContent = `${Math.max(0, G.currentMonsterHp)}/${G.currentMonsterMaxHp}`;
 }
 
 function updateBattlePlayerStatus() {
-  const nameEl = document.getElementById('bps-name');
-  const barEl  = document.getElementById('bps-hp-bar');
-  const txtEl  = document.getElementById('bps-hp-text');
-  if (!nameEl) return;
   const cls = CLASSES ? CLASSES.find(c => c.id === G.classId) : null;
-  nameEl.textContent = `${cls ? cls.icon : '⚔'} LV${G.level} ${G.playerName}`;
+
+  // New RPG status bar
+  const nameEl = document.getElementById('rpg-player-name');
+  const fill   = document.getElementById('rpg-player-hp-fill');
+  const txt    = document.getElementById('rpg-player-hp-text');
+  if (nameEl) nameEl.textContent = `${cls ? cls.icon : '⚔'} LV${G.level} ${G.playerName}`;
   const pct = Math.max(0, (G.hp / G.maxHp) * 100);
-  barEl.style.width = pct + '%';
-  barEl.style.background = pct > 50
-    ? 'linear-gradient(90deg,#22cc44,#44ff88)'
-    : pct > 25
-      ? 'linear-gradient(90deg,#cc8800,#ffbb00)'
-      : 'linear-gradient(90deg,#cc2200,#ff4400)';
-  txtEl.textContent = `${G.hp}/${G.maxHp}`;
+  if (fill) {
+    fill.style.width = pct + '%';
+    fill.style.background = pct > 50
+      ? 'linear-gradient(90deg,#22cc44,#44ff88)'
+      : pct > 25
+        ? 'linear-gradient(90deg,#cc8800,#ffbb00)'
+        : 'linear-gradient(90deg,#cc2200,#ff4400)';
+  }
+  if (txt) txt.textContent = `${G.hp}/${G.maxHp}`;
+
+  // Status tags (burn, poison, shields)
+  const tags = document.getElementById('rpg-player-status-tags');
+  if (tags) {
+    let html = '';
+    if ((G.playerPoisonTurns||0) > 0) html += `<span class="status-tag poison">☠${G.playerPoisonTurns}</span>`;
+    if ((G.playerBurnTurns||0)   > 0) html += `<span class="status-tag burn">🔥${G.playerBurnTurns}</span>`;
+    if ((_skillBuffs.ironShield||0) > 0) html += `<span class="status-tag shield">🛡${_skillBuffs.ironShield}</span>`;
+    if ((_skillBuffs.lightShield||0) > 0) html += `<span class="status-tag shield">✦${_skillBuffs.lightShield}</span>`;
+    tags.innerHTML = html;
+  }
+
+  // Legacy hidden bar (still in DOM, some paths read it)
+  const legBar = document.getElementById('bps-hp-bar');
+  const legTxt = document.getElementById('bps-hp-text');
+  if (legBar) legBar.style.width = pct + '%';
+  if (legTxt) legTxt.textContent = `${G.hp}/${G.maxHp}`;
 }
 
 // ---------- Skill system ----------
@@ -1531,37 +1586,59 @@ function _getEquippedSkills() {
 }
 
 function renderSkillBar() {
-  const bar = document.getElementById('skill-bar');
-  if (!bar) return;
+  // Primary: rpg-skill-menu (new RPG scene)
+  const rpgMenu = document.getElementById('rpg-skill-menu');
+  // Fallback: legacy skill-bar (hidden, keeps old code happy)
+  const legBar = document.getElementById('skill-bar');
+
   const allSkills = _getSkills();
-  if (allSkills.length === 0) {
-    bar.innerHTML = '<div style="color:var(--text2);font-size:.72rem;padding:.3rem .5rem">🌳 อัพ Skill Tree เพื่อปลดล็อคสกิล</div>';
-    return;
+
+  if (rpgMenu) {
+    if (allSkills.length === 0) {
+      rpgMenu.innerHTML = '<div style="color:var(--text2);font-size:.72rem;padding:.3rem .5rem;grid-column:1/-1">🌳 อัพ Skill Tree เพื่อปลดล็อคสกิล</div>';
+    } else {
+      const equipped = _getEquippedSkills();
+      const tierColors = {1:'#4a9',2:'#49f',3:'#a5f',4:'#fa0'};
+      rpgMenu.innerHTML = '';
+      equipped.forEach(sk => {
+        const cd = _skillCooldowns[sk.id] || 0;
+        const btn = document.createElement('button');
+        btn.className = 'rpg-cmd-btn skill-btn tree-skill' + (cd > 0 ? ' on-cd' : '');
+        btn.style.borderColor = tierColors[sk.tier] || '#4a9';
+        btn.disabled = cd > 0 || !G.battleInProgress;
+        btn.title = `${sk.name}\n${sk.desc}\nCD: ${sk.cd} ตา`;
+        btn.innerHTML = `<span class="rpg-cmd-icon">${sk.icon}</span>
+          <div class="rpg-cmd-label">${sk.name}
+            <div class="rpg-cmd-sub">${cd > 0 ? `CD: ${cd}` : 'พร้อมใช้'}</div>
+          </div>`;
+        btn.onclick = () => { useSkill(sk.id); toggleSkillMenu(false); };
+        rpgMenu.appendChild(btn);
+      });
+      // Manage button
+      const mgBtn = document.createElement('button');
+      mgBtn.className = 'rpg-cmd-btn skill-btn';
+      mgBtn.style.borderColor = '#666';
+      mgBtn.innerHTML = '<span class="rpg-cmd-icon">⚙</span><div class="rpg-cmd-label">จัดการ<div class="rpg-cmd-sub">Manage</div></div>';
+      mgBtn.onclick = () => openSkillSelectModal();
+      rpgMenu.appendChild(mgBtn);
+    }
   }
-  const equipped = _getEquippedSkills();
-  bar.innerHTML = '';
-  equipped.forEach(sk => {
-    const cd  = _skillCooldowns[sk.id] || 0;
-    const btn = document.createElement('button');
-    const tierColors = {1:'#4a9',2:'#49f',3:'#a5f',4:'#fa0'};
-    const tierBorder = tierColors[sk.tier] || '#4a9';
-    btn.className = 'skill-btn tree-skill' + (cd > 0 ? ' on-cd' : '');
-    btn.style.borderColor = tierBorder;
-    btn.disabled  = cd > 0 || !G.battleInProgress;
-    btn.title     = `${sk.name}\n${sk.desc}\nCD: ${sk.cd} ตา`;
-    btn.innerHTML = `<span class="sk-icon">${sk.icon}</span><span class="sk-name">${sk.name}</span>${cd > 0 ? `<span class="sk-cd">${cd}</span>` : ''}`;
-    btn.onclick   = () => useSkill(sk.id);
-    bar.appendChild(btn);
-  });
-  if (allSkills.length > 0) {
-    const manageBtn = document.createElement('button');
-    manageBtn.className = 'skill-btn';
-    manageBtn.style.cssText = 'border-color:#888;opacity:.8;min-width:2.4rem;padding:.25rem .4rem';
-    manageBtn.innerHTML = '⚙';
-    manageBtn.title = 'จัดการสกิล';
-    manageBtn.onclick = () => openSkillSelectModal();
-    bar.appendChild(manageBtn);
+
+  // Update skills button label
+  const skillsBtn = document.getElementById('btn-skills');
+  if (skillsBtn) {
+    const count = allSkills.length;
+    skillsBtn.querySelector('.rpg-cmd-sub').textContent = count > 0 ? `${count} สกิล` : 'ล็อค';
   }
+
+  if (legBar) legBar.innerHTML = '';
+}
+
+function toggleSkillMenu(forceOpen) {
+  const menu = document.getElementById('rpg-skill-menu');
+  if (!menu) return;
+  if (forceOpen === false) { menu.classList.remove('open'); return; }
+  menu.classList.toggle('open');
 }
 
 function openSkillSelectModal() {
@@ -2183,6 +2260,7 @@ function monsterDie() {
   if (typeof resolveInvasionWin   === 'function' && G.pendingMonsterInvasion) resolveInvasionWin();
   // Full RPG quest tracking
   if (typeof rpgOnKill === 'function') rpgOnKill(monster.name, monster.tier, G.currentZone);
+  if (typeof npcQuestOnKill === 'function') npcQuestOnKill(monster.name, G.currentZone);
 
   setTimeout(() => {
     if (G.hp > 0) {
@@ -2222,7 +2300,7 @@ function spawnSameMonster(monster) {
     monEl.classList.remove('die-anim');
     monEl.innerHTML = getMonsterSprite(monster.name, monster.isBoss, G.currentZone, monster.img);
   }
-  document.getElementById('mon-name').textContent = monster.name + (monster.isBoss ? ' 👑' : '');
+  _setEnemyInfo(monster, stats);
   updateMonsterHpBar();
   renderEnemyQueue();
   document.getElementById('btn-attack').disabled = false;
@@ -2246,8 +2324,7 @@ function spawnNextEnemy(next, prevMonster) {
     monEl.classList.add('spawn-anim');
     setTimeout(() => monEl.classList.remove('spawn-anim'), 400);
   }
-  document.getElementById('mon-name').textContent = next.name + (next.isBoss ? ' 👑' : '');
-  document.getElementById('mon-stats').textContent = `ATK: ${stats.atk}`;
+  _setEnemyInfo(next, stats);
   updateMonsterHpBar();
   renderEnemyQueue();
   document.getElementById('btn-attack').disabled = false;
@@ -2258,23 +2335,35 @@ function spawnNextEnemy(next, prevMonster) {
 // ---------- Kill counter ----------
 
 function updateKillCounter() {
-  const el = document.getElementById('kill-counter');
-  if (el) el.textContent = G.sessionKills;
+  // kill-counter appears in rpg-kill-counter div
+  document.querySelectorAll('#kill-counter').forEach(el => { el.textContent = G.sessionKills; });
 }
 
 // ---------- Auto attack ----------
+
+function _updateAutoBtn(on) {
+  const btn = document.getElementById('btn-auto');
+  if (!btn) return;
+  if (on) {
+    btn.classList.add('on');
+    const sub = btn.querySelector('.rpg-cmd-sub, #auto-status-label');
+    if (sub) sub.textContent = 'ON';
+  } else {
+    btn.classList.remove('on');
+    const sub = btn.querySelector('.rpg-cmd-sub, #auto-status-label');
+    if (sub) sub.textContent = 'OFF';
+  }
+}
 
 function toggleAuto() {
   if (autoAttackInterval) {
     clearInterval(autoAttackInterval);
     autoAttackInterval = null;
-    const btn = document.getElementById('btn-auto');
-    if (btn) { btn.textContent = '🤖 Auto'; btn.classList.remove('on'); }
+    _updateAutoBtn(false);
     logBattle('<span class="log-sys">⏹ Auto OFF</span>');
   } else {
     if (!G.battleInProgress || !G.currentMonster) return;
-    const btn = document.getElementById('btn-auto');
-    if (btn) { btn.textContent = '⏹ Auto ON'; btn.classList.add('on'); }
+    _updateAutoBtn(true);
     logBattle('<span class="log-sys">▶ Auto ON — โจมตีทุก 2 วินาที</span>');
     autoAttackInterval = setInterval(() => {
       if (G.battleInProgress && G.hp > 0 && G.currentMonster) {
@@ -2290,8 +2379,7 @@ function stopAuto() {
   if (!autoAttackInterval) return;
   clearInterval(autoAttackInterval);
   autoAttackInterval = null;
-  const b = document.getElementById('btn-auto');
-  if (b) { b.textContent = '🤖 Auto'; b.classList.remove('on'); }
+  _updateAutoBtn(false);
 }
 
 // ---------- Player die / flee ----------

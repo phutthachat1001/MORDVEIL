@@ -93,6 +93,9 @@ let G = {
   // Evolution quests
   evoQuestProgress: {},    // questId -> progress
   evoQuestDone: {},        // questId -> true
+  // NPC quests
+  npcQuestProgress: {},    // questId/seenKey -> progress/true
+  _npcQuestDefs: {},       // questId -> quest def (transient, restored on kill)
 };
 
 let autoAttackInterval = null;

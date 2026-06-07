@@ -345,39 +345,108 @@
 
         <!-- battle content (ซ่อนจนกว่าจะเลือกมอน) -->
         <div id="battle-content" style="width:100%;display:none">
-          <!-- pixel art arena -->
-          <div id="pixel-battle-arena" style="display:none"></div>
-          <!-- monster info -->
-          <div class="monster-display">
-            <span class="monster-sprite" id="mon-sprite" style="display:none">👹</span>
-            <div class="monster-name" id="mon-name">มอนสเตอร์</div>
-            <div class="monster-type" id="mon-type">ศัตรู</div>
-            <div class="mon-hp-bar">
-              <div class="mon-hp-fill" id="mon-hp-bar" style="width:100%"></div>
-              <div class="mon-hp-text" id="mon-hp-text">100/100</div>
-            </div>
-            <div class="mon-stats" id="mon-stats">ATK: 10</div>
-          </div>
-          <!-- player status bar -->
-          <div id="battle-player-status">
-            <span id="bps-name"></span>
-            <div class="bps-hp-bar">
-              <div class="bps-hp-fill" id="bps-hp-bar"></div>
-              <div class="bps-hp-text" id="bps-hp-text"></div>
-            </div>
-          </div>
-          <div class="kill-counter">💀 Kill Count: <span id="kill-counter">0</span></div>
-          <div class="battle-actions">
-            <button class="btn-attack" id="btn-attack" onclick="playerAttack()">⚔ โจมตี</button>
-            <button class="btn-auto"   id="btn-auto"   onclick="toggleAuto()">🤖 Auto</button>
-            <button class="btn-flee"                   onclick="fleeBattle()">🏃 หนี</button>
-          </div>
-          <div class="skill-bar" id="skill-bar"></div>
-        </div>
 
-        <div class="battle-log" id="battle-log">
-          <div class="log-sys">ยินดีต้อนรับสู่ Work Quest! เพิ่มงาน ทำงานเสร็จ รับ EXP แล้วมาสู้มอนสเตอร์!</div>
-        </div>
+          <!-- ══ Full RPG Battle Scene ══ -->
+          <div id="rpg-battle-scene">
+
+            <!-- Scene background -->
+            <div id="battle-scene-bg" class="zone-1"></div>
+            <img id="battle-bg-img" alt="">
+
+            <!-- Kill counter -->
+            <div id="rpg-kill-counter">💀 <span id="kill-counter">0</span></div>
+
+            <!-- Fighter stage -->
+            <div id="battle-fighters">
+
+              <!-- Enemy side -->
+              <div id="battle-enemy-side">
+                <div id="battle-enemy-info">
+                  <div id="battle-enemy-name">มอนสเตอร์</div>
+                  <div id="battle-enemy-type">ศัตรูทั่วไป</div>
+                  <div id="battle-enemy-hp-wrap">
+                    <div id="battle-enemy-hp-fill" style="width:100%"></div>
+                    <div id="battle-enemy-hp-text">100/100</div>
+                  </div>
+                  <div id="battle-enemy-atk">ATK: —</div>
+                  <div id="battle-enemy-queue"></div>
+                </div>
+                <div id="pixel-monster"></div>
+              </div>
+
+              <!-- Player side -->
+              <div id="battle-player-side">
+                <div id="pixel-player"></div>
+              </div>
+
+            </div><!-- /battle-fighters -->
+
+            <!-- RPG Bottom UI -->
+            <div id="rpg-battle-ui">
+
+              <!-- Player status strip -->
+              <div id="rpg-player-status">
+                <div id="rpg-player-name">Hero</div>
+                <div class="rpg-hp-wrap">
+                  <div class="rpg-hp-label">HP</div>
+                  <div class="rpg-hp-track">
+                    <div id="rpg-player-hp-fill" style="width:100%"></div>
+                    <div id="rpg-player-hp-text">100/100</div>
+                  </div>
+                </div>
+                <div id="rpg-player-status-tags"></div>
+              </div>
+
+              <!-- Command Menu (2×2 grid) -->
+              <div id="rpg-cmd-menu">
+                <button class="rpg-cmd-btn cmd-attack" id="btn-attack" onclick="playerAttack()">
+                  <span class="rpg-cmd-icon">⚔</span>
+                  <div class="rpg-cmd-label">โจมตี<div class="rpg-cmd-sub">Attack</div></div>
+                </button>
+                <button class="rpg-cmd-btn cmd-skills" id="btn-skills" onclick="toggleSkillMenu()">
+                  <span class="rpg-cmd-icon">✨</span>
+                  <div class="rpg-cmd-label">สกิล<div class="rpg-cmd-sub">Skills</div></div>
+                </button>
+                <button class="rpg-cmd-btn cmd-auto" id="btn-auto" onclick="toggleAuto()">
+                  <span class="rpg-cmd-icon">🤖</span>
+                  <div class="rpg-cmd-label">Auto<div class="rpg-cmd-sub" id="auto-status-label">OFF</div></div>
+                </button>
+                <button class="rpg-cmd-btn cmd-flee" onclick="fleeBattle()">
+                  <span class="rpg-cmd-icon">🏃</span>
+                  <div class="rpg-cmd-label">หนี<div class="rpg-cmd-sub">Flee</div></div>
+                </button>
+              </div>
+
+              <!-- Skills submenu (toggled) -->
+              <div id="rpg-skill-menu" class="skill-bar"></div>
+
+              <!-- Battle log strip -->
+              <div id="rpg-battle-log-strip"></div>
+
+            </div><!-- /rpg-battle-ui -->
+
+          </div><!-- /rpg-battle-scene -->
+
+          <!-- Legacy hidden elements that JS still references -->
+          <div style="display:none">
+            <span id="mon-sprite"></span>
+            <div id="mon-name"></div>
+            <div id="mon-type"></div>
+            <div id="mon-hp-bar"></div>
+            <div id="mon-hp-text"></div>
+            <div id="mon-stats"></div>
+            <div id="battle-player-status">
+              <span id="bps-name"></span>
+              <div class="bps-hp-bar"><div class="bps-hp-fill" id="bps-hp-bar"></div><div class="bps-hp-text" id="bps-hp-text"></div></div>
+            </div>
+            <div id="pixel-battle-arena"></div>
+            <div id="skill-bar"></div>
+          </div>
+
+        </div><!-- /battle-content -->
+
+        <!-- battle-log hidden fallback kept for non-battle logBattle calls -->
+        <div class="battle-log" id="battle-log" style="display:none"></div>
       </div>
     </div>
 
@@ -668,6 +737,20 @@
 
 </div>
 
+<!-- ===== NPC ENCOUNTER DIALOGUE ===== -->
+<div id="npc-encounter-overlay">
+  <div id="npc-encounter-box">
+    <div class="npc-enc-top">
+      <div class="npc-enc-portrait" id="npc-enc-portrait">🧙</div>
+      <div class="npc-enc-right">
+        <div class="npc-enc-name" id="npc-enc-name">NPC</div>
+        <div class="npc-enc-text" id="npc-enc-text"></div>
+      </div>
+    </div>
+    <div class="npc-enc-actions" id="npc-enc-actions"></div>
+  </div>
+</div>
+
 <!-- ===== NEW GAME CONFIRM ===== -->
 <div id="newgame-overlay">
   <div class="newgame-modal">
@@ -696,6 +779,7 @@
 <script src="js/events.js"></script>
 <script src="js/cosmetic.js"></script>
 <script src="js/rpg-quests.js"></script>
+<script src="js/npc-encounter.js"></script>
 <script src="js/battle.js"></script>
 <script src="js/tasks.js"></script>
 <script src="js/hub.js"></script>
@@ -857,6 +941,7 @@
         if (backBtn) backBtn.style.display = 'inline-block';
         if (typeof renderZoneTabs === 'function') renderZoneTabs();
         if (typeof renderMonsterList === 'function') renderMonsterList();
+        if (typeof npcCheckZoneEntry === 'function') npcCheckZoneEntry(p.zone);
       };
       container.appendChild(pin);
     });
