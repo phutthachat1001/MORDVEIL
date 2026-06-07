@@ -38,8 +38,30 @@ self.addEventListener('activate', e => {
   );
 });
 
+// Network-first for HTML/JS/CSS — always try to get fresh version,
+// fall back to cache only when offline.
+// Images and other assets use cache-first (stable, large).
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request).catch(() => cached))
-  );
+  const url = new URL(e.request.url);
+  const isAsset = /\.(png|jpg|jpeg|gif|svg|webp|mp4|woff2?)$/i.test(url.pathname);
+
+  if (isAsset) {
+    // cache-first for images/fonts/videos
+    e.respondWith(
+      caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      }))
+    );
+  } else {
+    // network-first for HTML/JS/CSS
+    e.respondWith(
+      fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
+  }
 });
