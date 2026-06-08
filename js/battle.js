@@ -1557,13 +1557,10 @@ function startBattle(monster, isReplay) {
   showBattleContent(monsterObj, stats);
   const tierLabel = monsterObj.isBoss ? ' 👑 BOSS' : ` (Tier ${monsterObj.tier})`;
   const spd = (getAttackInterval() / 1000).toFixed(1);
-  logBattle(`<span class="log-sys">⚔ ${monsterObj.name}${tierLabel} — HP:${stats.maxHp} ATK:${stats.atk} — โจมตีอัตโนมัติทุก ${spd} วิ</span>`);
+  logBattle(`<span class="log-sys">⚔ ${monsterObj.name}${tierLabel} — HP:${stats.maxHp} ATK:${stats.atk} — คูลดาวน์โจมตี ${spd} วิ</span>`);
 
-  // IDLE game: auto-attack on the speed-stat timer (both normal & boss).
-  // Default ON; respect the player turning it off via the IDLE button.
-  if (G._idleMode !== false) {
-    setTimeout(() => _startAutoIfNeeded(), 300);
-  }
+  // Zone monster = MANUAL fight. Player taps Attack; the button goes on
+  // cooldown for getAttackInterval() ms. (IDLE farming is a separate panel.)
 }
 
 function _startAutoIfNeeded() {
@@ -1571,16 +1568,13 @@ function _startAutoIfNeeded() {
   if (autoAttackInterval) return; // already running
   G._idleMode = true;
   _updateAutoBtn(true);
-  const interval = getAttackInterval();
+  // Auto presses Attack whenever it's off cooldown. playerAttack() itself
+  // guards against firing while the button is disabled, so we can poll fast.
   autoAttackInterval = setInterval(() => {
-    if (G.battleInProgress && G.hp > 0 && G.currentMonster) {
-      playerAttack();
-    } else if (!G.battleInProgress && G.hp > 0) {
-      // waiting for next battle to start — keep interval alive but do nothing
-    } else {
-      stopAuto();
-    }
-  }, interval);
+    if (!G.battleInProgress || G.hp <= 0 || !G.currentMonster) { stopAuto(); return; }
+    const btn = document.getElementById('btn-attack');
+    if (btn && !btn.disabled) playerAttack();
+  }, 200);
 }
 
 function restartAutoWithNewSpeed() {
@@ -2591,9 +2585,61 @@ function _singleMonsterAttack(enemyObj) {
 
   updateTopBar();
   updateBattlePlayerStatus();
-  document.getElementById('btn-attack').disabled = false;
   renderSkillBar();
-  if (G.hp <= 0) playerDie();
+  if (G.hp <= 0) { playerDie(); return; }
+  // Manual fight: attack button stays on cooldown for the speed-stat interval
+  _startAttackCooldown();
+}
+
+// ---------- Manual attack cooldown (zone monster) ----------
+// Disables the Attack button for getAttackInterval() ms with a visual
+// countdown bar, then re-enables it. This is what makes the zone fight
+// rate-limited by the speed stat instead of spammable.
+let _attackCooldownTimer = null;
+let _attackCooldownRAF   = null;
+
+function _startAttackCooldown() {
+  const btn = document.getElementById('btn-attack');
+  if (!btn) return;
+  const ms = getAttackInterval();
+  btn.disabled = true;
+
+  // visual cooldown overlay on the button
+  let bar = btn.querySelector('.cmd-cooldown-bar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.className = 'cmd-cooldown-bar';
+    btn.appendChild(bar);
+  }
+  const start = performance.now();
+  if (_attackCooldownRAF) cancelAnimationFrame(_attackCooldownRAF);
+  const tick = (now) => {
+    const elapsed = now - start;
+    const frac = Math.min(1, elapsed / ms);
+    bar.style.height = `${(1 - frac) * 100}%`;
+    if (frac < 1) {
+      _attackCooldownRAF = requestAnimationFrame(tick);
+    } else {
+      bar.style.height = '0%';
+    }
+  };
+  _attackCooldownRAF = requestAnimationFrame(tick);
+
+  if (_attackCooldownTimer) clearTimeout(_attackCooldownTimer);
+  _attackCooldownTimer = setTimeout(() => {
+    if (G.battleInProgress && G.currentMonster && G.hp > 0) {
+      btn.disabled = false;
+    }
+    if (bar) bar.style.height = '0%';
+  }, ms);
+}
+
+function _clearAttackCooldown() {
+  if (_attackCooldownTimer) { clearTimeout(_attackCooldownTimer); _attackCooldownTimer = null; }
+  if (_attackCooldownRAF)   { cancelAnimationFrame(_attackCooldownRAF); _attackCooldownRAF = null; }
+  const btn = document.getElementById('btn-attack');
+  const bar = btn && btn.querySelector('.cmd-cooldown-bar');
+  if (bar) bar.style.height = '0%';
 }
 
 // ---------- Monster die — spawn ใหม่ทันที ----------
@@ -2752,34 +2798,21 @@ function monsterDie() {
               hideBattleContent();
               return;
             } else {
-              // Advance to next monster in zone — auto-start IDLE
+              // Advance to next monster in zone — cleared monster, go back to
+              // the zone list so the player can start the next fight manually.
               const nextMonster = zoneMonsters[newProg];
               logBattle(`<span class="log-sys">✅ ผ่าน ${monster.name}! → ถัดไป: ${nextMonster.name}</span>`);
               saveGame();
-              setTimeout(() => {
-                startBattle(nextMonster);
-                // auto-start if auto was on or IDLE mode
-                if (autoAttackInterval || G._idleMode) {
-                  setTimeout(() => { if (G.battleInProgress && G.currentMonster) _startAutoIfNeeded(); }, 400);
-                }
-              }, 600);
+              _clearAttackCooldown();
+              setTimeout(() => { hideBattleContent(); renderMonsterList(); }, 800);
               updateTopBar(); updateCharPanel(); renderInventory(); renderDailyQuests();
               return;
             }
           }
         }
-        // Replay mode or fallback — respawn same monster
-        _buildWave(monster);
-        G.battleInProgress = true;
-        const stats = { maxHp: G.enemies[0].maxHp, atk: G.enemies[0].atk };
-        renderEnemyCards();
-        updateBattlePlayerStatus();
-        document.getElementById('btn-attack').disabled = false;
-        renderSkillBar();
-        logBattle(`<span class="log-sys">⚔ ${monster.name} เกิดใหม่! HP:${stats.maxHp}</span>`);
-        if (autoAttackInterval || G._idleMode) {
-          setTimeout(() => { if (G.battleInProgress && G.currentMonster) _startAutoIfNeeded(); }, 300);
-        }
+        // Replay / training (already-cleared monster) — return to zone list.
+        _clearAttackCooldown();
+        setTimeout(() => { hideBattleContent(); renderMonsterList(); }, 800);
       }
     } else {
       hideBattleContent();
@@ -2894,26 +2927,14 @@ function stopAuto() {
 
 function playerDie() {
   G.battleInProgress = false;
-  const dyingMonster = G.currentMonster ? {...G.currentMonster} : null;
-  const wasIdle = G._idleMode || !!autoAttackInterval;
-  stopAuto();
+  _clearAttackCooldown();
   G.hp = Math.floor(G.maxHp * .3);
-  logBattle(`<span class="log-dmg">💀 คุณพ่ายแพ้! ฟื้น HP 30%${wasIdle ? ' — รีสตาร์ทใน 3 วิ...' : ''}</span>`);
+  logBattle(`<span class="log-dmg">💀 คุณพ่ายแพ้! ฟื้น HP 30% — กลับไปเลือกมอน</span>`);
   updateTopBar();
   if (typeof resolveInvasionLose === 'function' && G.pendingMonsterInvasion) resolveInvasionLose();
   saveGame();
-  // IDLE mode: retry same monster after short delay
-  if (wasIdle && dyingMonster) {
-    setTimeout(() => {
-      hideBattleContent();
-      setTimeout(() => {
-        startBattle(dyingMonster, dyingMonster._isReplay);
-        setTimeout(() => _startAutoIfNeeded(), 400);
-      }, 600);
-    }, 1200);
-  } else {
-    setTimeout(hideBattleContent, 800);
-  }
+  // Manual fight: on loss, return to the zone list (no auto-retry).
+  setTimeout(() => { hideBattleContent(); renderMonsterList(); }, 1000);
 }
 
 function fleeBattle() {

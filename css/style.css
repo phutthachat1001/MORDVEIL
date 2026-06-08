@@ -1797,6 +1797,19 @@ body.preload{visibility:hidden}
   50%       { box-shadow: 0 0 18px rgba(255,200,40,.75); }
 }
 
+/* attack-button cooldown overlay (manual zone fight) */
+#btn-attack { position: relative; overflow: hidden; }
+.cmd-cooldown-bar {
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 100%; height: 0%;
+  background: rgba(0,0,0,.55);
+  pointer-events: none;
+  z-index: 1;
+  transition: none;
+}
+#btn-attack:disabled { filter: grayscale(.4) brightness(.8); }
+
 /* idle bounce */
 .pixel-fighter svg {
   animation: idle-bounce 1.2s ease-in-out infinite;
