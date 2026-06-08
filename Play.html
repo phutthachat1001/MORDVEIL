@@ -461,6 +461,17 @@
 
         </div><!-- /battle-content -->
 
+        <!-- ══ IDLE FARMING PANEL (view-only) ══ -->
+        <!-- Runs continuously alongside the zone fight. Player cannot click;
+             auto-attacks weaker random monsters from cleared/current zones. -->
+        <div id="idle-panel">
+          <div id="idle-panel-header">
+            <span>🌙 IDLE — ฟาร์มอัตโนมัติ</span>
+            <span id="idle-panel-spd">⚡ —</span>
+          </div>
+          <div id="idle-stage"></div>
+        </div>
+
         <!-- battle-log hidden fallback kept for non-battle logBattle calls -->
         <div class="battle-log" id="battle-log" style="display:none"></div>
       </div>
