@@ -196,22 +196,22 @@ function _renderMilestoneProgress() {
 }
 
 function _showMonsterDropTooltip(el, m) {
-  const cls      = CLASSES.find(c => c.id === G.classId);
-  const dropBonus= cls && cls.bonuses && cls.bonuses.dropBonus ? cls.bonuses.dropBonus : 0;
+  const cls       = CLASSES.find(c => c.id === G.classId);
+  const dropBonus = cls && cls.bonuses && cls.bonuses.dropBonus ? cls.bonuses.dropBonus : 0;
+  const zone      = G.currentZone || 1;
 
   if (m.isBoss) {
-    // boss: 100% boss chest
-    const lines = _chestDropLines('boss');
-    showDropTooltip(el, lines, '👑 บอส: ดรอปหีบบอสทุกครั้ง');
+    const rarityNames = { common:'ธรรมดา', uncommon:'พิเศษ', rare:'หายาก', epic:'ยอดเยี่ยม', legend:'ตำนาน', ancient:'โบราณ' };
+    const r = _dropRarityForZone(zone, true);
+    const lines = [`💎 ดรอปของ 1-2 ชิ้น (100%)`, `ความหายาก: ${rarityNames[r]||r} ขึ้นไป`];
+    showDropTooltip(el, lines, '👑 บอส: ดรอปของแน่นอน');
   } else {
-    const baseRate = 0.03 + dropBonus;
-    const pctStr   = `${Math.round(baseRate * 100)}%`;
-    const chestType= m.tier >= 4 ? 'rare' : m.tier >= 2 ? 'uncommon' : 'common';
-    const lines    = _chestDropLines(chestType);
-    const label    = { common:'หีบธรรมดา', uncommon:'หีบพิเศษ', rare:'หีบหายาก' }[chestType];
-    showDropTooltip(el, lines,
-      `โอกาสดรอป${label}: ${pctStr}${dropBonus ? ` (บอนัส +${Math.round(dropBonus*100)}%)` : ''}`
-    );
+    const baseRate = 0.08 + (zone - 1) * 0.02;
+    const total    = Math.min(0.95, baseRate + dropBonus + (G.dropBonusFromTree || 0));
+    const pctStr   = `${Math.round(total * 100)}%`;
+    const rarityLabel = {1:'ธรรมดา-พิเศษ', 2:'พิเศษ-หายาก', 3:'หายาก-ยอดเยี่ยม', 4:'หายาก-ยอดเยี่ยม', 5:'ยอดเยี่ยม-ตำนาน', 6:'ยอดเยี่ยม-โบราณ'}[zone] || '';
+    const lines = [`📦 ดรอปโดยตรง (ไม่มีกล่อง)`, `ด่าน ${zone}: ${rarityLabel}`];
+    showDropTooltip(el, lines, `โอกาสดรอป: ${pctStr}`);
   }
 }
 
@@ -2375,6 +2375,42 @@ function playerAttack() {
 
 // ---------- Attack effect image ----------
 
+// ---------- Drop rarity table by zone ----------
+// zone 1: common/uncommon; zone 2-3: uncommon/rare; zone 4-5: rare/epic; zone 6: epic/legend
+// boss always 1 tier higher than normal
+function _dropRarityForZone(zone, isBoss, tier = 3) {
+  // weighted table: [rarity, weight]
+  const tables = {
+    1: [['common',70],['uncommon',28],['rare',2]],
+    2: [['common',30],['uncommon',55],['rare',15]],
+    3: [['uncommon',40],['rare',45],['epic',15]],
+    4: [['uncommon',15],['rare',50],['epic',33],['legend',2]],
+    5: [['rare',30],['epic',52],['legend',18]],
+    6: [['rare',10],['epic',45],['legend',38],['ancient',7]],
+  };
+  let table = tables[Math.min(6, Math.max(1, zone))];
+  // high-tier monsters (5-6) in the zone: shift toward rarer
+  if (!isBoss && tier >= 5) {
+    table = table.map(([r, w]) => {
+      const shift = { common:-30, uncommon:-15, rare:10, epic:20, legend:12, ancient:3 };
+      return [r, Math.max(0, w + (shift[r] || 0))];
+    });
+  }
+  if (isBoss) {
+    table = table.map(([r, w]) => {
+      const bossShift = { common:-50, uncommon:-20, rare:5, epic:25, legend:15, ancient:5 };
+      return [r, Math.max(0, w + (bossShift[r] || 0))];
+    });
+  }
+  const total = table.reduce((s, [, w]) => s + w, 0);
+  let roll = Math.random() * total;
+  for (const [r, w] of table) {
+    roll -= w;
+    if (roll <= 0) return r;
+  }
+  return table[table.length - 1][0];
+}
+
 // ---------- Direct item drop (no chest) ----------
 
 function _dropDirectItem(rarity) {
@@ -2402,8 +2438,10 @@ function _dropDirectItem(rarity) {
 // ---------- Attack speed (ms per hit) ----------
 
 function getAttackInterval() {
-  // Base 6000ms; reduced by attackSpeedBonus (0.0–0.9 range, from items + skill tree)
-  const bonus = (G.attackSpeedBonus || 0); // e.g. 0.1 = 10% faster
+  // Base 6000ms; reduced by attackSpeedBonus (skill tree) + equipment attackSpeed
+  const treeBonus  = G.attackSpeedBonus || 0;
+  const equipBonus = typeof getEquippedStatBonus === 'function' ? (getEquippedStatBonus().attackSpeed || 0) : 0;
+  const bonus = Math.min(0.9, treeBonus + equipBonus);
   const ms = Math.max(800, Math.floor(6000 * (1 - bonus)));
   return ms;
 }
@@ -2596,14 +2634,16 @@ function monsterDie() {
   // Direct item drop (no chest middleman)
   let dropChest = null; // keep for boss chest reward
   if (monster.isBoss) {
-    dropChest = 'boss';
-    G.chests[dropChest] = (G.chests[dropChest] || 0) + 1;
+    // boss guaranteed 1-2 items, rarity based on zone
+    const bossRarity = _dropRarityForZone(G.currentZone, true);
+    _dropDirectItem(bossRarity);
+    if (Math.random() < 0.5) _dropDirectItem(bossRarity);
   } else {
-    const dropRate = 0.12 + dropBonus + (G.dropBonusFromTree || 0);
+    // base drop rate scales with zone (8% → 20%), bonus from class + tree
+    const baseRate = 0.08 + (G.currentZone - 1) * 0.02;
+    const dropRate = baseRate + dropBonus + (G.dropBonusFromTree || 0);
     if (Math.random() < dropRate) {
-      const rarity = monster.tier >= 5 ? 'rare'
-                   : monster.tier >= 3 ? 'uncommon'
-                   : 'common';
+      const rarity = _dropRarityForZone(G.currentZone, false, monster.tier);
       _dropDirectItem(rarity);
     }
   }

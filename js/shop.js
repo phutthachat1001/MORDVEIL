@@ -10,7 +10,7 @@ function canEquipItem(item) {
 }
 
 function getEquippedStatBonus() {
-  let bonus = { atk:0, def:0, hp:0, crit:0, speed:0, expMult:1, healPerTurn:0 };
+  let bonus = { atk:0, def:0, hp:0, crit:0, speed:0, attackSpeed:0, expMult:1, healPerTurn:0 };
   if (!G.equippedSlots) return bonus;
   SLOT_SLOTS.forEach(slot => {
     const uid = G.equippedSlots[slot];
@@ -23,11 +23,12 @@ function getEquippedStatBonus() {
       if (slot === 'weapon') G.equippedWeaponId = null;
       return;
     }
-    if (item.atk)   bonus.atk   += item.atk;
-    if (item.def)   bonus.def   += item.def;
-    if (item.hp)    bonus.hp    += item.hp;
-    if (item.crit)  bonus.crit  += item.crit;
-    if (item.speed) bonus.speed += item.speed;
+    if (item.atk)         bonus.atk         += item.atk;
+    if (item.def)         bonus.def         += item.def;
+    if (item.hp)          bonus.hp          += item.hp;
+    if (item.crit)        bonus.crit        += item.crit;
+    if (item.speed)       bonus.speed       += item.speed;
+    if (item.attackSpeed) bonus.attackSpeed += item.attackSpeed;
     if (item.effect) {
       const expM = item.effect.match(/EXP\+(\d+)%/);
       if (expM) bonus.expMult += parseInt(expM[1]) / 100;
@@ -70,13 +71,15 @@ function equipItemToSlot(item) {
   renderInventory();
   renderEquipSlots();
   saveGame();
-  logBattle(`<span class="log-sys">✅ สวมใส่ ${item.icon||''} ${item.name}!</span>`);
+  if (item.attackSpeed && typeof restartAutoWithNewSpeed === 'function') restartAutoWithNewSpeed();
+  logBattle(`<span class="log-sys">✅ สวมใส่ ${item.icon||''} ${item.name}${item.attackSpeed ? ` ⚡-${Math.round(item.attackSpeed*100)}%` : ''}!</span>`);
 }
 
 function unequipSlot(slot) {
   if (!G.equippedSlots) return;
   const uid = G.equippedSlots[slot];
   if (!uid) return;
+  const item = G.inventory.find(i => i.uid === uid);
   G.equippedSlots[slot] = null;
   if (slot === 'weapon') G.equippedWeaponId = null;
   updateTopBar();
@@ -84,6 +87,7 @@ function unequipSlot(slot) {
   renderInventory();
   renderEquipSlots();
   saveGame();
+  if (item && item.attackSpeed && typeof restartAutoWithNewSpeed === 'function') restartAutoWithNewSpeed();
 }
 
 // ---------- generate shop stock ----------
@@ -183,12 +187,13 @@ function renderShopSell() {
 
 function buildStatLine(item) {
   const parts = [];
-  if (item.atk)   parts.push(`ATK+${item.atk}`);
-  if (item.def)   parts.push(`DEF+${item.def}`);
-  if (item.hp)    parts.push(`HP+${item.hp}`);
-  if (item.crit)  parts.push(`CRIT+${item.crit}%`);
-  if (item.speed) parts.push(`SPD+${item.speed}`);
-  if (item.effect) parts.push(item.effect);
+  if (item.atk)         parts.push(`ATK+${item.atk}`);
+  if (item.def)         parts.push(`DEF+${item.def}`);
+  if (item.hp)          parts.push(`HP+${item.hp}`);
+  if (item.crit)        parts.push(`CRIT+${item.crit}%`);
+  if (item.attackSpeed) parts.push(`⚡ Speed-${Math.round(item.attackSpeed*100)}%`);
+  if (item.speed)       parts.push(`SPD+${item.speed}`);
+  if (item.effect)      parts.push(item.effect);
   return parts.join(' | ') || '-';
 }
 

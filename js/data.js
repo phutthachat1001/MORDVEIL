@@ -92,35 +92,35 @@ const WEAPONS = [
   // UNCOMMON (green)
   {id:'w06',name:'ดาบเหล็กกล้า',rarity:'uncommon',atk:8,effect:'crit+5%',icon:'⚔️'},
   {id:'w07',name:'ขวานป่า',rarity:'uncommon',atk:10,effect:null,icon:'🪓'},
-  {id:'w08',name:'ธนูล่าสัตว์',rarity:'uncommon',atk:7,effect:'crit+8%',icon:'🏹'},
-  {id:'w09',name:'ไม้เท้าเวทมนตร์',rarity:'uncommon',atk:6,effect:'EXP+5%',icon:'🪄'},
-  {id:'w10',name:'กริชสองคม',rarity:'uncommon',atk:9,effect:'crit+10%',icon:'🗡️'},
+  {id:'w08',name:'ธนูล่าสัตว์',rarity:'uncommon',atk:7,effect:'crit+8%',attackSpeed:0.05,icon:'🏹'},
+  {id:'w09',name:'ไม้เท้าเวทมนตร์',rarity:'uncommon',atk:6,effect:'EXP+5%',attackSpeed:0.05,icon:'🪄'},
+  {id:'w10',name:'กริชสองคม',rarity:'uncommon',atk:9,effect:'crit+10%',attackSpeed:0.06,icon:'🗡️'},
   // RARE (blue)
   {id:'w11',name:'ดาบมังกรน้ำแข็ง',rarity:'rare',atk:20,effect:'ชะลอ-10% ATK ศัตรู',icon:'❄️'},
-  {id:'w12',name:'คทาสายฟ้า',rarity:'rare',atk:18,effect:'EXP+10%',icon:'⚡'},
+  {id:'w12',name:'คทาสายฟ้า',rarity:'rare',atk:18,effect:'EXP+10%',attackSpeed:0.08,icon:'⚡'},
   {id:'w13',name:'โล่สายลม',rarity:'rare',atk:12,effect:'DEF+5',icon:'🛡️'},
-  {id:'w14',name:'ธนูเพลิง',rarity:'rare',atk:22,effect:'เผา 5%/เทิร์น',icon:'🔥'},
-  {id:'w15',name:'กระบี่อสูร',rarity:'rare',atk:25,effect:'ดูดเลือด 5%',icon:'🗡️'},
+  {id:'w14',name:'ธนูเพลิง',rarity:'rare',atk:22,effect:'เผา 5%/เทิร์น',attackSpeed:0.10,icon:'🔥'},
+  {id:'w15',name:'กระบี่อสูร',rarity:'rare',atk:25,effect:'ดูดเลือด 5%',attackSpeed:0.08,icon:'🗡️'},
   {id:'w16',name:'ขวานสายเลือด',rarity:'rare',atk:28,effect:'ดูดเลือด 8%',icon:'🪓'},
-  {id:'w17',name:'ไม้เท้าเงา',rarity:'rare',atk:16,effect:'EXP+15%',icon:'🌑'},
+  {id:'w17',name:'ไม้เท้าเงา',rarity:'rare',atk:16,effect:'EXP+15%',attackSpeed:0.08,icon:'🌑'},
   // EPIC (purple)
-  {id:'w18',name:'ดาบวิญญาณมืด',rarity:'epic',atk:45,effect:'crit×2 ทุก 3 เทิร์น',icon:'💜'},
-  {id:'w19',name:'คทาพลังจักรวาล',rarity:'epic',atk:40,effect:'EXP+20%',icon:'🔮'},
-  {id:'w20',name:'ธนูนักล่าปีศาจ',rarity:'epic',atk:42,effect:'ไม่พลาด+20%',icon:'🏹'},
-  {id:'w21',name:'กระบี่สายพิษ',rarity:'epic',atk:38,effect:'พิษ 10%/เทิร์น',icon:'☠️'},
+  {id:'w18',name:'ดาบวิญญาณมืด',rarity:'epic',atk:45,effect:'crit×2 ทุก 3 เทิร์น',attackSpeed:0.12,icon:'💜'},
+  {id:'w19',name:'คทาพลังจักรวาล',rarity:'epic',atk:40,effect:'EXP+20%',attackSpeed:0.12,icon:'🔮'},
+  {id:'w20',name:'ธนูนักล่าปีศาจ',rarity:'epic',atk:42,effect:'ไม่พลาด+20%',attackSpeed:0.15,icon:'🏹'},
+  {id:'w21',name:'กระบี่สายพิษ',rarity:'epic',atk:38,effect:'พิษ 10%/เทิร์น',attackSpeed:0.12,icon:'☠️'},
   {id:'w22',name:'ขวานยักษ์โบราณ',rarity:'epic',atk:55,effect:'ดาเมจ+30% vs บอส',icon:'🪓'},
   {id:'w23',name:'โล่อัศวินศักดิ์สิทธิ์',rarity:'epic',atk:30,effect:'DEF+15 ดูดเลือด 5%',icon:'✨'},
-  {id:'w24',name:'หอกพิฆาตมังกร',rarity:'epic',atk:50,effect:'ดาเมจ×2 vs มังกร',icon:'🐉'},
+  {id:'w24',name:'หอกพิฆาตมังกร',rarity:'epic',atk:50,effect:'ดาเมจ×2 vs มังกร',attackSpeed:0.12,icon:'🐉'},
   // LEGENDARY (orange)
-  {id:'w25',name:'ดาบสยบสวรรค์',rarity:'legend',atk:80,effect:'crit×3 ดูดเลือด 15%',icon:'⚔️'},
-  {id:'w26',name:'คทาผู้พิพากษาโลก',rarity:'legend',atk:75,effect:'EXP+30% ดาเมจทะลุ DEF',icon:'🔮'},
-  {id:'w27',name:'ธนูแห่งรุ่งอรุณ',rarity:'legend',atk:70,effect:'ยิง 2 ครั้ง/เทิร์น',icon:'🌅'},
-  {id:'w28',name:'กระบี่อมตะ',rarity:'legend',atk:85,effect:'ดูดเลือด 20% HP+50',icon:'♾️'},
+  {id:'w25',name:'ดาบสยบสวรรค์',rarity:'legend',atk:80,effect:'crit×3 ดูดเลือด 15%',attackSpeed:0.18,icon:'⚔️'},
+  {id:'w26',name:'คทาผู้พิพากษาโลก',rarity:'legend',atk:75,effect:'EXP+30% ดาเมจทะลุ DEF',attackSpeed:0.15,icon:'🔮'},
+  {id:'w27',name:'ธนูแห่งรุ่งอรุณ',rarity:'legend',atk:70,effect:'ยิง 2 ครั้ง/เทิร์น',attackSpeed:0.20,icon:'🌅'},
+  {id:'w28',name:'กระบี่อมตะ',rarity:'legend',atk:85,effect:'ดูดเลือด 20% HP+50',attackSpeed:0.18,icon:'♾️'},
   {id:'w29',name:'ขวานปราบอสูร',rarity:'legend',atk:90,effect:'ดาเมจ×2 ทุกครั้ง vs บอส',icon:'💥'},
-  {id:'w30',name:'หอกเจาะนิรันดร์',rarity:'legend',atk:78,effect:'ทะลุ DEF 100% DEF+10',icon:'🌟'},
+  {id:'w30',name:'หอกเจาะนิรันดร์',rarity:'legend',atk:78,effect:'ทะลุ DEF 100% DEF+10',attackSpeed:0.15,icon:'🌟'},
   // ANCIENT (red)
-  {id:'w31',name:'ดาบพิฆาตเทพ',rarity:'ancient',atk:150,effect:'crit×5 ดูดเลือด 25% EXP+50%',icon:'🌈'},
-  {id:'w32',name:'คทาแห่งจักรวาล',rarity:'ancient',atk:130,effect:'EXP+50% ดาเมจทะลุทุกอย่าง',icon:'🌌'}
+  {id:'w31',name:'ดาบพิฆาตเทพ',rarity:'ancient',atk:150,effect:'crit×5 ดูดเลือด 25% EXP+50%',attackSpeed:0.25,icon:'🌈'},
+  {id:'w32',name:'คทาแห่งจักรวาล',rarity:'ancient',atk:130,effect:'EXP+50% ดาเมจทะลุทุกอย่าง',attackSpeed:0.20,icon:'🌌'}
 ];
 
 // ====================================================================
@@ -205,27 +205,27 @@ const GLOVES = [
   {id:'g05',name:'ถุงมือไม้',slot:'gloves',rarity:'common',atk:1,crit:3,icon:'🧤',requiredClass:null},
   // UNCOMMON
   {id:'g06',name:'ถุงมือนักล่า',slot:'gloves',rarity:'uncommon',atk:6,crit:5,icon:'🧤',requiredClass:null},
-  {id:'g07',name:'ถุงมือมีดคม',slot:'gloves',rarity:'uncommon',atk:8,crit:8,icon:'🧤',requiredClass:'rogue'},
-  {id:'g08',name:'ถุงมือยิงธนู',slot:'gloves',rarity:'uncommon',atk:7,crit:6,icon:'🧤',requiredClass:'archer'},
+  {id:'g07',name:'ถุงมือมีดคม',slot:'gloves',rarity:'uncommon',atk:8,crit:8,attackSpeed:0.04,icon:'🧤',requiredClass:'rogue'},
+  {id:'g08',name:'ถุงมือยิงธนู',slot:'gloves',rarity:'uncommon',atk:7,crit:6,attackSpeed:0.04,icon:'🧤',requiredClass:'archer'},
   {id:'g09',name:'ถุงมือเวทย์',slot:'gloves',rarity:'uncommon',atk:4,crit:4,effect:'EXP+5%',icon:'🧤',requiredClass:'mage'},
   {id:'g10',name:'ถุงมือเกราะเหล็ก',slot:'gloves',rarity:'uncommon',atk:7,crit:2,icon:'🧤',requiredClass:'warrior'},
   // RARE
   {id:'g11',name:'ถุงมือมังกรดำ',slot:'gloves',rarity:'rare',atk:14,crit:10,icon:'🧤',requiredClass:null},
-  {id:'g12',name:'ถุงมือนักฆ่าเงา',slot:'gloves',rarity:'rare',atk:16,crit:15,icon:'🧤',requiredClass:'rogue'},
+  {id:'g12',name:'ถุงมือนักฆ่าเงา',slot:'gloves',rarity:'rare',atk:16,crit:15,attackSpeed:0.08,icon:'🧤',requiredClass:'rogue'},
   {id:'g13',name:'ถุงมือแสงสวรรค์',slot:'gloves',rarity:'rare',atk:10,crit:8,effect:'ฟื้น HP+5/เทิร์น',icon:'🧤',requiredClass:'paladin'},
-  {id:'g14',name:'ถุงมือธนูเพลิง',slot:'gloves',rarity:'rare',atk:15,crit:12,icon:'🧤',requiredClass:'archer'},
+  {id:'g14',name:'ถุงมือธนูเพลิง',slot:'gloves',rarity:'rare',atk:15,crit:12,attackSpeed:0.08,icon:'🧤',requiredClass:'archer'},
   {id:'g15',name:'ถุงมือเวทย์มืด',slot:'gloves',rarity:'rare',atk:10,crit:10,effect:'EXP+10%',icon:'🧤',requiredClass:'mage'},
   // EPIC
   {id:'g16',name:'ถุงมือหายนะ',slot:'gloves',rarity:'epic',atk:26,crit:18,icon:'🧤',requiredClass:'warrior'},
-  {id:'g17',name:'ถุงมือมืดสนิท',slot:'gloves',rarity:'epic',atk:28,crit:25,icon:'🧤',requiredClass:'rogue'},
+  {id:'g17',name:'ถุงมือมืดสนิท',slot:'gloves',rarity:'epic',atk:28,crit:25,attackSpeed:0.12,icon:'🧤',requiredClass:'rogue'},
   {id:'g18',name:'ถุงมือเทพ',slot:'gloves',rarity:'epic',atk:18,crit:15,effect:'EXP+15%',icon:'🧤',requiredClass:'mage'},
-  {id:'g19',name:'ถุงมือจอมล่า',slot:'gloves',rarity:'epic',atk:25,crit:22,icon:'🧤',requiredClass:'archer'},
+  {id:'g19',name:'ถุงมือจอมล่า',slot:'gloves',rarity:'epic',atk:25,crit:22,attackSpeed:0.12,icon:'🧤',requiredClass:'archer'},
   {id:'g20',name:'ถุงมือแสงจักรวาล',slot:'gloves',rarity:'epic',atk:20,crit:15,effect:'ฟื้น HP+10/เทิร์น',icon:'🧤',requiredClass:'paladin'},
   // LEGENDARY
   {id:'g21',name:'ถุงมือสยบสวรรค์',slot:'gloves',rarity:'legend',atk:42,crit:30,icon:'🧤',requiredClass:'warrior'},
-  {id:'g22',name:'ถุงมือราชาเงา',slot:'gloves',rarity:'legend',atk:45,crit:40,icon:'🧤',requiredClass:'rogue'},
+  {id:'g22',name:'ถุงมือราชาเงา',slot:'gloves',rarity:'legend',atk:45,crit:40,attackSpeed:0.18,icon:'🧤',requiredClass:'rogue'},
   {id:'g23',name:'ถุงมือจักรวาลเวทย์',slot:'gloves',rarity:'legend',atk:32,crit:28,effect:'EXP+25%',icon:'🧤',requiredClass:'mage'},
-  {id:'g24',name:'ถุงมือจอมล่าจักรวาล',slot:'gloves',rarity:'legend',atk:40,crit:35,icon:'🧤',requiredClass:'archer'},
+  {id:'g24',name:'ถุงมือจอมล่าจักรวาล',slot:'gloves',rarity:'legend',atk:40,crit:35,attackSpeed:0.18,icon:'🧤',requiredClass:'archer'},
   {id:'g25',name:'ถุงมือเทพแสงนิรันดร์',slot:'gloves',rarity:'legend',atk:35,crit:25,effect:'ฟื้น HP+18/เทิร์น',icon:'🧤',requiredClass:'paladin'},
 ];
 
@@ -263,36 +263,36 @@ const PANTS = [
 ];
 
 const BOOTS = [
-  // COMMON
-  {id:'b01',name:'รองเท้าฟาง',slot:'boots',rarity:'common',speed:5,icon:'👢',requiredClass:null},
-  {id:'b02',name:'รองเท้าหนังเก่า',slot:'boots',rarity:'common',speed:8,icon:'👢',requiredClass:null},
-  {id:'b03',name:'รองเท้าไม้',slot:'boots',rarity:'common',speed:4,icon:'👢',requiredClass:null},
-  {id:'b04',name:'รองเท้าชาวนา',slot:'boots',rarity:'common',speed:6,icon:'👢',requiredClass:null},
-  {id:'b05',name:'รองเท้าผ้าหยาบ',slot:'boots',rarity:'common',speed:7,icon:'👢',requiredClass:null},
-  // UNCOMMON
-  {id:'b06',name:'รองเท้าบูทหนัง',slot:'boots',rarity:'uncommon',speed:15,icon:'👢',requiredClass:null},
-  {id:'b07',name:'รองเท้าป่า',slot:'boots',rarity:'uncommon',speed:18,icon:'👢',requiredClass:'archer'},
-  {id:'b08',name:'รองเท้าเงียบเงา',slot:'boots',rarity:'uncommon',speed:20,icon:'👢',requiredClass:'rogue'},
-  {id:'b09',name:'รองเท้าเวทมืด',slot:'boots',rarity:'uncommon',speed:12,effect:'EXP+5%',icon:'👢',requiredClass:'mage'},
-  {id:'b10',name:'รองเท้าบูทอัศวิน',slot:'boots',rarity:'uncommon',speed:14,icon:'👢',requiredClass:'warrior'},
-  // RARE
-  {id:'b11',name:'รองเท้ามังกรน้ำแข็ง',slot:'boots',rarity:'rare',speed:28,icon:'👢',requiredClass:null},
-  {id:'b12',name:'รองเท้าเงาพิฆาต',slot:'boots',rarity:'rare',speed:35,icon:'👢',requiredClass:'rogue'},
-  {id:'b13',name:'รองเท้าเทพแสง',slot:'boots',rarity:'rare',speed:22,effect:'ฟื้น HP+5/เทิร์น',icon:'👢',requiredClass:'paladin'},
-  {id:'b14',name:'รองเท้านักล่าโบราณ',slot:'boots',rarity:'rare',speed:32,icon:'👢',requiredClass:'archer'},
-  {id:'b15',name:'รองเท้าเวทย์มืด',slot:'boots',rarity:'rare',speed:20,effect:'EXP+10%',icon:'👢',requiredClass:'mage'},
-  // EPIC
-  {id:'b16',name:'รองเท้าหายนะ',slot:'boots',rarity:'epic',speed:45,icon:'👢',requiredClass:'warrior'},
-  {id:'b17',name:'รองเท้าเงามืดสนิท',slot:'boots',rarity:'epic',speed:55,icon:'👢',requiredClass:'rogue'},
-  {id:'b18',name:'รองเท้าเทพเวทย์',slot:'boots',rarity:'epic',speed:35,effect:'EXP+15%',icon:'👢',requiredClass:'mage'},
-  {id:'b19',name:'รองเท้าจอมล่า',slot:'boots',rarity:'epic',speed:50,icon:'👢',requiredClass:'archer'},
-  {id:'b20',name:'รองเท้าแสงจักรวาล',slot:'boots',rarity:'epic',speed:40,effect:'ฟื้น HP+10/เทิร์น',icon:'👢',requiredClass:'paladin'},
-  // LEGENDARY
-  {id:'b21',name:'รองเท้าหายนะมืด',slot:'boots',rarity:'legend',speed:70,icon:'👢',requiredClass:'warrior'},
-  {id:'b22',name:'รองเท้าเงาอมตะ',slot:'boots',rarity:'legend',speed:85,icon:'👢',requiredClass:'rogue'},
-  {id:'b23',name:'รองเท้าจักรวาลนิรันดร์',slot:'boots',rarity:'legend',speed:60,effect:'EXP+25%',icon:'👢',requiredClass:'mage'},
-  {id:'b24',name:'รองเท้าจอมล่าจักรวาล',slot:'boots',rarity:'legend',speed:78,icon:'👢',requiredClass:'archer'},
-  {id:'b25',name:'รองเท้าแสงนิรันดร์',slot:'boots',rarity:'legend',speed:65,effect:'ฟื้น HP+18/เทิร์น',icon:'👢',requiredClass:'paladin'},
+  // COMMON — attackSpeed 2-4% (เริ่มต้นน้อยมาก)
+  {id:'b01',name:'รองเท้าฟาง',slot:'boots',rarity:'common',attackSpeed:0.02,icon:'👢',requiredClass:null},
+  {id:'b02',name:'รองเท้าหนังเก่า',slot:'boots',rarity:'common',attackSpeed:0.03,icon:'👢',requiredClass:null},
+  {id:'b03',name:'รองเท้าไม้',slot:'boots',rarity:'common',attackSpeed:0.02,icon:'👢',requiredClass:null},
+  {id:'b04',name:'รองเท้าชาวนา',slot:'boots',rarity:'common',attackSpeed:0.03,icon:'👢',requiredClass:null},
+  {id:'b05',name:'รองเท้าผ้าหยาบ',slot:'boots',rarity:'common',attackSpeed:0.04,icon:'👢',requiredClass:null},
+  // UNCOMMON — attackSpeed 5-8%
+  {id:'b06',name:'รองเท้าบูทหนัง',slot:'boots',rarity:'uncommon',attackSpeed:0.05,icon:'👢',requiredClass:null},
+  {id:'b07',name:'รองเท้าป่า',slot:'boots',rarity:'uncommon',attackSpeed:0.08,icon:'👢',requiredClass:'archer'},
+  {id:'b08',name:'รองเท้าเงียบเงา',slot:'boots',rarity:'uncommon',attackSpeed:0.08,icon:'👢',requiredClass:'rogue'},
+  {id:'b09',name:'รองเท้าเวทมืด',slot:'boots',rarity:'uncommon',attackSpeed:0.05,effect:'EXP+5%',icon:'👢',requiredClass:'mage'},
+  {id:'b10',name:'รองเท้าบูทอัศวิน',slot:'boots',rarity:'uncommon',attackSpeed:0.06,icon:'👢',requiredClass:'warrior'},
+  // RARE — attackSpeed 10-15%
+  {id:'b11',name:'รองเท้ามังกรน้ำแข็ง',slot:'boots',rarity:'rare',attackSpeed:0.10,icon:'👢',requiredClass:null},
+  {id:'b12',name:'รองเท้าเงาพิฆาต',slot:'boots',rarity:'rare',attackSpeed:0.15,icon:'👢',requiredClass:'rogue'},
+  {id:'b13',name:'รองเท้าเทพแสง',slot:'boots',rarity:'rare',attackSpeed:0.10,effect:'ฟื้น HP+5/เทิร์น',icon:'👢',requiredClass:'paladin'},
+  {id:'b14',name:'รองเท้านักล่าโบราณ',slot:'boots',rarity:'rare',attackSpeed:0.13,icon:'👢',requiredClass:'archer'},
+  {id:'b15',name:'รองเท้าเวทย์มืด',slot:'boots',rarity:'rare',attackSpeed:0.10,effect:'EXP+10%',icon:'👢',requiredClass:'mage'},
+  // EPIC — attackSpeed 18-25%
+  {id:'b16',name:'รองเท้าหายนะ',slot:'boots',rarity:'epic',attackSpeed:0.20,icon:'👢',requiredClass:'warrior'},
+  {id:'b17',name:'รองเท้าเงามืดสนิท',slot:'boots',rarity:'epic',attackSpeed:0.25,icon:'👢',requiredClass:'rogue'},
+  {id:'b18',name:'รองเท้าเทพเวทย์',slot:'boots',rarity:'epic',attackSpeed:0.18,effect:'EXP+15%',icon:'👢',requiredClass:'mage'},
+  {id:'b19',name:'รองเท้าจอมล่า',slot:'boots',rarity:'epic',attackSpeed:0.22,icon:'👢',requiredClass:'archer'},
+  {id:'b20',name:'รองเท้าแสงจักรวาล',slot:'boots',rarity:'epic',attackSpeed:0.20,effect:'ฟื้น HP+10/เทิร์น',icon:'👢',requiredClass:'paladin'},
+  // LEGENDARY — attackSpeed 28-35%
+  {id:'b21',name:'รองเท้าหายนะมืด',slot:'boots',rarity:'legend',attackSpeed:0.30,icon:'👢',requiredClass:'warrior'},
+  {id:'b22',name:'รองเท้าเงาอมตะ',slot:'boots',rarity:'legend',attackSpeed:0.35,icon:'👢',requiredClass:'rogue'},
+  {id:'b23',name:'รองเท้าจักรวาลนิรันดร์',slot:'boots',rarity:'legend',attackSpeed:0.28,effect:'EXP+25%',icon:'👢',requiredClass:'mage'},
+  {id:'b24',name:'รองเท้าจอมล่าจักรวาล',slot:'boots',rarity:'legend',attackSpeed:0.33,icon:'👢',requiredClass:'archer'},
+  {id:'b25',name:'รองเท้าแสงนิรันดร์',slot:'boots',rarity:'legend',attackSpeed:0.30,effect:'ฟื้น HP+18/เทิร์น',icon:'👢',requiredClass:'paladin'},
 ];
 
 // ความต้องการขั้นต่ำเพื่อต่อสู้บอส (ATK รวมอุปกรณ์)

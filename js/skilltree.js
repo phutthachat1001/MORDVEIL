@@ -254,14 +254,17 @@ function renderSkillTree() {
     6: 'IDLE — พลังขั้นสุด',
   };
 
-  const speedPct = Math.round((G.attackSpeedBonus || 0) * 100);
+  const equipBonus  = typeof getEquippedStatBonus === 'function' ? (getEquippedStatBonus().attackSpeed || 0) : 0;
+  const totalSpeed  = Math.min(0.9, (G.attackSpeedBonus || 0) + equipBonus);
+  const speedPct    = Math.round(totalSpeed * 100);
   const curInterval = typeof getAttackInterval === 'function' ? (getAttackInterval()/1000).toFixed(1) : '6.0';
+  const equipSpeedPct = Math.round(equipBonus * 100);
 
   let html = `
   <div style="background:rgba(0,0,0,.35);border:1px solid #333;border-radius:10px;padding:.7rem .9rem;margin-bottom:.7rem;display:flex;flex-wrap:wrap;gap:.8rem;align-items:center">
     <div style="color:var(--gold);font-size:.9rem;font-weight:700">🌳 Skill Points: <span style="font-size:1.1rem">${avail}</span></div>
     <div style="color:#aaa;font-size:.75rem">ใช้ไป ${spent}/${earned} &nbsp;|&nbsp; ทุก 5 LV = +1 point</div>
-    <div style="color:#88ccff;font-size:.75rem">⚡ ความเร็ว: ${curInterval}วิ/ตี (-${speedPct}%)</div>
+    <div style="color:#88ccff;font-size:.75rem">⚡ ความเร็ว: ${curInterval}วิ/ตี (-${speedPct}%${equipSpeedPct ? ` +${equipSpeedPct}% จากของ` : ''})</div>
     <div style="color:#ffcc44;font-size:.75rem">💎 Drop: +${Math.round((G.dropBonusFromTree||0)*100)}%</div>
     ${G.classBranch ? `<div style="color:#ffaa44;font-size:.75rem">🔱 สาย: ${G.classBranch==='A'?'ซ้าย':'ขวา'}</div>` : ''}
   </div>`;
