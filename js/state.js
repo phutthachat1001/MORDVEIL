@@ -102,6 +102,8 @@ let G = {
   // Milestone + Weekly Boss tracking
   claimedMilestones: [],   // kill thresholds already claimed
   weeklyBossKills: {},     // weekKey -> true
+  // Zone progress — how many monsters cleared per zone (0-6, 6=all done)
+  zoneProgress: {},        // { zoneId: tierIndex } 0=none cleared, 6=all cleared
 };
 
 let autoAttackInterval = null;

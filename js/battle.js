@@ -9,10 +9,22 @@ function renderZoneTabs() {
   tabs.innerHTML = '';
   tabs.style.display = 'flex';
   ZONES.forEach(z => {
-    const locked = G.level < z.reqLevel;
+    // Zone 1 always unlocked; subsequent zones unlock when previous zone is fully cleared
+    const prevZone = ZONES.find(pz => pz.id === z.id - 1);
+    const prevProgress = prevZone ? ((G.zoneProgress && G.zoneProgress[prevZone.id]) || 0) : 999;
+    const prevCleared  = prevZone ? prevProgress >= prevZone.monsters.length : true;
+    const locked = z.id > 1 && !prevCleared;
+
+    const zProgress = (G.zoneProgress && G.zoneProgress[z.id]) || 0;
+    const zTotal    = z.monsters.length;
+    const zComplete = zProgress >= zTotal;
+
     const tab = document.createElement('div');
     tab.className = 'zone-tab' + (G.currentZone === z.id ? ' active' : '') + (locked ? ' locked' : '');
-    tab.textContent = `${z.emoji} ${z.name}${locked ? ` (LV${z.reqLevel})` : ''}`;
+    const progressStr = locked ? '' : ` ${zProgress}/${zTotal}`;
+    tab.textContent = `${z.emoji}${locked ? '🔒' : zComplete ? '✅' : ''}${progressStr}`;
+    tab.title = `${z.name}${locked ? ' (ล็อค — ผ่านด่านก่อนหน้าก่อน)' : ''}`;
+
     if (!locked) tab.onclick = () => {
       G.currentZone = z.id;
       G.currentMonster = null;
@@ -42,68 +54,105 @@ function renderMonsterList() {
   const zone = ZONES.find(z => z.id === G.currentZone);
   if (!zone) { area.innerHTML = ''; return; }
 
-  const eqBonus = (typeof getEquippedStatBonus === 'function') ? getEquippedStatBonus() : { atk:0 };
-  const playerAtk = G.baseAtk + (eqBonus.atk || 0);
-
-  const grid = document.createElement('div');
-  grid.className = 'monster-select';
-  zone.monsters.forEach(m => {
-    const key      = `${G.currentZone}_${m.tier}`;
-    const defeated = G.defeatedMonsters[key];
-    const stats    = getMonsterStats(G.currentZone, m.tier, m.isBoss);
-    const btn      = document.createElement('div');
-
-    // Boss ATK requirement check
-    const req = m.isBoss ? (BOSS_REQ[G.currentZone] || null) : null;
-    const bossLocked = req && playerAtk < req.atk;
-
-    btn.className  = 'mon-btn' + (m.isBoss ? ' boss' : '') + (defeated ? ' defeated' : '') + (bossLocked ? ' boss-locked' : '');
-    const monIcon = m.img
-      ? `<img src="assets/sprites/${m.img}.png" style="width:48px;height:48px;object-fit:contain;display:block;margin:0 auto" onerror="this.outerHTML='${m.sprite}'">`
-      : m.sprite;
-
-    let bossReqHtml = '';
-    if (req) {
-      const pct = Math.min(100, Math.floor((playerAtk / req.atk) * 100));
-      const color = bossLocked ? '#ff6644' : '#44ff88';
-      bossReqHtml = `<div class="boss-req-bar-wrap">
-        <div class="boss-req-bar-bg"><div class="boss-req-bar-fill" style="width:${pct}%;background:${color}"></div></div>
-        <div class="boss-req-label" style="color:${color}">${bossLocked?'🔒':'✅'} ATK ${playerAtk}/${req.atk}</div>
-      </div>`;
-    }
-    btn.innerHTML  = `${monIcon}<br>${m.name}${m.isBoss ? '<br>👑BOSS' : ''}${bossReqHtml}`;
-
-    // long-press to show drop rates (works on both mobile touch and desktop)
-    let _lpTimer = null;
-    const _lpStart = () => { _lpTimer = setTimeout(() => _showMonsterDropTooltip(btn, m), 400); };
-    const _lpEnd   = () => { clearTimeout(_lpTimer); };
-    btn.addEventListener('mousedown',   _lpStart);
-    btn.addEventListener('touchstart',  _lpStart, {passive:true});
-    btn.addEventListener('mouseup',     _lpEnd);
-    btn.addEventListener('mouseleave',  () => { _lpEnd(); hideDropTooltip(); });
-    btn.addEventListener('touchend',    () => { _lpEnd(); setTimeout(hideDropTooltip, 1500); });
-    btn.addEventListener('touchcancel', _lpEnd);
-    btn.onclick = () => {
-      if (bossLocked) {
-        _showBossLockedPopup(m, req, playerAtk);
-        return;
-      }
-      startBattle(m);
-    };
-    grid.appendChild(btn);
-  });
-
-  // Kill milestone progress bar
-  const milestoneHtml = _renderMilestoneProgress();
+  const progress = (G.zoneProgress && G.zoneProgress[G.currentZone]) || 0;
+  // progress = number of monsters cleared (0-6)
+  const currentTierIdx = progress; // next monster to fight (0-based index into zone.monsters)
+  const zoneComplete   = progress >= zone.monsters.length;
 
   area.innerHTML = '';
+
+  // ── Zone header ──
+  const header = document.createElement('div');
+  header.style.cssText = 'margin-bottom:.8rem';
+  const progPct = Math.floor((progress / zone.monsters.length) * 100);
+  const progColor = zoneComplete ? '#44ff88' : (progress >= 4 ? '#ffaa00' : '#4488ff');
+  header.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+      <span style="color:#ccd;font-size:.85rem;font-weight:700">${zone.emoji} ${zone.name}</span>
+      <span style="color:${progColor};font-size:.8rem;font-weight:700">${zoneComplete ? '✅ ผ่านแล้ว!' : `${progress}/${zone.monsters.length} ตัว`}</span>
+    </div>
+    <div style="background:#1a1a2e;border-radius:4px;height:8px;overflow:hidden">
+      <div style="height:100%;width:${progPct}%;background:linear-gradient(90deg,${progColor},${zoneComplete?'#88ffaa':'#88aaff'});border-radius:4px;transition:width .4s"></div>
+    </div>`;
+  area.appendChild(header);
+
+  // ── Kill milestone progress ──
+  const milestoneHtml = _renderMilestoneProgress();
   if (milestoneHtml) {
     const msDiv = document.createElement('div');
     msDiv.id = 'kill-milestone-bar';
     msDiv.innerHTML = milestoneHtml;
     area.appendChild(msDiv);
   }
-  area.appendChild(grid);
+
+  // ── Monster progression list ──
+  const list = document.createElement('div');
+  list.style.cssText = 'display:flex;flex-direction:column;gap:.45rem';
+
+  zone.monsters.forEach((m, idx) => {
+    const cleared  = idx < progress;
+    const isCurrent = idx === currentTierIdx && !zoneComplete;
+    const isLocked = idx > currentTierIdx;
+    const stats    = getMonsterStats(G.currentZone, m.tier, m.isBoss);
+
+    const row = document.createElement('div');
+    row.style.cssText = `display:flex;align-items:center;gap:.7rem;padding:.55rem .7rem;border-radius:10px;
+      background:${cleared ? 'rgba(40,80,40,.35)' : isCurrent ? 'rgba(68,100,180,.25)' : 'rgba(255,255,255,.03)'};
+      border:1px solid ${cleared ? '#2a5a2a' : isCurrent ? '#4466cc' : '#222'};
+      opacity:${isLocked ? '.45' : '1'};
+      transition:background .2s;`;
+
+    const monIcon = m.img
+      ? `<img src="assets/sprites/${m.img}.png" style="width:38px;height:38px;object-fit:contain" onerror="this.outerHTML='<span style=font-size:1.8rem>${m.sprite}</span>'">`
+      : `<span style="font-size:1.8rem">${m.sprite}</span>`;
+
+    const tierLabel = m.isBoss
+      ? `<span style="color:#ffcc44;font-size:.7rem;font-weight:700">👑 BOSS</span>`
+      : `<span style="color:#888;font-size:.7rem">Tier ${m.tier}</span>`;
+
+    const statusIcon = cleared ? '✅' : isCurrent ? '⚔' : '🔒';
+    const hpLabel = `HP ${stats.maxHp.toLocaleString()} / ATK ${stats.atk}`;
+
+    row.innerHTML = `
+      <span style="font-size:1.1rem;min-width:1.4rem;text-align:center">${statusIcon}</span>
+      <div style="flex-shrink:0">${monIcon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="color:${cleared?'#66aa66':isCurrent?'#aabbff':'#888'};font-size:.82rem;font-weight:${isCurrent?'700':'400'}">${m.name}${m.isBoss?' 👑':''}</div>
+        <div style="color:#666;font-size:.68rem">${hpLabel}</div>
+        ${tierLabel}
+      </div>`;
+
+    if (isCurrent) {
+      const btn = document.createElement('button');
+      btn.textContent = '▶ สู้!';
+      btn.style.cssText = 'background:linear-gradient(135deg,#1a3a8a,#2244cc);border:1px solid #4466ff;color:#aaccff;padding:.3rem .8rem;border-radius:8px;cursor:pointer;font-size:.8rem;white-space:nowrap;font-weight:700';
+      btn.onclick = () => startBattle(m);
+      row.appendChild(btn);
+    } else if (cleared) {
+      const rebtn = document.createElement('button');
+      rebtn.textContent = '↺';
+      rebtn.title = 'ฝึกซ้ำ (ไม่นับ progress)';
+      rebtn.style.cssText = 'background:rgba(40,80,40,.4);border:1px solid #2a5a2a;color:#66aa66;padding:.3rem .6rem;border-radius:8px;cursor:pointer;font-size:.8rem';
+      rebtn.onclick = () => startBattle(m, true);
+      row.appendChild(rebtn);
+    }
+
+    list.appendChild(row);
+  });
+
+  area.appendChild(list);
+
+  // ── Zone complete banner ──
+  if (zoneComplete) {
+    const nextZone = ZONES.find(z => z.id === G.currentZone + 1);
+    if (nextZone) {
+      const banner = document.createElement('div');
+      banner.style.cssText = 'margin-top:.8rem;padding:.7rem;background:linear-gradient(135deg,rgba(0,60,0,.4),rgba(0,100,30,.3));border:1px solid #44ff88;border-radius:10px;text-align:center';
+      banner.innerHTML = `<div style="color:#44ff88;font-size:.85rem;font-weight:700">🎉 ผ่านด่านนี้แล้ว!</div>
+        <div style="color:#aaa;font-size:.75rem;margin-top:.2rem">ด่านถัดไป: ${nextZone.emoji} ${nextZone.name} ปลดล็อคแล้ว!</div>`;
+      area.appendChild(banner);
+    }
+  }
 }
 
 function _showBossLockedPopup(m, req, playerAtk) {
@@ -169,10 +218,14 @@ function _showMonsterDropTooltip(el, m) {
 // ---------- Stats ----------
 
 function getMonsterStats(zone, tier, isBoss) {
-  // softer scaling: linear zone instead of zone² so zone6 isn't 36× harder than zone1
-  let maxHp = Math.floor(60 * (1 + (zone - 1) * 0.9) * tier);
-  let atk   = Math.floor(5 * (1 + (zone - 1) * 0.7) * tier);
-  if (isBoss) { maxHp = Math.floor(maxHp * 4); atk = Math.floor(atk * 2.5); }
+  // Zone Progress mode: each monster in a zone is a "boss encounter"
+  // tier scaling: 1→1x, 2→1.8x, 3→3x, 4→5x, 5→8x, 6→14x (exponential curve)
+  const tierMult = [0, 1, 1.8, 3, 5, 8, 14][tier] || tier;
+  const zoneBase = 1 + (zone - 1) * 1.2; // zone 1=1, zone 2=2.2, zone 3=3.4 ... zone 6=7
+  let maxHp = Math.floor(200 * zoneBase * tierMult);
+  let atk   = Math.floor(12 * zoneBase * tierMult);
+  // tier 6 (zone boss) — extra tough
+  if (isBoss) { maxHp = Math.floor(maxHp * 1.5); atk = Math.floor(atk * 1.4); }
   return { maxHp, atk };
 }
 
@@ -1486,23 +1539,46 @@ function _syncLegacyFromTarget() {
   G.monsterBurnTurns    = e.burnTurns;
 }
 
-function startBattle(monster) {
+function startBattle(monster, isReplay) {
   stopAuto();
   G.battleInProgress = false;
   G.currentMonster   = null;
   _skillCooldowns    = {};
   _skillBuffs        = {};
   G.turnCount        = 0;
-  G.enemyQueue       = []; // legacy clear
+  G.enemyQueue       = [];
 
-  const waveSize = _buildWave(monster);
+  // Tag monster with replay flag so monsterDie() won't advance progress
+  const monsterObj = {...monster, _isReplay: !!isReplay};
+  const waveSize = _buildWave(monsterObj);
   G.battleInProgress = true;
   initClassMechanic();
 
   const stats = { maxHp: G.enemies[0].maxHp, atk: G.enemies[0].atk };
-  showBattleContent(monster, stats);
-  const waveLabel = waveSize > 1 ? ` (${waveSize} ตัว!)` : '';
-  logBattle(`<span class="log-sys">⚔ เริ่มต่อสู้กับ ${monster.name}!${waveLabel} HP:${stats.maxHp} ATK:${stats.atk}</span>`);
+  showBattleContent(monsterObj, stats);
+  const tierLabel = monsterObj.isBoss ? ' 👑 BOSS' : ` (Tier ${monsterObj.tier})`;
+  logBattle(`<span class="log-sys">⚔ ${monsterObj.name}${tierLabel} — HP:${stats.maxHp} ATK:${stats.atk}</span>`);
+
+  // IDLE: auto-start immediately when entering a zone
+  if (G._idleMode) {
+    setTimeout(() => _startAutoIfNeeded(), 300);
+  }
+}
+
+function _startAutoIfNeeded() {
+  if (!G.battleInProgress || !G.currentMonster) return;
+  if (autoAttackInterval) return; // already running
+  G._idleMode = true;
+  _updateAutoBtn(true);
+  autoAttackInterval = setInterval(() => {
+    if (G.battleInProgress && G.hp > 0 && G.currentMonster) {
+      playerAttack();
+    } else if (!G.battleInProgress && G.hp > 0) {
+      // waiting for next battle to start — keep interval alive but do nothing
+    } else {
+      stopAuto();
+    }
+  }, 1800);
 }
 
 function showBattleContent(monster, stats) {
@@ -2547,17 +2623,54 @@ function monsterDie() {
         renderSkillBar();
         logBattle(`<span class="log-sys">⚔ เหลือ ${aliveRemaining.length} ตัว! เลือกเป้าหมาย</span>`);
       } else {
-        // All dead — spawn new wave
+        // ── Zone Progress: advance to next monster ──
+        const isReplay = monster._isReplay;
+        if (!isReplay) {
+          if (!G.zoneProgress) G.zoneProgress = {};
+          const zoneMonsters = (ZONES.find(z => z.id === G.currentZone) || {}).monsters || [];
+          const currentProgress = G.zoneProgress[G.currentZone] || 0;
+          // advance only if this monster's tier matches current progress position
+          if (monster.tier === currentProgress + 1 && currentProgress < zoneMonsters.length) {
+            G.zoneProgress[G.currentZone] = currentProgress + 1;
+            const newProg = G.zoneProgress[G.currentZone];
+            if (newProg >= zoneMonsters.length) {
+              // Zone fully cleared — unlock next zone
+              const nextZoneId = G.currentZone + 1;
+              const nextZone = ZONES.find(z => z.id === nextZoneId);
+              logBattle(`<span class="log-exp" style="color:#44ff88;font-size:1.1em">🎉 ผ่านด่าน ${ZONES.find(z=>z.id===G.currentZone)?.name}! ${nextZone ? `ปลดล็อค ${nextZone.emoji} ${nextZone.name}!` : '🏆 ผ่านทุกด่านแล้ว!'}</span>`);
+              saveGame();
+              renderZoneTabs();
+              hideBattleContent();
+              return;
+            } else {
+              // Advance to next monster in zone — auto-start IDLE
+              const nextMonster = zoneMonsters[newProg];
+              logBattle(`<span class="log-sys">✅ ผ่าน ${monster.name}! → ถัดไป: ${nextMonster.name}</span>`);
+              saveGame();
+              setTimeout(() => {
+                startBattle(nextMonster);
+                // auto-start if auto was on or IDLE mode
+                if (autoAttackInterval || G._idleMode) {
+                  setTimeout(() => { if (G.battleInProgress && G.currentMonster) _startAutoIfNeeded(); }, 400);
+                }
+              }, 600);
+              updateTopBar(); updateCharPanel(); renderInventory(); renderDailyQuests();
+              return;
+            }
+          }
+        }
+        // Replay mode or fallback — respawn same monster
         _buildWave(monster);
         G.battleInProgress = true;
         const stats = { maxHp: G.enemies[0].maxHp, atk: G.enemies[0].atk };
-        const waveSize = G.enemies.length;
         renderEnemyCards();
         updateBattlePlayerStatus();
         document.getElementById('btn-attack').disabled = false;
         renderSkillBar();
-        const waveLabel = waveSize > 1 ? ` (${waveSize} ตัว!)` : '';
-        logBattle(`<span class="log-sys">⚔ ${monster.name} เกิดใหม่!${waveLabel} HP:${stats.maxHp}</span>`);
+        logBattle(`<span class="log-sys">⚔ ${monster.name} เกิดใหม่! HP:${stats.maxHp}</span>`);
+        if (autoAttackInterval || G._idleMode) {
+          setTimeout(() => { if (G.battleInProgress && G.currentMonster) _startAutoIfNeeded(); }, 300);
+        }
       }
     } else {
       hideBattleContent();
@@ -2643,19 +2756,20 @@ function toggleAuto() {
   if (autoAttackInterval) {
     clearInterval(autoAttackInterval);
     autoAttackInterval = null;
+    G._idleMode = false;
     _updateAutoBtn(false);
-    logBattle('<span class="log-sys">⏹ Auto OFF</span>');
+    logBattle('<span class="log-sys">⏹ IDLE OFF</span>');
   } else {
-    if (!G.battleInProgress || !G.currentMonster) return;
-    _updateAutoBtn(true);
-    logBattle('<span class="log-sys">▶ Auto ON — โจมตีทุก 2 วินาที</span>');
-    autoAttackInterval = setInterval(() => {
-      if (G.battleInProgress && G.hp > 0 && G.currentMonster) {
-        playerAttack();
-      } else {
-        stopAuto();
-      }
-    }, 2000);
+    if (!G.battleInProgress || !G.currentMonster) {
+      // Enable IDLE mode even before battle starts — will auto-start when battle begins
+      G._idleMode = true;
+      _updateAutoBtn(true);
+      logBattle('<span class="log-sys">▶ IDLE ON — จะโจมตีอัตโนมัติ</span>');
+      return;
+    }
+    G._idleMode = true;
+    logBattle('<span class="log-sys">▶ IDLE ON — โจมตีทุก 1.8 วินาที</span>');
+    _startAutoIfNeeded();
   }
 }
 
@@ -2664,19 +2778,33 @@ function stopAuto() {
   clearInterval(autoAttackInterval);
   autoAttackInterval = null;
   _updateAutoBtn(false);
+  // Don't reset G._idleMode here — only toggleAuto() should reset it
 }
 
 // ---------- Player die / flee ----------
 
 function playerDie() {
   G.battleInProgress = false;
+  const dyingMonster = G.currentMonster ? {...G.currentMonster} : null;
+  const wasIdle = G._idleMode || !!autoAttackInterval;
   stopAuto();
   G.hp = Math.floor(G.maxHp * .3);
-  logBattle(`<span class="log-dmg">💀 คุณพ่ายแพ้! ฟื้น HP 30%</span>`);
+  logBattle(`<span class="log-dmg">💀 คุณพ่ายแพ้! ฟื้น HP 30%${wasIdle ? ' — รีสตาร์ทใน 3 วิ...' : ''}</span>`);
   updateTopBar();
-  setTimeout(hideBattleContent, 800);
   if (typeof resolveInvasionLose === 'function' && G.pendingMonsterInvasion) resolveInvasionLose();
   saveGame();
+  // IDLE mode: retry same monster after short delay
+  if (wasIdle && dyingMonster) {
+    setTimeout(() => {
+      hideBattleContent();
+      setTimeout(() => {
+        startBattle(dyingMonster, dyingMonster._isReplay);
+        setTimeout(() => _startAutoIfNeeded(), 400);
+      }, 600);
+    }, 1200);
+  } else {
+    setTimeout(hideBattleContent, 800);
+  }
 }
 
 function fleeBattle() {

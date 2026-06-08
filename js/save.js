@@ -87,6 +87,20 @@ function loadGame() {
       if (G.targetIndex === undefined) G.targetIndex = 0;
       if (!G.claimedMilestones) G.claimedMilestones = [];
       if (!G.weeklyBossKills)   G.weeklyBossKills   = {};
+      if (!G.zoneProgress)      G.zoneProgress      = {};
+      // migrate: build zoneProgress from defeatedMonsters for existing saves
+      if (G.defeatedMonsters && Object.keys(G.zoneProgress).length === 0) {
+        const allZones = [1,2,3,4,5,6];
+        allZones.forEach(zid => {
+          // count how many tiers cleared consecutively from tier 1
+          let cleared = 0;
+          for (let t = 1; t <= 6; t++) {
+            if (G.defeatedMonsters[`${zid}_${t}`]) cleared = t;
+            else break;
+          }
+          if (cleared > 0) G.zoneProgress[zid] = cleared;
+        });
+      }
     }
   } catch(e) {
     console.warn('[LoadGame] failed, trying backup:', e);
