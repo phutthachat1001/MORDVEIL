@@ -90,8 +90,9 @@ function loadGame() {
       if (!G.zoneProgress)           G.zoneProgress      = {};
       if (G.attackSpeedBonus === undefined) G.attackSpeedBonus = 0;
       if (G.dropBonusFromTree === undefined) G.dropBonusFromTree = 0;
-      // transient flags — never resume mid-battle / idle after reload
-      G._idleMode = false;
+      // transient flags — reset battle state on reload.
+      // _idleMode defaults ON (IDLE game) but don't resume an active battle loop.
+      G._idleMode = true;
       G.battleInProgress = false;
       // migrate: build zoneProgress from defeatedMonsters for existing saves
       if (G.defeatedMonsters && Object.keys(G.zoneProgress).length === 0) {

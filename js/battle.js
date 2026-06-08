@@ -1498,14 +1498,9 @@ function getMonsterSprite(monsterName, isBoss, zone, imgFile) {
 // ---------- Start / show / hide ----------
 
 function _rollWaveSize(monster) {
-  // Boss zone fights (progress mode) always single
-  if (monster.isBoss) return 1;
-  // IDLE mode: 1-4 enemies based on zone
-  if (G._idleMode) {
-    const maxWave = Math.min(4, 1 + Math.floor(G.currentZone / 2));
-    return Math.floor(Math.random() * maxWave) + 1;
-  }
-  // Normal mode: single enemy
+  // IDLE design: every fight is a single enemy. You attack the current
+  // zone monster repeatedly (auto, on the speed-stat timer); on death it
+  // respawns so you can keep farming, and clearing it advances the zone.
   return 1;
 }
 
@@ -1561,10 +1556,12 @@ function startBattle(monster, isReplay) {
   const stats = { maxHp: G.enemies[0].maxHp, atk: G.enemies[0].atk };
   showBattleContent(monsterObj, stats);
   const tierLabel = monsterObj.isBoss ? ' 👑 BOSS' : ` (Tier ${monsterObj.tier})`;
-  logBattle(`<span class="log-sys">⚔ ${monsterObj.name}${tierLabel} — HP:${stats.maxHp} ATK:${stats.atk}</span>`);
+  const spd = (getAttackInterval() / 1000).toFixed(1);
+  logBattle(`<span class="log-sys">⚔ ${monsterObj.name}${tierLabel} — HP:${stats.maxHp} ATK:${stats.atk} — โจมตีอัตโนมัติทุก ${spd} วิ</span>`);
 
-  // IDLE: auto-start immediately when entering a zone
-  if (G._idleMode) {
+  // IDLE game: auto-attack on the speed-stat timer (both normal & boss).
+  // Default ON; respect the player turning it off via the IDLE button.
+  if (G._idleMode !== false) {
     setTimeout(() => _startAutoIfNeeded(), 300);
   }
 }
@@ -2631,12 +2628,17 @@ function monsterDie() {
   let stats  = getMonsterStats(G.currentZone, monster.tier, monster.isBoss);
   // apply event monster modifiers
   if (typeof applyMonsterEventMods === 'function') stats = applyMonsterEventMods(stats);
-  // Full RPG: EXP จาก kill สูงกว่า 8× เพราะไม่มี task EXP
+
+  // ── Reward scaling: normal IDLE monsters give ~35% of a boss kill ──
+  // Boss = full reward. Normal monster (tier 1-5) = NORMAL_REWARD_MULT of that.
+  const NORMAL_REWARD_MULT = 0.35;
+  const rewardMult = monster.isBoss ? 1 : NORMAL_REWARD_MULT;
+
+  // Base EXP per kill (boss baseline), then scaled down for normal monsters
   const killExpBase = G.gameMode === 'fullrpg' ? 0.5 : 0.03;
-  let expGain  = Math.floor(stats.maxHp * killExpBase);
-  if (monster.isBoss) expGain *= 3;
-  // Full RPG boss bonus
+  let expGain = Math.floor(stats.maxHp * killExpBase * 3); // ×3 = boss baseline
   if (G.gameMode === 'fullrpg' && monster.isBoss) expGain = Math.floor(expGain * 1.5);
+  expGain = Math.floor(expGain * rewardMult);
   // apply event exp rewards (ferocious ×3, rare ×2 etc.)
   let evExpMult = 1;
   if (typeof applyMonsterEventRewards === 'function') evExpMult = applyMonsterEventRewards(stats);
@@ -2644,6 +2646,7 @@ function monsterDie() {
   // apply exp boost buff
   const expBoostMult = (typeof getExpBoostMult === 'function') ? getExpBoostMult() : 1;
   expGain = Math.floor(expGain * expBoostMult * (1 + (G.expBonusFromTree || 0)));
+  expGain = Math.max(1, expGain);
   G.totalExpGained += expGain;
 
   const cls      = CLASSES.find(c => c.id === G.classId);
@@ -2656,7 +2659,8 @@ function monsterDie() {
     _dropDirectItem(bossRarity);
     if (Math.random() < 0.5) _dropDirectItem(bossRarity);
   } else {
-    // base drop rate scales with zone (8% → 20%), bonus from class + tree
+    // normal monster: lower drop rate than boss (boss = guaranteed)
+    // base drop rate scales with zone (8% → 18%), bonus from class + tree
     const baseRate = 0.08 + (G.currentZone - 1) * 0.02;
     const dropRate = baseRate + dropBonus + (G.dropBonusFromTree || 0);
     if (Math.random() < dropRate) {
@@ -2665,9 +2669,11 @@ function monsterDie() {
     }
   }
 
-  let goldGain = Math.floor(stats.atk * (monster.isBoss ? 3 : 0.5));
+  // Gold: boss = atk × 3 (baseline); normal = 35% of that ≈ atk × 1.05
+  let goldGain = Math.floor(stats.atk * 3 * rewardMult);
   if (cls && cls.bonuses.goldMult) goldGain = Math.floor(goldGain * cls.bonuses.goldMult);
   if ((G.goldBonusFromTree || 0) > 0) goldGain = Math.floor(goldGain * (1 + G.goldBonusFromTree));
+  goldGain = Math.max(1, goldGain);
   G.gold += goldGain;
   if (typeof rpgOnGoldGain === 'function') rpgOnGoldGain(goldGain);
 
