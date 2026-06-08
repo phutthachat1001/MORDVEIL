@@ -2259,7 +2259,11 @@ function useSkill(id) {
 
 function playerAttack() {
   if (!G.battleInProgress || !G.currentMonster) return;
-  document.getElementById('btn-attack').disabled = true;
+  const atkBtn = document.getElementById('btn-attack');
+  // guard: don't stack attacks while waiting for monster's counter-turn
+  // (auto-attack interval can fire while the button is mid-cooldown)
+  if (atkBtn && atkBtn.disabled) return;
+  if (atkBtn) atkBtn.disabled = true;
 
   // animate player attacking
   const playerEl = document.getElementById('pixel-player');
@@ -2268,7 +2272,7 @@ function playerAttack() {
     setTimeout(() => playerEl.classList.remove('attack-anim'), 500);
   }
 
-  const eqBonus = (typeof getEquippedStatBonus === 'function') ? getEquippedStatBonus() : { atk:0, def:0, hp:0, crit:0, speed:0 };
+  const eqBonus = (typeof getEquippedStatBonus === 'function') ? getEquippedStatBonus() : { atk:0, def:0, hp:0, crit:0, attackSpeed:0 };
   const weapon  = G.equippedWeaponId ? G.inventory.find(i => i.uid === G.equippedWeaponId) : null;
   // eqBonus.atk already includes weapon slot + gloves — do NOT add weapon.atk separately
   let atk = G.baseAtk + (eqBonus.atk || 0) + Math.floor(Math.random() * G.level) + 1;
