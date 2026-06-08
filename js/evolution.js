@@ -36,23 +36,7 @@ function canEvolve() {
 function checkEvolutionConditions(evo) {
   const c = evo.conditions;
   if (!c) return true;
-  if (c.level     && G.level      < c.level)     return false;
-  if (c.kills     && G.totalKills < c.kills)     return false;
-  if (c.bossKills && G.bossKills  < c.bossKills) return false;
-  if (c.tasks     && G.totalTasks < c.tasks)     return false;
-  if (c.epicTasks && (G.epicTasksDone||0) < c.epicTasks) return false;
-  if (c.critCount && (G.critCount||0)     < c.critCount) return false;
-  if (c.streak    && G.streak     < c.streak)    return false;
-  if (c.hp        && G.maxHp < c.hp)             return false;
-  if (c.hpHealed  && (G.totalHpHealed||0) < c.hpHealed) return false;
-  if (c.gold      && G.gold       < c.gold)      return false;
-  if (c.needsSet) {
-    const setKey = getSetKey(c.setTier);
-    if (!hasCompleteSet(setKey)) return false;
-  }
-  if (c.evoQuest) {
-    if (!G.evoQuestDone || !G.evoQuestDone[c.evoQuest]) return false;
-  }
+  if (c.level && G.level < c.level) return false;
   return true;
 }
 
@@ -198,25 +182,12 @@ function renderEvolutionButton() {
 
   const ready = canEvolve();
   const c = next.conditions || {};
-  let condHtml = '';
-  if (c.level)     condHtml += condLine('⭐ LV', c.level,   G.level);
-  if (c.kills)     condHtml += condLine('💀 Kill', c.kills, G.totalKills);
-  if (c.bossKills) condHtml += condLine('👑 Boss', c.bossKills, G.bossKills);
-  if (c.tasks)     condHtml += condLine('✅ งาน', c.tasks, G.totalTasks);
-  if (c.epicTasks) condHtml += condLine('🔥 Epic', c.epicTasks, G.epicTasksDone||0);
-  if (c.critCount) condHtml += condLine('💥 Crit', c.critCount, G.critCount||0);
-  if (c.streak)    condHtml += condLine('🔥 Streak', c.streak, G.streak);
-  if (c.hp)        condHtml += condLine('❤ Max HP', c.hp, G.maxHp);
-  if (c.hpHealed)  condHtml += condLine('💚 HP ฟื้น', c.hpHealed, G.totalHpHealed||0);
-  if (c.gold)      condHtml += condLine('💰 ทอง', c.gold, G.gold);
-  if (c.needsSet)  condHtml += `<div class="evo-cond${hasCompleteSet(getSetKey(c.setTier))?'':' fail'}">🎴 เซ็ต Tier${c.setTier} ครบ</div>`;
-  if (c.evoQuest && typeof renderEvoQuestProgress === 'function')
-    condHtml += renderEvoQuestProgress(next);
+  const condHtml = c.level ? condLine('⭐ LV', c.level, G.level) : '';
 
   area.innerHTML = `
     <div class="evo-next-name" style="color:${next.color||'var(--gold)'}">${next.icon} ${next.name} (Tier ${next.tier})</div>
     <div class="evo-conds">${condHtml}</div>
-    ${ready ? `<button class="btn-evolve" onclick="evolveClass()">✨ วิวัฒนาการ!</button>` : '<div style="color:var(--text2);font-size:.8rem">เงื่อนไขยังไม่ครบ</div>'}`;
+    ${ready ? `<button class="btn-evolve" onclick="evolveClass()">✨ วิวัฒนาการ!</button>` : `<div style="color:var(--text2);font-size:.8rem">ต้องการ LV ${c.level||'?'}</div>`}`;
 }
 
 function condLine(label, need, have) {

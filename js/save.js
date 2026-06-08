@@ -87,7 +87,9 @@ function loadGame() {
       if (G.targetIndex === undefined) G.targetIndex = 0;
       if (!G.claimedMilestones) G.claimedMilestones = [];
       if (!G.weeklyBossKills)   G.weeklyBossKills   = {};
-      if (!G.zoneProgress)      G.zoneProgress      = {};
+      if (!G.zoneProgress)           G.zoneProgress      = {};
+      if (G.attackSpeedBonus === undefined) G.attackSpeedBonus = 0;
+      if (G.dropBonusFromTree === undefined) G.dropBonusFromTree = 0;
       // migrate: build zoneProgress from defeatedMonsters for existing saves
       if (G.defeatedMonsters && Object.keys(G.zoneProgress).length === 0) {
         const allZones = [1,2,3,4,5,6];

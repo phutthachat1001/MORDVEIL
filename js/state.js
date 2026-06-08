@@ -89,6 +89,8 @@ let G = {
   goldBonusFromTree: 0,
   regenBonusFromTree: 0,
   streakBonusFromTree: 0,
+  attackSpeedBonus: 0,     // 0.0–0.9 reduces 6000ms base attack interval
+  dropBonusFromTree: 0,    // extra drop chance from skill tree
   totalDmgTaken: 0,
   // Evolution quests
   evoQuestProgress: {},    // questId -> progress

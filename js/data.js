@@ -734,6 +734,18 @@ const SKILL_TREES = {
     {id:'w_B4_hp',   name:'+120 HP',         icon:'❤', type:'stat',  row:4,col:3, requires:'w_B_hp4',    branch:'B', stat:{hp:120}},
     {id:'w_B4_sk',   name:'ปราการนิรันดร์', icon:'🏯', type:'skill', row:4,col:2, requires:'w_B_shield', branch:'B',
      skill:{id:'eternal_fortress',name:'ปราการนิรันดร์',desc:'บล็อกดาเมจทั้งหมด 2 ตา + โจมตีตอบโต้ ×3 หลังจบ',cooldown:12,tier:4}},
+    // ── Row 5 — IDLE: Speed + Drop + bulk HP/ATK ──
+    {id:'w_spd1',  name:'-5% ช้า',   icon:'⚡', type:'stat', row:5,col:0, requires:'w_atk1',  stat:{speedBonus:0.05}},
+    {id:'w_spd2',  name:'-8% ช้า',   icon:'⚡', type:'stat', row:5,col:1, requires:'w_spd1',  stat:{speedBonus:0.08}},
+    {id:'w_spd3',  name:'-10% ช้า',  icon:'⚡', type:'stat', row:5,col:2, requires:'w_spd2',  stat:{speedBonus:0.10}},
+    {id:'w_hp5',   name:'+150 HP',    icon:'❤', type:'stat', row:5,col:3, requires:'w_hp2',   stat:{hp:150}},
+    {id:'w_atk5',  name:'+15 ATK',   icon:'⚔', type:'stat', row:5,col:4, requires:'w_atk3',  stat:{atk:15}},
+    {id:'w_drop1', name:'+5% Drop',  icon:'💎', type:'stat', row:5,col:5, requires:'w_atk1',  stat:{dropBonus:0.05}},
+    // ── Row 6 — Ultra: massive buffs ──
+    {id:'w_spd4',  name:'-15% ช้า',  icon:'⚡', type:'stat', row:6,col:0, requires:'w_spd3',  stat:{speedBonus:0.15}},
+    {id:'w_hp6',   name:'+250 HP',    icon:'❤', type:'stat', row:6,col:2, requires:'w_hp5',   stat:{hp:250}},
+    {id:'w_atk6',  name:'+25 ATK',   icon:'⚔', type:'stat', row:6,col:3, requires:'w_atk5',  stat:{atk:25}},
+    {id:'w_drop2', name:'+10% Drop', icon:'💎', type:'stat', row:6,col:5, requires:'w_drop1', stat:{dropBonus:0.10}},
   ],
 
   // ══════════════════════════════════════════════════════════
@@ -776,6 +788,17 @@ const SKILL_TREES = {
     {id:'m_B4_exp', name:'+30% EXP',     icon:'✨', type:'stat',  row:4,col:3, requires:'m_B_exp4',  branch:'B', stat:{expBonus:0.3}},
     {id:'m_B4_sk',  name:'ฝนแสงสวรรค์', icon:'🌟', type:'skill', row:4,col:2, requires:'m_B_holy',  branch:'B',
      skill:{id:'heaven_rain',name:'ฝนแสงสวรรค์',desc:'โจมตี 6 ลูก ×1.5 + ฟื้น 8% HP/ลูก + ฟื้น HP ทุกตา 5 ตา',cooldown:12,tier:4}},
+    // ── Row 5-6 — IDLE nodes ──
+    {id:'m_spd1',  name:'-5% ช้า',   icon:'⚡', type:'stat', row:5,col:0, requires:'m_atk1',  stat:{speedBonus:0.05}},
+    {id:'m_spd2',  name:'-8% ช้า',   icon:'⚡', type:'stat', row:5,col:1, requires:'m_spd1',  stat:{speedBonus:0.08}},
+    {id:'m_spd3',  name:'-12% ช้า',  icon:'⚡', type:'stat', row:5,col:2, requires:'m_spd2',  stat:{speedBonus:0.12}},
+    {id:'m_hp5',   name:'+100 HP',    icon:'❤', type:'stat', row:5,col:3, requires:'m_hp1',   stat:{hp:100}},
+    {id:'m_atk5',  name:'+12 ATK',   icon:'🔮', type:'stat', row:5,col:4, requires:'m_atk2',  stat:{atk:12}},
+    {id:'m_drop1', name:'+5% Drop',  icon:'💎', type:'stat', row:5,col:5, requires:'m_atk1',  stat:{dropBonus:0.05}},
+    {id:'m_spd4',  name:'-15% ช้า',  icon:'⚡', type:'stat', row:6,col:0, requires:'m_spd3',  stat:{speedBonus:0.15}},
+    {id:'m_hp6',   name:'+200 HP',    icon:'❤', type:'stat', row:6,col:2, requires:'m_hp5',   stat:{hp:200}},
+    {id:'m_atk6',  name:'+20 ATK',   icon:'🔮', type:'stat', row:6,col:3, requires:'m_atk5',  stat:{atk:20}},
+    {id:'m_drop2', name:'+10% Drop', icon:'💎', type:'stat', row:6,col:5, requires:'m_drop1', stat:{dropBonus:0.10}},
   ],
 
   // ══════════════════════════════════════════════════════════
@@ -818,6 +841,17 @@ const SKILL_TREES = {
     {id:'r_B4_crit', name:'+15% Crit', icon:'💥', type:'stat',  row:4,col:3, requires:'r_B_crit3',  branch:'B', stat:{crit:0.15}},
     {id:'r_B4_sk',   name:'ปล้นจักรวรรดิ',icon:'💰', type:'skill', row:4,col:2, requires:'r_B_loot', branch:'B',
      skill:{id:'empire_plunder',name:'ปล้นจักรวรรดิ',desc:'โจมตี 5 ครั้ง ×1.8 + ทองสูงสุดจากมอน + droprate ×3 (ตาต่อไป)',cooldown:10,tier:4}},
+    // ── Row 5-6 — IDLE nodes ──
+    {id:'r_spd1',  name:'-8% ช้า',   icon:'⚡', type:'stat', row:5,col:0, requires:'r_atk1',  stat:{speedBonus:0.08}},
+    {id:'r_spd2',  name:'-10% ช้า',  icon:'⚡', type:'stat', row:5,col:1, requires:'r_spd1',  stat:{speedBonus:0.10}},
+    {id:'r_spd3',  name:'-15% ช้า',  icon:'⚡', type:'stat', row:5,col:2, requires:'r_spd2',  stat:{speedBonus:0.15}},
+    {id:'r_hp5',   name:'+80 HP',     icon:'❤', type:'stat', row:5,col:3, requires:'r_crit1', stat:{hp:80}},
+    {id:'r_atk5',  name:'+10 ATK',   icon:'🗡', type:'stat', row:5,col:4, requires:'r_atk2',  stat:{atk:10}},
+    {id:'r_drop1', name:'+8% Drop',  icon:'💎', type:'stat', row:5,col:5, requires:'r_atk1',  stat:{dropBonus:0.08}},
+    {id:'r_spd4',  name:'-20% ช้า',  icon:'⚡', type:'stat', row:6,col:0, requires:'r_spd3',  stat:{speedBonus:0.20}},
+    {id:'r_hp6',   name:'+150 HP',    icon:'❤', type:'stat', row:6,col:2, requires:'r_hp5',   stat:{hp:150}},
+    {id:'r_atk6',  name:'+18 ATK',   icon:'🗡', type:'stat', row:6,col:3, requires:'r_atk5',  stat:{atk:18}},
+    {id:'r_drop2', name:'+12% Drop', icon:'💎', type:'stat', row:6,col:5, requires:'r_drop1', stat:{dropBonus:0.12}},
   ],
 
   // ══════════════════════════════════════════════════════════
@@ -860,6 +894,17 @@ const SKILL_TREES = {
     {id:'a_B4_atk',  name:'+25 ATK',      icon:'🏹', type:'stat',  row:4,col:3, requires:'a_B_atk4',  branch:'B', stat:{atk:25}},
     {id:'a_B4_sk',   name:'พายุสายฟ้า',  icon:'⚡', type:'skill', row:4,col:2, requires:'a_B_wind',  branch:'B',
      skill:{id:'thunder_storm',name:'พายุสายฟ้า',desc:'ยิง 8 ลูกสายฟ้า ×1.5 ทุกลูก crit อัตโนมัติ + stun 2 ตา',cooldown:12,tier:4}},
+    // ── Row 5-6 — IDLE nodes ──
+    {id:'a_spd1',  name:'-8% ช้า',   icon:'⚡', type:'stat', row:5,col:0, requires:'a_atk1',  stat:{speedBonus:0.08}},
+    {id:'a_spd2',  name:'-10% ช้า',  icon:'⚡', type:'stat', row:5,col:1, requires:'a_spd1',  stat:{speedBonus:0.10}},
+    {id:'a_spd3',  name:'-15% ช้า',  icon:'⚡', type:'stat', row:5,col:2, requires:'a_spd2',  stat:{speedBonus:0.15}},
+    {id:'a_hp5',   name:'+80 HP',     icon:'❤', type:'stat', row:5,col:3, requires:'a_atk1',  stat:{hp:80}},
+    {id:'a_atk5',  name:'+12 ATK',   icon:'🏹', type:'stat', row:5,col:4, requires:'a_atk3',  stat:{atk:12}},
+    {id:'a_drop1', name:'+6% Drop',  icon:'💎', type:'stat', row:5,col:5, requires:'a_atk1',  stat:{dropBonus:0.06}},
+    {id:'a_spd4',  name:'-20% ช้า',  icon:'⚡', type:'stat', row:6,col:0, requires:'a_spd3',  stat:{speedBonus:0.20}},
+    {id:'a_hp6',   name:'+160 HP',    icon:'❤', type:'stat', row:6,col:2, requires:'a_hp5',   stat:{hp:160}},
+    {id:'a_atk6',  name:'+20 ATK',   icon:'🏹', type:'stat', row:6,col:3, requires:'a_atk5',  stat:{atk:20}},
+    {id:'a_drop2', name:'+12% Drop', icon:'💎', type:'stat', row:6,col:5, requires:'a_drop1', stat:{dropBonus:0.12}},
   ],
 
   // ══════════════════════════════════════════════════════════
@@ -902,5 +947,16 @@ const SKILL_TREES = {
     {id:'p_B4_crit', name:'+15% Crit', icon:'💥', type:'stat',  row:4,col:3, requires:'p_B_crit1', branch:'B', stat:{crit:0.15}},
     {id:'p_B4_sk',   name:'พิพากษา',   icon:'👑', type:'skill', row:4,col:2, requires:'p_B_smite', branch:'B',
      skill:{id:'final_judgment',name:'พิพากษา',desc:'ดาเมจ = 35% HP max ศัตรู + ถ้าบอส ×2 + crit อัตโนมัติ',cooldown:12,tier:4}},
+    // ── Row 5-6 — IDLE nodes ──
+    {id:'p_spd1',  name:'-5% ช้า',   icon:'⚡', type:'stat', row:5,col:0, requires:'p_hp1',   stat:{speedBonus:0.05}},
+    {id:'p_spd2',  name:'-8% ช้า',   icon:'⚡', type:'stat', row:5,col:1, requires:'p_spd1',  stat:{speedBonus:0.08}},
+    {id:'p_spd3',  name:'-10% ช้า',  icon:'⚡', type:'stat', row:5,col:2, requires:'p_spd2',  stat:{speedBonus:0.10}},
+    {id:'p_hp5',   name:'+200 HP',    icon:'❤', type:'stat', row:5,col:3, requires:'p_hp2',   stat:{hp:200}},
+    {id:'p_atk5',  name:'+10 ATK',   icon:'⚔', type:'stat', row:5,col:4, requires:'p_def3',  stat:{atk:10}},
+    {id:'p_drop1', name:'+5% Drop',  icon:'💎', type:'stat', row:5,col:5, requires:'p_hp1',   stat:{dropBonus:0.05}},
+    {id:'p_spd4',  name:'-12% ช้า',  icon:'⚡', type:'stat', row:6,col:0, requires:'p_spd3',  stat:{speedBonus:0.12}},
+    {id:'p_hp6',   name:'+300 HP',    icon:'❤', type:'stat', row:6,col:2, requires:'p_hp5',   stat:{hp:300}},
+    {id:'p_atk6',  name:'+18 ATK',   icon:'⚔', type:'stat', row:6,col:3, requires:'p_atk5',  stat:{atk:18}},
+    {id:'p_drop2', name:'+10% Drop', icon:'💎', type:'stat', row:6,col:5, requires:'p_drop1', stat:{dropBonus:0.10}},
   ],
 };

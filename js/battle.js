@@ -1498,11 +1498,15 @@ function getMonsterSprite(monsterName, isBoss, zone, imgFile) {
 // ---------- Start / show / hide ----------
 
 function _rollWaveSize(monster) {
+  // Boss zone fights (progress mode) always single
   if (monster.isBoss) return 1;
-  const r = Math.random();
-  if (r < 0.50) return 1;
-  if (r < 0.80) return 2;
-  return 3;
+  // IDLE mode: 1-4 enemies based on zone
+  if (G._idleMode) {
+    const maxWave = Math.min(4, 1 + Math.floor(G.currentZone / 2));
+    return Math.floor(Math.random() * maxWave) + 1;
+  }
+  // Normal mode: single enemy
+  return 1;
 }
 
 // Build G.enemies[] for a new wave of the given monster type
@@ -1570,6 +1574,7 @@ function _startAutoIfNeeded() {
   if (autoAttackInterval) return; // already running
   G._idleMode = true;
   _updateAutoBtn(true);
+  const interval = getAttackInterval();
   autoAttackInterval = setInterval(() => {
     if (G.battleInProgress && G.hp > 0 && G.currentMonster) {
       playerAttack();
@@ -1578,7 +1583,13 @@ function _startAutoIfNeeded() {
     } else {
       stopAuto();
     }
-  }, 1800);
+  }, interval);
+}
+
+function restartAutoWithNewSpeed() {
+  if (!G._idleMode) return;
+  stopAuto();
+  if (G.battleInProgress && G.currentMonster) _startAutoIfNeeded();
 }
 
 function showBattleContent(monster, stats) {
@@ -2364,6 +2375,39 @@ function playerAttack() {
 
 // ---------- Attack effect image ----------
 
+// ---------- Direct item drop (no chest) ----------
+
+function _dropDirectItem(rarity) {
+  if (G.inventory && G.inventory.length >= 50) {
+    logBattle(`<span class="log-sys">⚠ กระเป๋าเต็ม! ขายของก่อน</span>`);
+    return;
+  }
+  // Pick random slot and random item of that rarity
+  const slots = ['weapon','helmet','armor','gloves','pants','boots'];
+  const slot   = slots[Math.floor(Math.random() * slots.length)];
+  const pool   = (ALL_ITEMS_BY_SLOT[slot] || []).filter(i => i.rarity === rarity);
+  if (!pool.length) return;
+  const base = pool[Math.floor(Math.random() * pool.length)];
+  const item = { ...base, uid: Date.now() + Math.random() };
+  if (!G.inventory) G.inventory = [];
+  G.inventory.push(item);
+  const rarityColor = RARITIES[rarity] ? RARITIES[rarity].color : '#aaa';
+  logBattle(`<span class="log-exp" style="color:${rarityColor}">💎 ดรอป: ${item.icon||'⚔'} ${item.name} [${RARITIES[rarity]?.label||rarity}]</span>`);
+  // flag for achievements
+  if (rarity === 'rare' || rarity === 'epic' || rarity === 'legend' || rarity === 'ancient') G.gotRareWeapon = true;
+  if (rarity === 'legend' || rarity === 'ancient') G.gotLegendWeapon = true;
+  renderInventory();
+}
+
+// ---------- Attack speed (ms per hit) ----------
+
+function getAttackInterval() {
+  // Base 6000ms; reduced by attackSpeedBonus (0.0–0.9 range, from items + skill tree)
+  const bonus = (G.attackSpeedBonus || 0); // e.g. 0.1 = 10% faster
+  const ms = Math.max(800, Math.floor(6000 * (1 - bonus)));
+  return ms;
+}
+
 function _showAttackEffect(container, isCrit) {
   const CLASS_FX = {
     warrior: 'slash',
@@ -2547,18 +2591,20 @@ function monsterDie() {
   expGain = Math.floor(expGain * expBoostMult * (1 + (G.expBonusFromTree || 0)));
   G.totalExpGained += expGain;
 
-  let dropChest = null;
   const cls      = CLASSES.find(c => c.id === G.classId);
   const dropBonus = cls && cls.bonuses.dropBonus ? cls.bonuses.dropBonus : 0;
+  // Direct item drop (no chest middleman)
+  let dropChest = null; // keep for boss chest reward
   if (monster.isBoss) {
     dropChest = 'boss';
-  } else if (Math.random() < (.03 + dropBonus)) {
-    dropChest = monster.tier >= 4 ? 'rare' : monster.tier >= 2 ? 'uncommon' : 'common';
-  }
-  if (dropChest) {
     G.chests[dropChest] = (G.chests[dropChest] || 0) + 1;
-    if (G.inventory.length >= 40) {
-      logBattle(`<span class="log-sys">⚠ กระเป๋าเกือบเต็ม (${G.inventory.length}/50) — ขายของออกก่อนเปิดหีบ</span>`);
+  } else {
+    const dropRate = 0.12 + dropBonus + (G.dropBonusFromTree || 0);
+    if (Math.random() < dropRate) {
+      const rarity = monster.tier >= 5 ? 'rare'
+                   : monster.tier >= 3 ? 'uncommon'
+                   : 'common';
+      _dropDirectItem(rarity);
     }
   }
 
@@ -2593,7 +2639,7 @@ function monsterDie() {
   const monEl = document.getElementById('pixel-monster');
   if (monEl) monEl.classList.add('die-anim');
 
-  logBattle(`<span class="log-exp">🏆 ${monster.name} ตาย! +${expGain} EXP 💰+${goldGain}${dropChest ? ` 📦 หีบ${dropChest==='boss'?'บอส':dropChest==='rare'?'หายาก':dropChest==='uncommon'?'พิเศษ':'ธรรมดา'}` : ''} [Kill #${G.sessionKills}]</span>`);
+  logBattle(`<span class="log-exp">🏆 ${monster.name} ตาย! +${expGain} EXP 💰+${goldGain}${dropChest ? ` 📦 หีบบอส` : ''} [Kill #${G.sessionKills}]</span>`);
 
   giveExp(expGain);
   checkAchievements();
@@ -2768,7 +2814,7 @@ function toggleAuto() {
       return;
     }
     G._idleMode = true;
-    logBattle('<span class="log-sys">▶ IDLE ON — โจมตีทุก 1.8 วินาที</span>');
+    logBattle(`<span class="log-sys">▶ IDLE ON — โจมตีทุก ${(getAttackInterval()/1000).toFixed(1)} วิ</span>`);
     _startAutoIfNeeded();
   }
 }
