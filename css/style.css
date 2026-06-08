@@ -1792,6 +1792,11 @@ body.preload{visibility:hidden}
   50%       { opacity: 1;   transform: scale(1.2); }
 }
 
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(255,200,40,.4); }
+  50%       { box-shadow: 0 0 18px rgba(255,200,40,.75); }
+}
+
 /* idle bounce */
 .pixel-fighter svg {
   animation: idle-bounce 1.2s ease-in-out infinite;

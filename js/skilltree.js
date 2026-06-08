@@ -227,12 +227,55 @@ function formatBonuses(b) {
   return s.join(' &nbsp;');
 }
 
-// ── Skill Tree UI (full-page) ──
+// ── Skill Tree UI ──
+// Sidebar shows a compact summary + button. Full grid opens in an overlay.
 function renderSkillTree() {
-  const area = document.getElementById('skill-tree-area');
+  const area = document.getElementById('skill-tree-summary');
   if (!area || !G.classId) return;
-
   refreshSkillPoints();
+
+  const earned = getSkillPointsEarned(G.level);
+  const spent  = Object.keys(G.skillTreeSpent || {}).length;
+  const avail  = Math.max(0, earned - spent);
+
+  const equipBonus  = typeof getEquippedStatBonus === 'function' ? (getEquippedStatBonus().attackSpeed || 0) : 0;
+  const totalSpeed  = Math.min(0.9, (G.attackSpeedBonus || 0) + equipBonus);
+  const speedPct    = Math.round(totalSpeed * 100);
+  const curInterval = typeof getAttackInterval === 'function' ? (getAttackInterval()/1000).toFixed(1) : '6.0';
+
+  const pulse = avail > 0 ? 'box-shadow:0 0 12px rgba(255,200,40,.5);animation:pulse 1.5s infinite' : '';
+  area.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-size:.74rem;color:#aaa;margin-bottom:.5rem">
+      <span>⚡ ${curInterval}วิ/ตี (-${speedPct}%)</span>
+      <span>💎 +${Math.round((G.dropBonusFromTree||0)*100)}% Drop</span>
+    </div>
+    <button onclick="openSkillTreeFull()" style="width:100%;padding:.55rem;border-radius:10px;cursor:pointer;font-weight:700;font-size:.85rem;
+      background:linear-gradient(135deg,#2a2a4a,#3a3a6a);border:1px solid ${avail>0?'#ffcc44':'#445'};color:${avail>0?'#ffdd66':'#aabbdd'};${pulse}">
+      🌳 เปิด Skill Tree${avail > 0 ? ` &nbsp;<span style="background:#ffcc44;color:#221100;border-radius:10px;padding:0 .5rem">${avail} จุด</span>` : ''}
+    </button>`;
+
+  // keep full overlay in sync if open
+  const ov = document.getElementById('skilltree-overlay');
+  if (ov && ov.classList.contains('active')) _renderSkillTreeFull();
+}
+
+function openSkillTreeFull() {
+  const ov = document.getElementById('skilltree-overlay');
+  if (!ov) return;
+  _renderSkillTreeFull();
+  ov.classList.add('active');
+}
+
+function closeSkillTreeFull() {
+  const ov = document.getElementById('skilltree-overlay');
+  if (ov) ov.classList.remove('active');
+}
+
+function _renderSkillTreeFull() {
+  const area = document.getElementById('skill-tree-area-full');
+  if (!area || !G.classId) return;
+  refreshSkillPoints();
+
   const allNodes = SKILL_TREES[G.classId] || [];
   const tree = allNodes.filter(n => {
     if (!n.branch) return true;
@@ -262,7 +305,7 @@ function renderSkillTree() {
 
   let html = `
   <div style="background:rgba(0,0,0,.35);border:1px solid #333;border-radius:10px;padding:.7rem .9rem;margin-bottom:.7rem;display:flex;flex-wrap:wrap;gap:.8rem;align-items:center">
-    <div style="color:var(--gold);font-size:.9rem;font-weight:700">🌳 Skill Points: <span style="font-size:1.1rem">${avail}</span></div>
+    <div style="color:var(--gold);font-size:.95rem;font-weight:700">🌳 Skill Points: <span style="font-size:1.2rem">${avail}</span></div>
     <div style="color:#aaa;font-size:.75rem">ใช้ไป ${spent}/${earned} &nbsp;|&nbsp; ทุก 5 LV = +1 point</div>
     <div style="color:#88ccff;font-size:.75rem">⚡ ความเร็ว: ${curInterval}วิ/ตี (-${speedPct}%${equipSpeedPct ? ` +${equipSpeedPct}% จากของ` : ''})</div>
     <div style="color:#ffcc44;font-size:.75rem">💎 Drop: +${Math.round((G.dropBonusFromTree||0)*100)}%</div>
@@ -276,9 +319,9 @@ function renderSkillTree() {
     const label = ROW_LABELS[row] || `Row ${row}`;
     const isSeparator = row === 5;
     html += `
-    ${isSeparator ? `<div style="border-top:1px solid #335;margin:.6rem 0;padding-top:.4rem"><span style="color:#88aaff;font-size:.72rem;font-weight:700">── IDLE SYSTEM ──</span></div>` : ''}
-    <div style="color:#666;font-size:.68rem;margin:.2rem 0 .3rem .2rem">${label}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.3rem">`;
+    ${isSeparator ? `<div style="border-top:1px solid #335;margin:.7rem 0;padding-top:.4rem"><span style="color:#88aaff;font-size:.78rem;font-weight:700">── IDLE SYSTEM ──</span></div>` : ''}
+    <div style="color:#888;font-size:.72rem;margin:.3rem 0 .35rem .2rem;font-weight:600">${label}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">`;
 
     rowNodes.forEach(node => {
       const unlocked = isNodeUnlocked(node.id);
@@ -288,16 +331,17 @@ function renderSkillTree() {
       const border   = unlocked ? '#44aa44' : canGet ? '#4466cc' : '#333';
       const textCol  = unlocked ? '#88ff88' : canGet ? '#aaccff' : '#555';
       const cursor   = canGet ? 'pointer' : 'default';
-      const branchTag = node.branch ? `<span style="position:absolute;top:2px;right:4px;font-size:.55rem;color:#ffaa44">${node.branch}</span>` : '';
+      const branchTag = node.branch ? `<span style="position:absolute;top:2px;right:4px;font-size:.6rem;color:#ffaa44">${node.branch}</span>` : '';
       const subText  = isSkill
-        ? `<div style="font-size:.58rem;color:#ffcc88;margin-top:1px">${node.skill?.name}</div>`
-        : `<div style="font-size:.58rem;color:${textCol};margin-top:1px">${_formatStatShort(node.stat)}</div>`;
-      const lockIcon = !unlocked && !canGet ? '<span style="position:absolute;top:2px;left:4px;font-size:.6rem">🔒</span>' : '';
-      html += `<div onclick="${canGet?`unlockNode('${node.id}')`:''}" title="${isSkill ? (node.skill?.name+': '+node.skill?.desc) : _formatStatShort(node.stat)}"
-        style="position:relative;min-width:64px;max-width:80px;padding:.4rem .3rem;background:${bgColor};border:1px solid ${border};border-radius:8px;text-align:center;cursor:${cursor};transition:all .2s;flex:0 0 auto">
-        ${branchTag}${lockIcon}
-        <div style="font-size:1.2rem">${node.icon}</div>
-        <div style="font-size:.65rem;color:${textCol};font-weight:${canGet||unlocked?700:400};line-height:1.2">${node.name}</div>
+        ? `<div style="font-size:.62rem;color:#ffcc88;margin-top:2px">${node.skill?.name}</div>`
+        : `<div style="font-size:.62rem;color:${textCol};margin-top:2px">${_formatStatShort(node.stat)}</div>`;
+      const lockIcon = !unlocked && !canGet ? '<span style="position:absolute;top:2px;left:4px;font-size:.65rem">🔒</span>' : '';
+      const checkIcon = unlocked ? '<span style="position:absolute;top:2px;left:4px;font-size:.65rem">✓</span>' : '';
+      html += `<div onclick="${canGet?`unlockNodeFromFull('${node.id}')`:''}" title="${isSkill ? (node.skill?.name+': '+node.skill?.desc) : _formatStatShort(node.stat)}"
+        style="position:relative;min-width:78px;max-width:96px;padding:.5rem .4rem;background:${bgColor};border:1px solid ${border};border-radius:10px;text-align:center;cursor:${cursor};transition:all .2s;flex:0 0 auto">
+        ${branchTag}${lockIcon}${checkIcon}
+        <div style="font-size:1.5rem">${node.icon}</div>
+        <div style="font-size:.7rem;color:${textCol};font-weight:${canGet||unlocked?700:400};line-height:1.2">${node.name}</div>
         ${subText}
       </div>`;
     });
@@ -305,6 +349,12 @@ function renderSkillTree() {
   }
 
   area.innerHTML = html;
+}
+
+// unlock from the full overlay, then re-render both views
+function unlockNodeFromFull(nodeId) {
+  unlockNode(nodeId);
+  _renderSkillTreeFull();
 }
 
 function _formatStatShort(s) {

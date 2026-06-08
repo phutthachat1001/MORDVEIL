@@ -2413,6 +2413,8 @@ function _dropRarityForZone(zone, isBoss, tier = 3) {
 
 // ---------- Direct item drop (no chest) ----------
 
+const _RARITY_ORDER = ['common','uncommon','rare','epic','legend','ancient'];
+
 function _dropDirectItem(rarity) {
   if (G.inventory && G.inventory.length >= 50) {
     logBattle(`<span class="log-sys">⚠ กระเป๋าเต็ม! ขายของก่อน</span>`);
@@ -2420,18 +2422,29 @@ function _dropDirectItem(rarity) {
   }
   // Pick random slot and random item of that rarity
   const slots = ['weapon','helmet','armor','gloves','pants','boots'];
-  const slot   = slots[Math.floor(Math.random() * slots.length)];
-  const pool   = (ALL_ITEMS_BY_SLOT[slot] || []).filter(i => i.rarity === rarity);
+  const slot  = slots[Math.floor(Math.random() * slots.length)];
+
+  // Find pool for requested rarity; if empty (e.g. ancient only exists for weapon),
+  // fall back to the next-lower rarity that has items for this slot.
+  let effRarity = rarity;
+  let pool = (ALL_ITEMS_BY_SLOT[slot] || []).filter(i => i.rarity === effRarity);
+  let ri = _RARITY_ORDER.indexOf(rarity);
+  while (!pool.length && ri > 0) {
+    ri--;
+    effRarity = _RARITY_ORDER[ri];
+    pool = (ALL_ITEMS_BY_SLOT[slot] || []).filter(i => i.rarity === effRarity);
+  }
   if (!pool.length) return;
+
   const base = pool[Math.floor(Math.random() * pool.length)];
   const item = { ...base, uid: Date.now() + Math.random() };
   if (!G.inventory) G.inventory = [];
   G.inventory.push(item);
-  const rarityColor = RARITIES[rarity] ? RARITIES[rarity].color : '#aaa';
-  logBattle(`<span class="log-exp" style="color:${rarityColor}">💎 ดรอป: ${item.icon||'⚔'} ${item.name} [${RARITIES[rarity]?.label||rarity}]</span>`);
+  const rarityColor = RARITIES[effRarity] ? RARITIES[effRarity].color : '#aaa';
+  logBattle(`<span class="log-exp" style="color:${rarityColor}">💎 ดรอป: ${item.icon||'⚔'} ${item.name} [${RARITIES[effRarity]?.label||effRarity}]</span>`);
   // flag for achievements
-  if (rarity === 'rare' || rarity === 'epic' || rarity === 'legend' || rarity === 'ancient') G.gotRareWeapon = true;
-  if (rarity === 'legend' || rarity === 'ancient') G.gotLegendWeapon = true;
+  if (['rare','epic','legend','ancient'].includes(effRarity)) G.gotRareWeapon = true;
+  if (effRarity === 'legend' || effRarity === 'ancient') G.gotLegendWeapon = true;
   renderInventory();
 }
 

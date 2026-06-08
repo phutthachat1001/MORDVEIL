@@ -10,7 +10,7 @@ function canEquipItem(item) {
 }
 
 function getEquippedStatBonus() {
-  let bonus = { atk:0, def:0, hp:0, crit:0, speed:0, attackSpeed:0, expMult:1, healPerTurn:0 };
+  let bonus = { atk:0, def:0, hp:0, crit:0, attackSpeed:0, expMult:1, healPerTurn:0 };
   if (!G.equippedSlots) return bonus;
   SLOT_SLOTS.forEach(slot => {
     const uid = G.equippedSlots[slot];
@@ -27,7 +27,6 @@ function getEquippedStatBonus() {
     if (item.def)         bonus.def         += item.def;
     if (item.hp)          bonus.hp          += item.hp;
     if (item.crit)        bonus.crit        += item.crit;
-    if (item.speed)       bonus.speed       += item.speed;
     if (item.attackSpeed) bonus.attackSpeed += item.attackSpeed;
     if (item.effect) {
       const expM = item.effect.match(/EXP\+(\d+)%/);

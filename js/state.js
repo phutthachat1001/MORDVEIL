@@ -106,6 +106,7 @@ let G = {
   weeklyBossKills: {},     // weekKey -> true
   // Zone progress — how many monsters cleared per zone (0-6, 6=all done)
   zoneProgress: {},        // { zoneId: tierIndex } 0=none cleared, 6=all cleared
+  _idleMode: false,        // transient — IDLE auto-battle active (reset on load)
 };
 
 let autoAttackInterval = null;

@@ -490,7 +490,7 @@
           <div class="section-title">⚡ วิวัฒนาการคลาส</div>
           <div id="evolution-btn-area" style="margin-bottom:.5rem"></div>
           <div class="section-title">🌳 Skill Tree</div>
-          <div id="skill-tree-area" style="margin-bottom:.5rem"></div>
+          <div id="skill-tree-summary" style="margin-bottom:.5rem"></div>
           <div class="section-title">🎴 ชุดเซ็ต</div>
           <div id="set-progress-area" style="margin-bottom:.5rem"></div>
           <div class="section-title">🛡 อุปกรณ์ที่สวมใส่</div>
@@ -710,6 +710,17 @@
     <div id="shop-buy-panel" style="display:none;margin-top:.6rem">
       <div id="shop-buy-list"></div>
     </div>
+  </div>
+</div>
+
+<!-- ===== SKILL TREE FULL-SCREEN OVERLAY ===== -->
+<div class="overlay" id="skilltree-overlay" onclick="if(event.target===this)closeSkillTreeFull()">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:920px;width:96%;max-height:92vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;position:sticky;top:0;background:var(--bg2,#16161e);padding-bottom:.5rem;z-index:2">
+      <h2 style="color:var(--gold);margin:0">🌳 Skill Tree</h2>
+      <button onclick="closeSkillTreeFull()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.35rem .9rem;border-radius:6px;cursor:pointer">✕ ปิด</button>
+    </div>
+    <div id="skill-tree-area-full"></div>
   </div>
 </div>
 
