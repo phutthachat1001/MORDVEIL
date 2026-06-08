@@ -48,6 +48,7 @@ function doPrestige() {
   G.maxHp = 100; G.hp = 100;
   G.baseAtk = 10; G.baseDef = 5; G.skillPoints = 0;
   G.tasks = []; G.inventory = []; G.equippedWeaponId = null;
+  G.equippedSlots = { weapon:null, helmet:null, armor:null, gloves:null, pants:null, boots:null };
   G.chests = { common:0, uncommon:0, rare:0, boss:0 };
   G.defeatedMonsters = {}; G.battleInProgress = false; G.currentMonster = null;
 

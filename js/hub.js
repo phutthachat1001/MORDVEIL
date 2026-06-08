@@ -1364,7 +1364,7 @@ function hubShowExpInfo() {
       <span style="color:#ffd700">${sMn.toLocaleString()}–${sMx.toLocaleString()} EXP</span>
     </div>`;
   }).join('');
-  const next = G.level + (10 - (G.level%10 || 10));
+  const next = Math.floor(G.level / 10) * 10 + 10;
   const nScale = 1 + Math.floor(next/10)*0.15;
   body.innerHTML = `
     <div style="color:#9988cc;font-size:.75rem;margin-bottom:.5rem">เลเวล ${G.level} → ×${lvScale.toFixed(2)} EXP</div>

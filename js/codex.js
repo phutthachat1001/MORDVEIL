@@ -174,6 +174,10 @@ function startWeeklyBoss() {
     return;
   }
 
+  if (typeof stopAuto === 'function') stopAuto();
+  G.battleInProgress = false;
+  G.currentMonster   = null;
+
   // Build a synthetic monster and start battle
   const stats = getMonsterStats(wb.zone, 6, true);
   const wbMonster = {
@@ -202,9 +206,9 @@ function startWeeklyBoss() {
   _skillCooldowns = {};
   _skillBuffs = {};
 
+  if (typeof switchMobileTab === 'function') switchMobileTab('battle');
   showBattleContent(wbMonster, { maxHp: wbMonster.maxHp, atk: wbMonster.atk });
   logBattle(`<span class="log-crit">⚔ Weekly Boss: ${wb.name} ปรากฏตัว! HP:${wbMonster.maxHp} ATK:${wbMonster.atk}</span>`);
-  switchMobileTab('battle');
 }
 
 function _onWeeklyBossKill(wb) {

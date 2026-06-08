@@ -2877,9 +2877,8 @@ function _applyClassMechOnAttack(atk) {
       atk = Math.floor(atk * 1.3);
       _classMechanic.focus = 0;
       logBattle('<span class="log-crit">🏹 Focus! +30% ATK</span>');
-    } else {
-      _classMechanic.focus = Math.min(100, (_classMechanic.focus||0) + 10);
     }
+    // focus accumulation is handled by _tickClassMechTurn (per turn)
   }
   _renderClassMechBar();
   return atk;
