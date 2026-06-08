@@ -1,4 +1,4 @@
-const CACHE = 'mordveil-v24';
+const CACHE = 'mordveil-v25';
 const ASSETS = [
   './Play.html',
   './css/style.css',
@@ -48,19 +48,23 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Network-first for HTML/JS/CSS — always try to get fresh version,
-// fall back to cache only when offline.
-// Images and other assets use cache-first (stable, large).
+// Only cache full responses (status 200) — skip 206 Partial Content
+function _safeCache(cache, req, res) {
+  if (res && res.status === 200) cache.put(req, res);
+}
+
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
+  // Skip non-GET and cross-origin requests
+  if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
+
   const isAsset = /\.(png|jpg|jpeg|gif|svg|webp|mp4|woff2?)$/i.test(url.pathname);
 
   if (isAsset) {
     // cache-first for images/fonts/videos
     e.respondWith(
       caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
+        caches.open(CACHE).then(c => _safeCache(c, e.request, res.clone()));
         return res;
       }))
     );
@@ -68,8 +72,7 @@ self.addEventListener('fetch', e => {
     // network-first for HTML/JS/CSS
     e.respondWith(
       fetch(e.request).then(res => {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
+        caches.open(CACHE).then(c => _safeCache(c, e.request, res.clone()));
         return res;
       }).catch(() => caches.match(e.request))
     );
