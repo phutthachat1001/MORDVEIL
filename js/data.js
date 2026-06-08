@@ -295,6 +295,26 @@ const BOOTS = [
   {id:'b25',name:'รองเท้าแสงนิรันดร์',slot:'boots',rarity:'legend',speed:65,effect:'ฟื้น HP+18/เทิร์น',icon:'👢',requiredClass:'paladin'},
 ];
 
+// ความต้องการขั้นต่ำเพื่อต่อสู้บอส (ATK รวมอุปกรณ์)
+const BOSS_REQ = {
+  1: { atk: 15,  label: 'ราชากอบลิน' },
+  2: { atk: 45,  label: 'จอมซอมบี้' },
+  3: { atk: 100, label: 'มังกรราชัน' },
+  4: { atk: 200, label: 'ราชาอสูร' },
+  5: { atk: 380, label: 'เจ้าแห่งปราสาท' },
+  6: { atk: 700, label: 'เทพแห่งโกลาหล' },
+};
+
+// Milestone rewards — kill milestones
+const KILL_MILESTONES = [
+  { kills:10,   reward:'gold',    amount:200,  label:'นักล่าหน้าใหม่',  icon:'🥉' },
+  { kills:50,   reward:'chest',   type:'uncommon', label:'นักล่าผ่านศึก', icon:'🥈' },
+  { kills:100,  reward:'chest',   type:'rare',  label:'นักล่าชำนาญ',    icon:'🥇' },
+  { kills:250,  reward:'gold',    amount:1500, label:'นักล่าผู้เชี่ยวชาญ', icon:'💎' },
+  { kills:500,  reward:'chest',   type:'boss',  label:'มือสังหารระดับตำนาน', icon:'👑' },
+  { kills:1000, reward:'gold',    amount:8000, label:'ราชาแห่งนักล่า',   icon:'🌟' },
+];
+
 // รวม item pool ทุกประเภท
 const ALL_ITEMS_BY_SLOT = {
   weapon: WEAPONS,

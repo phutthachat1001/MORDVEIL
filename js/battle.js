@@ -41,6 +41,10 @@ function renderMonsterList() {
   area.style.display = 'block';
   const zone = ZONES.find(z => z.id === G.currentZone);
   if (!zone) { area.innerHTML = ''; return; }
+
+  const eqBonus = (typeof getEquippedStatBonus === 'function') ? getEquippedStatBonus() : { atk:0 };
+  const playerAtk = G.baseAtk + (eqBonus.atk || 0);
+
   const grid = document.createElement('div');
   grid.className = 'monster-select';
   zone.monsters.forEach(m => {
@@ -48,11 +52,27 @@ function renderMonsterList() {
     const defeated = G.defeatedMonsters[key];
     const stats    = getMonsterStats(G.currentZone, m.tier, m.isBoss);
     const btn      = document.createElement('div');
-    btn.className  = 'mon-btn' + (m.isBoss ? ' boss' : '') + (defeated ? ' defeated' : '');
+
+    // Boss ATK requirement check
+    const req = m.isBoss ? (BOSS_REQ[G.currentZone] || null) : null;
+    const bossLocked = req && playerAtk < req.atk;
+
+    btn.className  = 'mon-btn' + (m.isBoss ? ' boss' : '') + (defeated ? ' defeated' : '') + (bossLocked ? ' boss-locked' : '');
     const monIcon = m.img
       ? `<img src="assets/sprites/${m.img}.png" style="width:48px;height:48px;object-fit:contain;display:block;margin:0 auto" onerror="this.outerHTML='${m.sprite}'">`
       : m.sprite;
-    btn.innerHTML  = `${monIcon}<br>${m.name}${m.isBoss ? '<br>👑BOSS' : ''}`;
+
+    let bossReqHtml = '';
+    if (req) {
+      const pct = Math.min(100, Math.floor((playerAtk / req.atk) * 100));
+      const color = bossLocked ? '#ff6644' : '#44ff88';
+      bossReqHtml = `<div class="boss-req-bar-wrap">
+        <div class="boss-req-bar-bg"><div class="boss-req-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <div class="boss-req-label" style="color:${color}">${bossLocked?'🔒':'✅'} ATK ${playerAtk}/${req.atk}</div>
+      </div>`;
+    }
+    btn.innerHTML  = `${monIcon}<br>${m.name}${m.isBoss ? '<br>👑BOSS' : ''}${bossReqHtml}`;
+
     // long-press to show drop rates (works on both mobile touch and desktop)
     let _lpTimer = null;
     const _lpStart = () => { _lpTimer = setTimeout(() => _showMonsterDropTooltip(btn, m), 400); };
@@ -63,11 +83,67 @@ function renderMonsterList() {
     btn.addEventListener('mouseleave',  () => { _lpEnd(); hideDropTooltip(); });
     btn.addEventListener('touchend',    () => { _lpEnd(); setTimeout(hideDropTooltip, 1500); });
     btn.addEventListener('touchcancel', _lpEnd);
-    btn.onclick = () => startBattle(m);
+    btn.onclick = () => {
+      if (bossLocked) {
+        _showBossLockedPopup(m, req, playerAtk);
+        return;
+      }
+      startBattle(m);
+    };
     grid.appendChild(btn);
   });
+
+  // Kill milestone progress bar
+  const milestoneHtml = _renderMilestoneProgress();
+
   area.innerHTML = '';
+  if (milestoneHtml) {
+    const msDiv = document.createElement('div');
+    msDiv.id = 'kill-milestone-bar';
+    msDiv.innerHTML = milestoneHtml;
+    area.appendChild(msDiv);
+  }
   area.appendChild(grid);
+}
+
+function _showBossLockedPopup(m, req, playerAtk) {
+  let box = document.getElementById('boss-locked-popup');
+  if (box) box.remove();
+  box = document.createElement('div');
+  box.id = 'boss-locked-popup';
+  box.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9000;background:#1a0800;border:2px solid #ff6644;border-radius:12px;padding:1.2rem 1.5rem;text-align:center;box-shadow:0 0 40px #ff664466;max-width:300px;width:90%';
+  const pct = Math.min(100, Math.floor((playerAtk / req.atk) * 100));
+  box.innerHTML = `<div style="font-size:2rem;margin-bottom:.4rem">🔒</div>
+    <div style="color:#ff8866;font-size:1rem;font-weight:700;margin-bottom:.4rem">${m.name} ยังล็อคอยู่!</div>
+    <div style="color:#aaa;font-size:.82rem;margin-bottom:.8rem">ต้องการ ATK ≥ ${req.atk}<br>ATK ปัจจุบัน: ${playerAtk}</div>
+    <div style="background:#330000;border-radius:6px;height:10px;margin-bottom:.6rem;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#ff4400,#ff8800);border-radius:6px"></div>
+    </div>
+    <div style="color:#ff8800;font-size:.8rem;margin-bottom:.9rem">พลังยังไม่เพียงพอ (${pct}%)</div>
+    <button onclick="document.getElementById('boss-locked-popup').remove()" style="background:#3a1000;border:1px solid #ff6644;color:#ff8866;padding:.35rem 1.2rem;border-radius:8px;cursor:pointer">ตกลง</button>`;
+  document.body.appendChild(box);
+  setTimeout(() => { if (box.parentNode) box.remove(); }, 4000);
+}
+
+function _renderMilestoneProgress() {
+  const kills = G.totalKills || 0;
+  const next = KILL_MILESTONES.find(ms => kills < ms.kills);
+  if (!next) return '';
+  const prev = KILL_MILESTONES.filter(ms => ms.kills <= kills).slice(-1)[0];
+  const from = prev ? prev.kills : 0;
+  const pct  = Math.floor(((kills - from) / (next.kills - from)) * 100);
+  const rewardStr = next.reward === 'gold' ? `💰${next.amount} ทอง` : `📦 หีบ${next.type==='boss'?'บอส':next.type==='rare'?'หายาก':next.type==='uncommon'?'พิเศษ':'ธรรมดา'}`;
+  return `<div class="milestone-bar-wrap">
+    <div class="milestone-bar-row">
+      <span class="milestone-icon">${next.icon}</span>
+      <span class="milestone-label">${next.label}</span>
+      <span class="milestone-reward">${rewardStr}</span>
+    </div>
+    <div class="milestone-bar-bg">
+      <div class="milestone-bar-fill" style="width:${pct}%"></div>
+    </div>
+    <div class="milestone-bar-text">Kill ${kills}/${next.kills} (${pct}%)</div>
+  </div>`;
 }
 
 function _showMonsterDropTooltip(el, m) {
@@ -1421,6 +1497,7 @@ function startBattle(monster) {
 
   const waveSize = _buildWave(monster);
   G.battleInProgress = true;
+  initClassMechanic();
 
   const stats = { maxHp: G.enemies[0].maxHp, atk: G.enemies[0].atk };
   showBattleContent(monster, stats);
@@ -2131,6 +2208,7 @@ function playerAttack() {
   }
   if (_skillBuffs.huntersMark > 0) atk = Math.floor(atk * 2.2);
   if (_skillBuffs.deathMark > 0) { atk = Math.floor(atk * 4); _skillBuffs.deathMark--; logBattle(`<span class="log-crit">☠ ตราชีวิตระเบิด! ×4 ดาเมจ</span>`); }
+  atk = _applyClassMechOnAttack(atk);
   if (isCrit) { atk = Math.floor(atk * 2); G.critCount = (G.critCount || 0) + 1; }
 
   // Write damage to multi-enemy array
@@ -2142,6 +2220,7 @@ function playerAttack() {
   }
   G.turnCount++;
   tickSkillCooldowns();
+  _tickClassMechTurn();
   if (typeof tickWeatherBuff === 'function') tickWeatherBuff();
 
   if (isCrit) {
@@ -2280,6 +2359,7 @@ function _singleMonsterAttack(enemyObj) {
   }
   G.hp = Math.max(0, G.hp - dmgTaken);
   if (dmgTaken > 0) {
+    _applyClassMechOnHit(dmgTaken);
     G.totalDmgTaken = (G.totalDmgTaken || 0) + dmgTaken;
     logBattle(`<span class="log-dmg">💔 ${enemyObj.name} โจมตี ${dmgTaken} ดาเมจ${_skillBuffs.ironShield > 0 ? ' (Iron Shield)' : ''}</span>`);
     _flashArena('#ff0000');
@@ -2361,7 +2441,11 @@ function monsterDie() {
   G.sessionKills++;
   if (monster.isBoss) {
     G.bossKills++;
-    G.chests.boss = (G.chests.boss || 0) + 1;
+    if (monster.isWeeklyBoss && monster.wbData) {
+      if (typeof _onWeeklyBossKill === 'function') _onWeeklyBossKill(monster.wbData);
+    } else {
+      G.chests.boss = (G.chests.boss || 0) + 1;
+    }
     if (typeof tryDropLegendaryCosmetic === 'function' && tryDropLegendaryCosmetic()) {
       logBattle(`<span style="color:#ffdd00;font-weight:700">✨ ตำนาน! ได้รับชุด ตำนาน จากบอส! (Cosmetic T6)</span>`);
     }
@@ -2437,6 +2521,7 @@ function monsterDie() {
 
   giveExp(expGain);
   checkAchievements();
+  _checkKillMilestones();
   saveGame();
   updateKillCounter();
   if (typeof renderEvolutionButton === 'function') renderEvolutionButton();
@@ -2659,6 +2744,182 @@ function animateSprite(id, cls) {
   if (!el) return;
   el.className = 'monster-sprite ' + cls;
   if (cls === 'shake') setTimeout(() => { el.className = 'monster-sprite'; }, 300);
+}
+
+// ---------- Kill Milestone system ----------
+
+function _checkKillMilestones() {
+  if (!G.claimedMilestones) G.claimedMilestones = [];
+  KILL_MILESTONES.forEach(ms => {
+    if (G.totalKills >= ms.kills && !G.claimedMilestones.includes(ms.kills)) {
+      G.claimedMilestones.push(ms.kills);
+      if (ms.reward === 'gold') {
+        G.gold += ms.amount;
+        setTimeout(() => _showMilestonePopup(ms, `💰 +${ms.amount} ทอง`), 1000);
+      } else if (ms.reward === 'chest') {
+        G.chests[ms.type] = (G.chests[ms.type] || 0) + 1;
+        const chestLabel = ms.type==='boss'?'บอส':ms.type==='rare'?'หายาก':ms.type==='uncommon'?'พิเศษ':'ธรรมดา';
+        setTimeout(() => _showMilestonePopup(ms, `📦 หีบ${chestLabel}`), 1000);
+      }
+    }
+  });
+}
+
+function _showMilestonePopup(ms, rewardStr) {
+  let box = document.getElementById('milestone-popup');
+  if (box) box.remove();
+  box = document.createElement('div');
+  box.id = 'milestone-popup';
+  box.style.cssText = 'position:fixed;top:20%;left:50%;transform:translateX(-50%);z-index:9500;background:linear-gradient(135deg,#1a1a00,#2a2000);border:2px solid #ffd700;border-radius:16px;padding:1.4rem 2rem;text-align:center;box-shadow:0 0 50px #ffd70066,0 0 20px #ff8800;max-width:320px;width:90%;animation:msPopIn .4s cubic-bezier(.2,1.4,.4,1)';
+  box.innerHTML = `
+    <div style="font-size:2.5rem;margin-bottom:.3rem">${ms.icon}</div>
+    <div style="color:#ffd700;font-size:1rem;font-weight:700;margin-bottom:.2rem">${ms.label}</div>
+    <div style="color:#aaa;font-size:.82rem;margin-bottom:.5rem">ถึง ${ms.kills} Kill!</div>
+    <div style="color:#ffcc44;font-size:1.1rem;font-weight:700;margin-bottom:.8rem">${rewardStr}</div>
+    <button onclick="document.getElementById('milestone-popup').remove()" style="background:#2a1800;border:1px solid #ffd700;color:#ffd700;padding:.35rem 1.2rem;border-radius:8px;cursor:pointer">รับรางวัล!</button>`;
+  document.body.appendChild(box);
+  setTimeout(() => { if (box && box.parentNode) box.remove(); }, 6000);
+  updateTopBar();
+  renderMonsterList();
+}
+
+// ---------- Class Mechanic bars ----------
+// Warrior: Rage (เพิ่มเมื่อโดนโจมตี, ≥100 = Rage mode +50% ATK)
+// Mage: MP (เต็มตอนเริ่มต่อสู้, สกิลใช้ MP, ฟื้น 10/ตา)
+// Rogue: Combo (โจมตีติดกัน +1, ถึง 3 = Crit ครั้งถัดไปแน่นอน, reset เมื่อโดนตี)
+// Archer: Focus (เพิ่มทีละ 10/ตา, ≥50 = +30% ATK ครั้งถัดไป แล้ว reset)
+// Paladin: Faith (ฟื้น HP ขึ้นเรื่อยๆ → +Faith stacks)
+
+let _classMechanic = {};
+
+function initClassMechanic() {
+  const cls = G.classId;
+  if (cls === 'warrior') _classMechanic = { rage: 0, rageMode: false };
+  else if (cls === 'mage')    _classMechanic = { mp: 100, maxMp: 100 };
+  else if (cls === 'rogue')   _classMechanic = { combo: 0 };
+  else if (cls === 'archer')  _classMechanic = { focus: 0 };
+  else if (cls === 'paladin') _classMechanic = { faith: 0 };
+  else _classMechanic = {};
+  _renderClassMechBar();
+}
+
+function _renderClassMechBar() {
+  const el = document.getElementById('class-mech-bar');
+  if (!el) return;
+  const cls = G.classId;
+  let html = '';
+  if (cls === 'warrior') {
+    const r = Math.min(100, _classMechanic.rage || 0);
+    const mode = _classMechanic.rageMode;
+    html = `<div class="cmb-wrap cmb-warrior${mode?' cmb-rage-active':''}">
+      <span class="cmb-icon">⚔</span>
+      <span class="cmb-label">${mode?'RAGE!':'Rage'}</span>
+      <div class="cmb-bar-bg"><div class="cmb-bar-fill" style="width:${r}%;background:${mode?'#ff2200':'linear-gradient(90deg,#cc4400,#ff6600)'}"></div></div>
+      <span class="cmb-val">${r}/100</span>
+    </div>`;
+  } else if (cls === 'mage') {
+    const mp = _classMechanic.mp || 0, maxMp = _classMechanic.maxMp || 100;
+    html = `<div class="cmb-wrap cmb-mage">
+      <span class="cmb-icon">🔮</span>
+      <span class="cmb-label">MP</span>
+      <div class="cmb-bar-bg"><div class="cmb-bar-fill" style="width:${(mp/maxMp)*100}%;background:linear-gradient(90deg,#4400aa,#aa44ff)"></div></div>
+      <span class="cmb-val">${mp}/${maxMp}</span>
+    </div>`;
+  } else if (cls === 'rogue') {
+    const c = _classMechanic.combo || 0;
+    const ready = c >= 3;
+    html = `<div class="cmb-wrap cmb-rogue${ready?' cmb-crit-ready':''}">
+      <span class="cmb-icon">🗡</span>
+      <span class="cmb-label">${ready?'CRIT!':'Combo'}</span>
+      <div class="cmb-pip-row">${[0,1,2].map(i=>`<div class="cmb-pip${i<c?' filled':''}"></div>`).join('')}</div>
+      <span class="cmb-val">${c}/3</span>
+    </div>`;
+  } else if (cls === 'archer') {
+    const f = Math.min(100, _classMechanic.focus || 0);
+    const ready = f >= 50;
+    html = `<div class="cmb-wrap cmb-archer${ready?' cmb-focus-ready':''}">
+      <span class="cmb-icon">🏹</span>
+      <span class="cmb-label">${ready?'FOCUS!':'Focus'}</span>
+      <div class="cmb-bar-bg"><div class="cmb-bar-fill" style="width:${f}%;background:linear-gradient(90deg,#886600,#ffd700)"></div></div>
+      <span class="cmb-val">${f}/100</span>
+    </div>`;
+  } else if (cls === 'paladin') {
+    const fa = Math.min(10, _classMechanic.faith || 0);
+    html = `<div class="cmb-wrap cmb-paladin">
+      <span class="cmb-icon">✨</span>
+      <span class="cmb-label">Faith</span>
+      <div class="cmb-pip-row">${[0,1,2,3,4,5,6,7,8,9].map(i=>`<div class="cmb-pip${i<fa?' filled faith-pip':''}"></div>`).join('')}</div>
+      <span class="cmb-val">${fa}/10</span>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+// Called in playerAttack BEFORE damage apply — returns atk multiplier
+function _applyClassMechOnAttack(atk) {
+  const cls = G.classId;
+  if (cls === 'warrior') {
+    if (_classMechanic.rageMode) {
+      atk = Math.floor(atk * 1.5);
+      _classMechanic.rage = Math.max(0, (_classMechanic.rage||0) - 25);
+      if (_classMechanic.rage <= 0) { _classMechanic.rageMode = false; logBattle('<span class="log-heal">⚔ Rage สิ้นสุด</span>'); }
+    }
+  } else if (cls === 'rogue') {
+    if ((_classMechanic.combo||0) >= 3) {
+      atk = Math.floor(atk * 2.5);
+      _classMechanic.combo = 0;
+      logBattle('<span class="log-crit">🗡 Combo Crit x2.5!</span>');
+    } else {
+      _classMechanic.combo = (_classMechanic.combo||0) + 1;
+    }
+  } else if (cls === 'archer') {
+    if ((_classMechanic.focus||0) >= 50) {
+      atk = Math.floor(atk * 1.3);
+      _classMechanic.focus = 0;
+      logBattle('<span class="log-crit">🏹 Focus! +30% ATK</span>');
+    } else {
+      _classMechanic.focus = Math.min(100, (_classMechanic.focus||0) + 10);
+    }
+  }
+  _renderClassMechBar();
+  return atk;
+}
+
+// Called when player takes damage
+function _applyClassMechOnHit(dmg) {
+  const cls = G.classId;
+  if (cls === 'warrior' && dmg > 0) {
+    const gain = Math.min(20, Math.floor(dmg / 5) + 5);
+    _classMechanic.rage = Math.min(100, (_classMechanic.rage||0) + gain);
+    if (_classMechanic.rage >= 100 && !_classMechanic.rageMode) {
+      _classMechanic.rageMode = true;
+      logBattle('<span class="log-crit">🔥 RAGE! +50% ATK ชั่วคราว!</span>');
+    }
+  } else if (cls === 'rogue' && dmg > 0) {
+    _classMechanic.combo = 0;
+    _renderClassMechBar();
+  } else if (cls === 'paladin' && dmg > 0) {
+    const faithHeal = Math.floor(G.maxHp * 0.02 * (1 + (_classMechanic.faith||0)));
+    if (faithHeal > 0) {
+      G.hp = Math.min(G.maxHp, G.hp + faithHeal);
+      G.totalHpHealed = (G.totalHpHealed||0) + faithHeal;
+      _classMechanic.faith = Math.min(10, (_classMechanic.faith||0) + 1);
+      logBattle(`<span class="log-heal">✨ Faith ฟื้น ${faithHeal} HP (stacks:${_classMechanic.faith})</span>`);
+    }
+  }
+  _renderClassMechBar();
+}
+
+// Called per turn for mage MP regen
+function _tickClassMechTurn() {
+  const cls = G.classId;
+  if (cls === 'mage') {
+    _classMechanic.mp = Math.min(_classMechanic.maxMp||100, (_classMechanic.mp||0) + 10);
+    _renderClassMechBar();
+  } else if (cls === 'archer') {
+    _classMechanic.focus = Math.min(100, (_classMechanic.focus||0) + 5);
+    _renderClassMechBar();
+  }
 }
 
 function floatDamage(amount, isPlayer, isCrit) {

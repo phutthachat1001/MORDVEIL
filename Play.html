@@ -391,6 +391,7 @@
                     <span id="battle-player-atk">ATK: —</span>
                     <span id="battle-player-status-inline"></span>
                   </div>
+                  <div id="class-mech-bar"></div>
                 </div>
               </div>
 
@@ -472,6 +473,7 @@
         <div class="tabs">
           <div class="tab active" onclick="switchTab('char')">สถานะ</div>
           <div class="tab"        onclick="switchTab('daily')">ภารกิจวัน</div>
+          <div class="tab"        onclick="switchTab('codex')">คอลเลคชัน</div>
         </div>
         <!-- TAB: สถานะ -->
         <div class="tab-content active" id="tab-char">
@@ -499,6 +501,14 @@
           </div>
           <div class="section-title">⭐ ความสำเร็จล่าสุด</div>
           <div id="recent-ach" style="font-size:.8rem;color:var(--text2)">ยังไม่มี</div>
+        </div>
+        <!-- TAB: คอลเลคชัน -->
+        <div class="tab-content" id="tab-codex">
+          <div class="section-title">📖 Collection Log</div>
+          <div id="codex-zone-tabs" style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.6rem"></div>
+          <div id="codex-content"></div>
+          <div class="section-title" style="margin-top:1rem">⚡ Weekly Boss</div>
+          <div id="weekly-boss-panel"></div>
         </div>
         <!-- TAB: ภารกิจวัน -->
         <div class="tab-content" id="tab-daily">
@@ -796,6 +806,7 @@
 <script src="js/rpg-quests.js"></script>
 <script src="js/npc-encounter.js"></script>
 <script src="js/battle.js"></script>
+<script src="js/codex.js"></script>
 <script src="js/tasks.js"></script>
 <script src="js/hub.js"></script>
 <script src="js/intro.js"></script>

@@ -2608,3 +2608,92 @@ body.preload{visibility:hidden}
 .rpq-npc-done{ border-color:#4a9;background:linear-gradient(135deg,#0a1e10,#060e08) }
 .rpq-npc-active{ border-color:#fa0;background:linear-gradient(135deg,#1e1400,#0e0800) }
 .rpq-npc-locked{ opacity:.55 }
+
+/* ── Boss Power Requirement Bar ── */
+.boss-req-bar-wrap{
+  margin-top:.3rem;padding-top:.3rem;border-top:1px solid rgba(255,255,255,.08);
+}
+.boss-req-bar-bg{
+  background:#1a1a1a;border-radius:4px;height:5px;overflow:hidden;margin:.15rem 0;
+}
+.boss-req-bar-fill{
+  height:100%;border-radius:4px;transition:width .4s;
+}
+.boss-req-label{
+  font-size:.62rem;text-align:center;font-weight:600;
+}
+.mon-btn.boss-locked{
+  opacity:.7;border-color:#ff4400 !important;
+  background:rgba(50,10,0,.6) !important;
+  cursor:pointer;
+}
+.mon-btn.boss-locked:hover{
+  border-color:#ff6644 !important;
+  box-shadow:0 0 12px #ff440044;
+}
+
+/* ── Kill Milestone Bar ── */
+#kill-milestone-bar{
+  padding:.4rem .6rem;margin-bottom:.4rem;
+  background:rgba(255,200,0,.05);border:1px solid rgba(255,200,0,.2);
+  border-radius:8px;
+}
+.milestone-bar-wrap{ }
+.milestone-bar-row{
+  display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem;
+}
+.milestone-icon{ font-size:.9rem; }
+.milestone-label{ flex:1;font-size:.72rem;color:#ddb;font-weight:600; }
+.milestone-reward{ font-size:.68rem;color:#ffd700; }
+.milestone-bar-bg{
+  background:#1a1800;border-radius:4px;height:6px;overflow:hidden;margin-bottom:.2rem;
+}
+.milestone-bar-fill{
+  height:100%;background:linear-gradient(90deg,#aa6600,#ffd700);border-radius:4px;transition:width .4s;
+}
+.milestone-bar-text{
+  font-size:.62rem;color:#888;text-align:right;
+}
+
+/* ── Class Mechanic Bar ── */
+#class-mech-bar{
+  margin-top:.3rem;
+}
+.cmb-wrap{
+  display:flex;align-items:center;gap:.3rem;padding:.2rem .3rem;
+  background:rgba(255,255,255,.04);border-radius:5px;border:1px solid rgba(255,255,255,.07);
+}
+.cmb-icon{ font-size:.75rem; }
+.cmb-label{
+  font-size:.58rem;color:#aaa;font-weight:700;min-width:28px;text-transform:uppercase;
+}
+.cmb-bar-bg{
+  flex:1;background:#111;border-radius:3px;height:5px;overflow:hidden;
+}
+.cmb-bar-fill{
+  height:100%;border-radius:3px;transition:width .3s;
+}
+.cmb-val{
+  font-size:.58rem;color:#888;min-width:28px;text-align:right;
+}
+.cmb-pip-row{
+  display:flex;gap:.15rem;flex:1;
+}
+.cmb-pip{
+  flex:1;height:6px;border-radius:3px;background:#222;border:1px solid #333;
+}
+.cmb-pip.filled{
+  background:linear-gradient(90deg,#336622,#44ff88);border-color:#44ff88;
+}
+.cmb-pip.faith-pip.filled{
+  background:linear-gradient(90deg,#224488,#4488ff);border-color:#4488ff;
+}
+.cmb-warrior.cmb-rage-active .cmb-label{ color:#ff4400;animation:pulse-vs .7s ease-in-out infinite; }
+.cmb-rogue.cmb-crit-ready .cmb-label{ color:#44ff88;animation:pulse-vs .7s ease-in-out infinite; }
+.cmb-archer.cmb-focus-ready .cmb-label{ color:#ffd700;animation:pulse-vs .7s ease-in-out infinite; }
+
+/* ── Milestone popup animation ── */
+@keyframes msPopIn{
+  0%{transform:translateX(-50%) scale(.6);opacity:0}
+  100%{transform:translateX(-50%) scale(1);opacity:1}
+}

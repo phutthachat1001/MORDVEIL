@@ -99,6 +99,9 @@ let G = {
   // Multi-enemy battle
   enemies: [],             // [{...monster, hp, maxHp, poisonTurns, burnTurns}]
   targetIndex: 0,          // which enemy the player is targeting
+  // Milestone + Weekly Boss tracking
+  claimedMilestones: [],   // kill thresholds already claimed
+  weeklyBossKills: {},     // weekKey -> true
 };
 
 let autoAttackInterval = null;

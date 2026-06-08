@@ -104,11 +104,15 @@ function updateCharPanel() {
 }
 
 function switchTab(name) {
+  const tabNames = ['char','daily','codex'];
   document.querySelectorAll('.tab').forEach((t, i) => {
-    t.classList.toggle('active', ['char','daily'][i] === name);
+    t.classList.toggle('active', tabNames[i] === name);
   });
   document.getElementById('tab-char').classList.toggle('active',  name === 'char');
   document.getElementById('tab-daily').classList.toggle('active', name === 'daily');
+  const codexEl = document.getElementById('tab-codex');
+  if (codexEl) codexEl.classList.toggle('active', name === 'codex');
+  if (name === 'codex') renderCodex();
   // hide daily tab in fullrpg mode
   const dailyTab = document.querySelector('.tab[onclick*="daily"]');
   if (dailyTab) dailyTab.style.display = G.gameMode === 'fullrpg' ? 'none' : '';

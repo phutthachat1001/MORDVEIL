@@ -85,6 +85,8 @@ function loadGame() {
       if (!G._npcQuestDefs)     G._npcQuestDefs     = {};
       if (!G.enemies)           G.enemies           = [];
       if (G.targetIndex === undefined) G.targetIndex = 0;
+      if (!G.claimedMilestones) G.claimedMilestones = [];
+      if (!G.weeklyBossKills)   G.weeklyBossKills   = {};
     }
   } catch(e) {
     console.warn('[LoadGame] failed, trying backup:', e);
