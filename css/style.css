@@ -1812,13 +1812,16 @@ body.preload{visibility:hidden}
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: .4rem .8rem;
+  flex-wrap: wrap;
+  gap: .3rem 1rem;
+  padding: .45rem .9rem;
   font-size: .78rem;
   font-weight: 700;
   color: #88aadd;
   background: rgba(40,60,100,.25);
   border-bottom: 1px solid #223;
 }
+#idle-panel-kills { color: #ff9988; font-weight: 600; }
 #idle-panel-rate { color: #ffcc66; font-weight: 600; font-size: .74rem; }
 #idle-panel-spd { color: #88ccff; font-weight: 600; }
 #idle-stage {

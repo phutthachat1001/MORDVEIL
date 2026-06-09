@@ -24,6 +24,7 @@ let _idleRespawnAt  = 0;        // timestamp when hero respawns
 
 // per-minute reward tracking (rolling window)
 let _idleRewardLog  = [];       // [{t, exp, gold}]
+let _idleSessionKills = 0;      // mobs killed in this IDLE session
 
 // ---------- pool of monsters the IDLE panel may spawn ----------
 function _idleMonsterPool() {
@@ -116,6 +117,8 @@ function _updateIdleHeader() {
     const { exp, gold } = _idleRatePerMin();
     rateEl.innerHTML = `📈 ${_fmtNum(exp)} EXP/นาที · 💰 ${_fmtNum(gold)}/นาที`;
   }
+  const killEl = document.getElementById('idle-panel-kills');
+  if (killEl) killEl.textContent = `💀 ${_idleSessionKills}`;
 }
 
 function _fmtNum(n) {
@@ -257,6 +260,7 @@ function _idleMobDie(idx, mob) {
 
   G.gold += goldGain;
   G.totalKills = (G.totalKills || 0) + 1;
+  _idleSessionKills++;
   if (typeof giveExp === 'function') giveExp(expGain);
 
   // track for per-minute rate
