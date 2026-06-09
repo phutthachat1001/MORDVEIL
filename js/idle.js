@@ -7,8 +7,10 @@
 // to respawn. EXP/gold-per-minute is tracked and shown in the header.
 // ============================================================
 
-// IDLE monsters are weaker than the real zone monsters.
-const IDLE_STAT_MULT   = 0.4;   // HP/ATK scale vs real monster
+// IDLE monsters are much weaker than the real zone monsters so kills are
+// fast and the numbers visibly tick (proper IDLE-game feel).
+const IDLE_HP_MULT     = 0.18;  // HP scale vs real monster (low → quick kills)
+const IDLE_ATK_MULT    = 0.25;  // ATK scale vs real monster (gentle on the hero)
 const IDLE_REWARD_MULT = 0.35;  // EXP/gold vs a boss-baseline kill
 const IDLE_RESPAWN_MS  = 3000;  // hero respawn delay on death
 
@@ -53,8 +55,8 @@ function _spawnIdleWave() {
   for (let i = 0; i < count; i++) {
     const base = pool[Math.floor(Math.random() * pool.length)];
     const full = getMonsterStats(base.zone, base.tier, false);
-    const hp  = Math.max(1, Math.floor(full.maxHp * IDLE_STAT_MULT));
-    const atk = Math.max(1, Math.floor(full.atk   * IDLE_STAT_MULT));
+    const hp  = Math.max(1, Math.floor(full.maxHp * IDLE_HP_MULT));
+    const atk = Math.max(1, Math.floor(full.atk   * IDLE_ATK_MULT));
     _idleMobs.push({
       name: base.name, sprite: base.sprite, img: base.img,
       tier: base.tier, zone: base.zone,
@@ -208,6 +210,7 @@ function _idleAttackTick() {
 
   mob.hp -= atk;
   _updateIdleMobHp(idx);
+  _floatAboveIdleMob(idx, `${isCrit ? '💥' : ''}${atk}`, 'idle-dmg-float' + (isCrit ? ' crit' : ''));
 
   if (mob.hp <= 0) {
     mob.dead = true;
@@ -273,11 +276,15 @@ function _idleMobDie(idx, mob) {
     }
   }
 
-  _renderIdleStage();
+  // play the death animation on the existing sprite, then re-render so the
+  // floating popups stay visible during the fade-out.
+  const stage = document.getElementById('idle-stage');
+  const wrap = stage && stage.querySelector(`.idle-mob[data-idx="${idx}"]`);
+  if (wrap) wrap.classList.add('dead');
   if (typeof updateTopBar === 'function') updateTopBar();
 
   if (_idleMobs.every(m => m.dead)) {
-    setTimeout(() => { if (_idleLoopTimer) _spawnIdleWave(); }, 700);
+    setTimeout(() => { if (_idleLoopTimer) _spawnIdleWave(); }, 900);
   }
 }
 
