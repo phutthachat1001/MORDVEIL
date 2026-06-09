@@ -19,6 +19,22 @@ let _idleLoopTimer  = null;     // setInterval handle for the tick
 let _idleTargetIdx  = 0;
 let _idlePlayerHp   = 0;        // hero HP inside the IDLE panel (separate from G.hp)
 let _idlePlayerMax  = 0;
+let _idleSkillReady = {};       // skillId -> timestamp(ms) when it can cast again
+
+// Damage skills usable in IDLE: extra hits / damage multiplier vs a normal hit.
+// (Buff/utility skills are skipped in IDLE — only offensive ones auto-cast.)
+const _IDLE_SKILL_DMG = {
+  quick_stab:    { mult: 1.2, hits: 2, label: '🗡 แทงเร็ว' },
+  slam:          { mult: 2.5, hits: 1, label: '💥 กระทืบ' },
+  dragon_breath: { mult: 2.0, hits: 1, label: '🐉 ลมหายใจ' },
+  magic_bolt:    { mult: 1.8, hits: 1, label: '🔥 ลูกไฟ' },
+  precise_shot:  { mult: 2.0, hits: 1, label: '🎯 ยิงแม่น' },
+  holy_strike_t1:{ mult: 1.8, hits: 1, label: '✨ ฟันศักดิ์สิทธิ์' },
+  backstab:      { mult: 2.2, hits: 1, label: '🗡 ลอบแทง' },
+  power_shot:    { mult: 2.4, hits: 1, label: '🏹 ธนูทรง' },
+  fireball:      { mult: 2.6, hits: 1, label: '🔥 ไฟบรรลัย' },
+  shadow_strike: { mult: 2.8, hits: 1, label: '🌑 เงาสังหาร' },
+};
 let _idleDead       = false;    // hero is dead, waiting to respawn
 let _idleRespawnAt  = 0;        // timestamp when hero respawns
 
@@ -191,6 +207,22 @@ function _showIdleFx(idx) {
   setTimeout(() => el.remove(), 400);
 }
 
+// find an equipped offensive skill that's off cooldown (returns {id, cd} or null)
+function _idleReadySkill() {
+  const equipped = G.equippedSkills || G.unlockedSkills || [];
+  if (!equipped.length) return null;
+  const now = performance.now();
+  // gather skill defs (for cooldown) from the equipped list
+  const allSkills = (typeof _getSkills === 'function') ? _getSkills() : [];
+  for (const sid of equipped) {
+    if (!_IDLE_SKILL_DMG[sid]) continue;        // only offensive skills
+    if ((_idleSkillReady[sid] || 0) > now) continue; // still on cooldown
+    const def = allSkills.find(s => s.id === sid);
+    return { id: sid, cd: def ? def.cd : 3 };
+  }
+  return null;
+}
+
 // ---------- combat tick ----------
 function _idleAttackTick() {
   // pause while the panel isn't on screen (Hub, hidden arena, no game)
@@ -213,23 +245,40 @@ function _idleAttackTick() {
   _idleTargetIdx = idx;
   const mob = _idleMobs[idx];
 
-  // hero attacks the target
+  // hero base attack
   const eqBonus = (typeof getEquippedStatBonus === 'function') ? getEquippedStatBonus() : { atk:0, crit:0 };
   const cls = (typeof CLASSES !== 'undefined') ? CLASSES.find(c => c.id === G.classId) : null;
   let atk = (G.baseAtk || 10) + (eqBonus.atk || 0) + Math.floor(Math.random() * (G.level || 1)) + 1;
   const critChance = .05 + (cls && cls.bonuses && cls.bonuses.critBonus ? cls.bonuses.critBonus : 0)
                    + (eqBonus.crit || 0) / 100 + (G.critBonusFromTree || 0);
-  const isCrit = Math.random() < critChance;
+  let isCrit = Math.random() < critChance;
+
+  // skill auto-cast: if an equipped damage skill is off cooldown, use it
+  const skill = _idleReadySkill();
+  let hits = 1, label = '';
+  if (skill) {
+    const def = _IDLE_SKILL_DMG[skill.id];
+    atk = Math.floor(atk * def.mult);
+    hits = def.hits;
+    label = def.label;
+    // skill crit bonus (e.g. quick_stab +20%)
+    if (skill.id === 'quick_stab' && Math.random() < 0.2) isCrit = true;
+    // cooldown in seconds = skill.cd turns × current attack interval
+    const cdMs = (skill.cd || 3) * getAttackInterval();
+    _idleSkillReady[skill.id] = performance.now() + cdMs;
+  }
   if (isCrit) atk = Math.floor(atk * 2);
 
   // hero attack animation
   const heroSpr = document.getElementById('idle-hero-sprite');
   if (heroSpr) { heroSpr.classList.add('atk'); setTimeout(() => heroSpr.classList.remove('atk'), 200); }
 
-  mob.hp -= atk;
+  const totalDmg = atk * hits;
+  mob.hp -= totalDmg;
   _updateIdleMobHp(idx);
   _showIdleFx(idx);
-  _floatAboveIdleMob(idx, `${isCrit ? '💥' : ''}${atk}`, 'idle-dmg-float' + (isCrit ? ' crit' : ''));
+  const dmgText = (label ? label + ' ' : '') + (hits > 1 ? `${atk}×${hits}` : `${totalDmg}`);
+  _floatAboveIdleMob(idx, `${isCrit ? '💥' : ''}${dmgText}`, 'idle-dmg-float' + (isCrit ? ' crit' : ''));
 
   if (mob.hp <= 0) {
     mob.dead = true;

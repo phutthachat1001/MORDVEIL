@@ -1873,10 +1873,10 @@ body.preload{visibility:hidden}
   align-items: center;
   width: 104px;
 }
-/* mob sprite is flipped to face LEFT toward the hero */
+/* the sprite is flipped to face LEFT toward the hero (mob is on the right) */
 .idle-mob-sprite { font-size: 3.6rem; line-height: 1; transition: transform .15s; transform: scaleX(-1); }
 .idle-mob-sprite img { width: 88px; height: 88px; object-fit: contain; image-rendering: pixelated; }
-.idle-mob.hit .idle-mob-sprite { transform: scaleX(-1) scale(.88) translateX(-4px); filter: brightness(2.2) sepia(1) hue-rotate(-30deg); }
+.idle-mob.hit .idle-mob-sprite { transform: scaleX(-1) scale(.88) translateX(4px); filter: brightness(2.2) sepia(1) hue-rotate(-30deg); }
 .idle-mob.dead .idle-mob-sprite { animation: idleMobDie .5s forwards; }
 @keyframes idleMobDie {
   to { opacity: 0; transform: scaleX(-1) scale(.3) rotate(20deg); }

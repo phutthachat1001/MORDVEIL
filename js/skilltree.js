@@ -36,15 +36,15 @@ function canUnlockNode(node) {
   return true;
 }
 
-function unlockNode(nodeId) {
+// apply a node's effects to G (no rendering, no save)
+function _applyNodeUnlock(nodeId) {
   const tree = SKILL_TREES[G.classId] || [];
   const node = tree.find(n => n.id === nodeId);
-  if (!node || !canUnlockNode(node)) return;
+  if (!node || !canUnlockNode(node)) return false;
 
   G.skillTreeSpent[nodeId] = true;
   G.skillTreePoints = Math.max(0, (G.skillTreePoints || 0) - 1);
 
-  // apply stat bonus
   if (node.type === 'stat' && node.stat) {
     const s = node.stat;
     if (s.hp)           { G.maxHp += s.hp; G.hp = Math.min(G.hp + s.hp, G.maxHp); }
@@ -64,7 +64,6 @@ function unlockNode(nodeId) {
     if (!G.unlockedSkills) G.unlockedSkills = [];
     if (!G.unlockedSkills.includes(node.skill.id)) {
       G.unlockedSkills.push(node.skill.id);
-      // auto-equip ถ้ายังมีที่ว่าง
       if (!G.equippedSkills) G.equippedSkills = [];
       if (G.equippedSkills.length < 4) G.equippedSkills.push(node.skill.id);
       logBattle(`<span class="log-exp">✨ สกิลใหม่: ${node.icon||'⚡'} ${node.skill.name} — ${node.skill.desc}</span>`);
@@ -73,6 +72,11 @@ function unlockNode(nodeId) {
 
   const nodeTier = (node.skill?.tier) || (node.row >= 3 ? 4 : node.row + 1);
   if (typeof rpgOnSkillUnlock === 'function') rpgOnSkillUnlock(node.type, nodeTier);
+  return true;
+}
+
+function unlockNode(nodeId) {
+  if (!_applyNodeUnlock(nodeId)) return;
   saveGame();
   renderAll();
   renderSkillTree();
@@ -351,10 +355,16 @@ function _renderSkillTreeFull() {
   area.innerHTML = html;
 }
 
-// unlock from the full overlay, then re-render both views
+// unlock from the full overlay. Apply the node + refresh the overlay
+// immediately for instant feedback, then defer the heavier full re-render.
 function unlockNodeFromFull(nodeId) {
-  unlockNode(nodeId);
-  _renderSkillTreeFull();
+  _applyNodeUnlock(nodeId);
+  _renderSkillTreeFull();               // instant visual feedback in the overlay
+  requestAnimationFrame(() => {         // heavy work next frame, off the click
+    saveGame();
+    if (typeof renderAll === 'function') renderAll();
+    renderSkillTree();
+  });
 }
 
 function _formatStatShort(s) {
