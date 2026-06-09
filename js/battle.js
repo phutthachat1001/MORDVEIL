@@ -2446,12 +2446,14 @@ function _dropDirectItem(rarity) {
 
 // ---------- Attack speed (ms per hit) ----------
 
+const ATTACK_INTERVAL_BASE = 3000; // default 3s per hit
+
 function getAttackInterval() {
-  // Base 6000ms; reduced by attackSpeedBonus (skill tree) + equipment attackSpeed
+  // Base 3000ms; reduced by attackSpeedBonus (skill tree) + equipment attackSpeed
   const treeBonus  = G.attackSpeedBonus || 0;
   const equipBonus = typeof getEquippedStatBonus === 'function' ? (getEquippedStatBonus().attackSpeed || 0) : 0;
   const bonus = Math.min(0.9, treeBonus + equipBonus);
-  const ms = Math.max(800, Math.floor(6000 * (1 - bonus)));
+  const ms = Math.max(500, Math.floor(ATTACK_INTERVAL_BASE * (1 - bonus)));
   return ms;
 }
 

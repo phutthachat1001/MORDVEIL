@@ -1,39 +1,49 @@
 // ============================================================
 // IDLE FARMING PANEL — runs continuously, view-only.
-// Separate from the manual zone-monster fight. Auto-attacks a small
-// group of WEAKER random monsters drawn from the current + cleared zones,
-// on the speed-stat timer. Items drop floating above the monster's head.
+// Separate from the manual zone-monster fight. Your hero stands and
+// auto-attacks a small group of WEAKER random monsters drawn from the
+// current + cleared zones, on the speed-stat timer. Items drop floating
+// above the monster's head. The hero takes damage; on death it waits 3s
+// to respawn. EXP/gold-per-minute is tracked and shown in the header.
 // ============================================================
 
 // IDLE monsters are weaker than the real zone monsters.
 const IDLE_STAT_MULT   = 0.4;   // HP/ATK scale vs real monster
-const IDLE_REWARD_MULT = 0.35;  // EXP/gold vs a boss-baseline kill (same as normal)
+const IDLE_REWARD_MULT = 0.35;  // EXP/gold vs a boss-baseline kill
+const IDLE_RESPAWN_MS  = 3000;  // hero respawn delay on death
 
 let _idleMobs       = [];       // [{name, sprite, img, tier, zone, hp, maxHp, atk, dead}]
-let _idleLoopTimer  = null;     // setInterval handle for the attack tick
+let _idleLoopTimer  = null;     // setInterval handle for the tick
 let _idleTargetIdx  = 0;
+let _idlePlayerHp   = 0;        // hero HP inside the IDLE panel (separate from G.hp)
+let _idlePlayerMax  = 0;
+let _idleDead       = false;    // hero is dead, waiting to respawn
+let _idleRespawnAt  = 0;        // timestamp when hero respawns
+
+// per-minute reward tracking (rolling window)
+let _idleRewardLog  = [];       // [{t, exp, gold}]
 
 // ---------- pool of monsters the IDLE panel may spawn ----------
-// current zone + every already-cleared zone (zoneProgress > 0)
 function _idleMonsterPool() {
   const pool = [];
   const curZone = G.currentZone || 1;
   (ZONES || []).forEach(z => {
     const cleared = (G.zoneProgress && G.zoneProgress[z.id]) || 0;
-    // include a zone if it's the current one, or we've cleared at least 1 monster there
     if (z.id > curZone) return;
     const isCurrent = z.id === curZone;
     z.monsters.forEach((m, idx) => {
-      // skip bosses (tier 6) — IDLE farms only the weaker non-boss mobs
-      if (m.isBoss) return;
-      // for current zone, only spawn mobs up to current progress+1; past zones: all
-      if (isCurrent && idx > cleared) return;
+      if (m.isBoss) return;                       // IDLE farms non-boss mobs only
+      if (isCurrent && idx > cleared) return;      // current zone: up to progress
       pool.push({ ...m, zone: z.id });
     });
   });
-  // fallback: at least the first monster of zone 1
   if (!pool.length && ZONES[0]) pool.push({ ...ZONES[0].monsters[0], zone: 1 });
   return pool;
+}
+
+function _idlePlayerMaxHp() {
+  const eq = (typeof getEquippedStatBonus === 'function') ? getEquippedStatBonus() : { hp:0 };
+  return (G.maxHp || 100) + (eq.hp || 0);
 }
 
 function _spawnIdleWave() {
@@ -59,24 +69,71 @@ function _spawnIdleWave() {
 function _renderIdleStage() {
   const stage = document.getElementById('idle-stage');
   if (!stage) return;
-  stage.innerHTML = '';
+
+  // zone background class on the panel
+  const panel = document.getElementById('idle-panel');
+  if (panel) panel.dataset.zone = G.currentZone || 1;
+
+  const hpPct = _idlePlayerMax > 0 ? Math.max(0, (_idlePlayerHp / _idlePlayerMax) * 100) : 100;
+  const playerSprite = (typeof getPlayerSpriteWithCosmetic !== 'undefined')
+    ? getPlayerSpriteWithCosmetic(G.classId || 'warrior', G.classTier || 1, G.cosmeticTier || 1)
+    : (typeof getPlayerSprite !== 'undefined' ? getPlayerSprite(G.classId || 'warrior', G.classTier || 1) : '🧍');
+
+  let mobsHtml = '';
   _idleMobs.forEach((m, idx) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'idle-mob' + (m.dead ? ' dead' : '');
-    wrap.dataset.idx = idx;
     const pct = Math.max(0, (m.hp / m.maxHp) * 100);
     const sprite = m.img
       ? `<img src="assets/sprites/${m.img}.png" onerror="this.outerHTML='${(m.sprite||'👾').replace(/'/g,'')}'">`
       : (m.sprite || '👾');
-    wrap.innerHTML = `
-      <div class="idle-mob-sprite">${sprite}</div>
-      <div class="idle-mob-name">${m.name}</div>
-      <div class="idle-mob-hp"><div class="idle-mob-hp-fill" style="width:${pct}%"></div></div>`;
-    stage.appendChild(wrap);
+    mobsHtml += `
+      <div class="idle-mob${m.dead ? ' dead' : ''}" data-idx="${idx}">
+        <div class="idle-mob-sprite">${sprite}</div>
+        <div class="idle-mob-name">${m.name}</div>
+        <div class="idle-mob-hp"><div class="idle-mob-hp-fill" style="width:${pct}%"></div></div>
+      </div>`;
   });
 
+  stage.innerHTML = `
+    <div class="idle-hero${_idleDead ? ' dead' : ''}">
+      <div class="idle-hero-sprite" id="idle-hero-sprite">${playerSprite}</div>
+      <div class="idle-mob-name">คุณ</div>
+      <div class="idle-mob-hp"><div class="idle-mob-hp-fill idle-hero-hp" style="width:${hpPct}%"></div></div>
+      ${_idleDead ? '<div class="idle-respawn">💀 รอเกิด...</div>' : ''}
+    </div>
+    <div class="idle-vs">⚔</div>
+    <div class="idle-mobs-wrap">${mobsHtml}</div>`;
+
+  _updateIdleHeader();
+}
+
+function _updateIdleHeader() {
   const spdEl = document.getElementById('idle-panel-spd');
   if (spdEl) spdEl.textContent = `⚡ ${(getAttackInterval()/1000).toFixed(1)} วิ/ตี`;
+  const rateEl = document.getElementById('idle-panel-rate');
+  if (rateEl) {
+    const { exp, gold } = _idleRatePerMin();
+    rateEl.innerHTML = `📈 ${_fmtNum(exp)} EXP/นาที · 💰 ${_fmtNum(gold)}/นาที`;
+  }
+}
+
+function _fmtNum(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1) + 'k';
+  return Math.round(n).toString();
+}
+
+// rolling window → per-minute. Uses elapsed-since-start (capped at 60s) as the
+// denominator so a single early kill doesn't spike the rate to absurd numbers.
+let _idleStartTime = 0;
+function _idleRatePerMin() {
+  const now = performance.now();
+  _idleRewardLog = _idleRewardLog.filter(r => now - r.t <= 60000);
+  if (!_idleRewardLog.length) return { exp: 0, gold: 0 };
+  const elapsed = Math.min(60000, Math.max(5000, now - _idleStartTime)); // ≥5s floor
+  const sumExp  = _idleRewardLog.reduce((s, r) => s + r.exp, 0);
+  const sumGold = _idleRewardLog.reduce((s, r) => s + r.gold, 0);
+  const scale = 60000 / elapsed;
+  return { exp: sumExp * scale, gold: sumGold * scale };
 }
 
 function _updateIdleMobHp(idx) {
@@ -87,11 +144,18 @@ function _updateIdleMobHp(idx) {
   const m = _idleMobs[idx];
   const fill = wrap.querySelector('.idle-mob-hp-fill');
   if (fill) fill.style.width = `${Math.max(0, (m.hp / m.maxHp) * 100)}%`;
-  wrap.querySelector('.idle-mob-sprite')?.classList.remove('hit');
-  // force reflow to retrigger the hit flash
-  void wrap.offsetWidth;
-  wrap.querySelector('.idle-mob-sprite')?.classList.add('hit');
-  setTimeout(() => wrap.querySelector('.idle-mob-sprite')?.classList.remove('hit'), 160);
+  const spr = wrap.querySelector('.idle-mob-sprite');
+  if (spr) {
+    spr.classList.remove('hit');
+    void wrap.offsetWidth;
+    spr.classList.add('hit');
+    setTimeout(() => spr.classList.remove('hit'), 160);
+  }
+}
+
+function _updateIdleHeroHp() {
+  const fill = document.querySelector('.idle-hero-hp');
+  if (fill) fill.style.width = `${_idlePlayerMax > 0 ? Math.max(0, (_idlePlayerHp/_idlePlayerMax)*100) : 100}%`;
 }
 
 // ---------- floating popups above a mob's head ----------
@@ -107,19 +171,29 @@ function _floatAboveIdleMob(idx, html, cls) {
   setTimeout(() => el.remove(), 1700);
 }
 
-// ---------- player's IDLE attack (auto, view-only) ----------
+// ---------- combat tick ----------
 function _idleAttackTick() {
   // pause while the panel isn't on screen (Hub, hidden arena, no game)
   const panel = document.getElementById('idle-panel');
   if (!panel || panel.offsetParent === null) return;
+
+  // hero dead → wait for respawn
+  if (_idleDead) {
+    if (performance.now() >= _idleRespawnAt) {
+      _idleDead = false;
+      _idlePlayerHp = _idlePlayerMax = _idlePlayerMaxHp();
+      _renderIdleStage();
+    }
+    return;
+  }
+
   if (!_idleMobs.length) { _spawnIdleWave(); return; }
-  // find first alive target
   let idx = _idleMobs.findIndex(m => !m.dead);
   if (idx === -1) { _spawnIdleWave(); return; }
   _idleTargetIdx = idx;
   const mob = _idleMobs[idx];
 
-  // damage = player's effective attack (same formula as manual, simplified)
+  // hero attacks the target
   const eqBonus = (typeof getEquippedStatBonus === 'function') ? getEquippedStatBonus() : { atk:0, crit:0 };
   const cls = (typeof CLASSES !== 'undefined') ? CLASSES.find(c => c.id === G.classId) : null;
   let atk = (G.baseAtk || 10) + (eqBonus.atk || 0) + Math.floor(Math.random() * (G.level || 1)) + 1;
@@ -128,17 +202,45 @@ function _idleAttackTick() {
   const isCrit = Math.random() < critChance;
   if (isCrit) atk = Math.floor(atk * 2);
 
+  // hero attack animation
+  const heroSpr = document.getElementById('idle-hero-sprite');
+  if (heroSpr) { heroSpr.classList.add('atk'); setTimeout(() => heroSpr.classList.remove('atk'), 200); }
+
   mob.hp -= atk;
   _updateIdleMobHp(idx);
 
   if (mob.hp <= 0) {
     mob.dead = true;
     _idleMobDie(idx, mob);
+    return;
+  }
+
+  // surviving mobs strike back at the hero
+  _idleMobsAttackHero();
+}
+
+function _idleMobsAttackHero() {
+  const eq = (typeof getEquippedStatBonus === 'function') ? getEquippedStatBonus() : { def:0 };
+  const def = (G.baseDef || 0) + (eq.def || 0);
+  let dmg = 0;
+  _idleMobs.forEach(m => { if (!m.dead) dmg += Math.max(1, m.atk - Math.floor(def * 0.5)); });
+  if (dmg <= 0) return;
+  _idlePlayerHp -= dmg;
+  if (_idlePlayerHp <= 0) {
+    _idlePlayerHp = 0;
+    _idleHeroDie();
+  } else {
+    _updateIdleHeroHp();
   }
 }
 
+function _idleHeroDie() {
+  _idleDead = true;
+  _idleRespawnAt = performance.now() + IDLE_RESPAWN_MS;
+  _renderIdleStage();
+}
+
 function _idleMobDie(idx, mob) {
-  // reward — boss baseline × IDLE_REWARD_MULT (lower than zone monsters/boss)
   const full = getMonsterStats(mob.zone, mob.tier, false);
   const killExpBase = G.gameMode === 'fullrpg' ? 0.5 : 0.03;
   let expGain = Math.floor(full.maxHp * killExpBase * 3 * IDLE_REWARD_MULT);
@@ -154,12 +256,14 @@ function _idleMobDie(idx, mob) {
   G.totalKills = (G.totalKills || 0) + 1;
   if (typeof giveExp === 'function') giveExp(expGain);
 
-  // floating EXP/gold above head
+  // track for per-minute rate
+  _idleRewardLog.push({ t: performance.now(), exp: expGain, gold: goldGain });
+
   _floatAboveIdleMob(idx, `+${expGain} EXP · 💰${goldGain}`, 'idle-xp-float');
 
   // item drop (lower rate than zone monster) — floats above head
   const dropBonus = clsB && clsB.bonuses && clsB.bonuses.dropBonus ? clsB.bonuses.dropBonus : 0;
-  const baseRate = 0.06 + ((mob.zone || 1) - 1) * 0.015; // slightly below zone-monster rate
+  const baseRate = 0.06 + ((mob.zone || 1) - 1) * 0.015;
   const dropRate = baseRate + dropBonus + (G.dropBonusFromTree || 0);
   if (Math.random() < dropRate) {
     const dropped = _idleDropItem(mob.zone, mob.tier);
@@ -172,7 +276,6 @@ function _idleMobDie(idx, mob) {
   _renderIdleStage();
   if (typeof updateTopBar === 'function') updateTopBar();
 
-  // respawn the wave shortly after all mobs are dead
   if (_idleMobs.every(m => m.dead)) {
     setTimeout(() => { if (_idleLoopTimer) _spawnIdleWave(); }, 700);
   }
@@ -207,10 +310,13 @@ function _idleDropItem(zone, tier) {
 
 // ---------- lifecycle ----------
 function startIdleFarm() {
-  if (_idleLoopTimer) return;
+  if (_idleLoopTimer) { _updateIdleHeader(); return; }
   if (!G.classId) return; // not in a game yet
+  _idlePlayerHp = _idlePlayerMax = _idlePlayerMaxHp();
+  _idleDead = false;
+  _idleRewardLog = [];
+  _idleStartTime = performance.now();
   _spawnIdleWave();
-  // poll on a short tick; attack fires every getAttackInterval()
   let lastAttack = 0;
   _idleLoopTimer = setInterval(() => {
     const now = performance.now();
@@ -218,6 +324,7 @@ function startIdleFarm() {
       lastAttack = now;
       _idleAttackTick();
     }
+    _updateIdleHeader(); // refresh per-minute rate continuously
   }, 150);
 }
 
@@ -225,8 +332,10 @@ function stopIdleFarm() {
   if (_idleLoopTimer) { clearInterval(_idleLoopTimer); _idleLoopTimer = null; }
 }
 
-// refresh the spawn pool when the player changes zone or clears a monster
+// refresh the spawn pool + hero max HP on zone change / clearing a monster
 function refreshIdleFarm() {
   if (!_idleLoopTimer) return;
+  _idlePlayerMax = _idlePlayerMaxHp();
+  if (!_idleDead) _idlePlayerHp = Math.min(_idlePlayerHp || _idlePlayerMax, _idlePlayerMax);
   _spawnIdleWave();
 }

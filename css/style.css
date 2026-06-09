@@ -1824,10 +1824,41 @@ body.preload{visibility:hidden}
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 1.4rem;
-  min-height: 150px;
+  gap: 1.2rem;
+  min-height: 160px;
   padding: 1rem .8rem .8rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  position: relative;
+  background-size: cover;
+  background-position: center bottom;
+  border-radius: 0 0 12px 12px;
+}
+/* zone backgrounds for the IDLE stage (reuse battle bg images) */
+#idle-panel[data-zone="1"] #idle-stage { background-image: linear-gradient(rgba(6,10,20,.55),rgba(6,10,20,.78)), url("../assets/bg/battle/zone1.png"); }
+#idle-panel[data-zone="2"] #idle-stage { background-image: linear-gradient(rgba(6,10,20,.55),rgba(6,10,20,.78)), url("../assets/bg/battle/zone2.png"); }
+#idle-panel[data-zone="3"] #idle-stage { background-image: linear-gradient(rgba(6,10,20,.55),rgba(6,10,20,.78)), url("../assets/bg/battle/zone3.png"); }
+#idle-panel[data-zone="4"] #idle-stage { background-image: linear-gradient(rgba(6,10,20,.55),rgba(6,10,20,.78)), url("../assets/bg/battle/zone4.png"); }
+#idle-panel[data-zone="5"] #idle-stage { background-image: linear-gradient(rgba(6,10,20,.55),rgba(6,10,20,.78)), url("../assets/bg/battle/zone5.png"); }
+#idle-panel[data-zone="6"] #idle-stage { background-image: linear-gradient(rgba(6,10,20,.55),rgba(6,10,20,.78)), url("../assets/bg/battle/zone6.png"); }
+
+/* hero standing on the left of the IDLE stage */
+.idle-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.idle-hero-sprite { transform: scaleX(1); transition: transform .12s; }
+.idle-hero-sprite img,
+.idle-hero-sprite .png-sprite-wrap img { width: 60px; height: 60px; }
+.idle-hero-sprite.atk { transform: translateX(8px) scale(1.05); filter: brightness(1.4); }
+.idle-hero.dead .idle-hero-sprite { opacity: .35; filter: grayscale(1); }
+.idle-hero-hp { background: linear-gradient(90deg,#22aa44,#55ff77) !important; }
+.idle-respawn { font-size: .58rem; color: #ff8888; margin-top: 2px; font-weight: 700; }
+.idle-vs { color: #ffcc44; font-size: 1rem; align-self: center; flex: 0 0 auto; opacity: .7; }
+.idle-mobs-wrap {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 1rem; flex: 1 1 auto; flex-wrap: wrap;
 }
 .idle-mob {
   position: relative;

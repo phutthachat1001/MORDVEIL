@@ -241,7 +241,7 @@ function renderSkillTree() {
   const equipBonus  = typeof getEquippedStatBonus === 'function' ? (getEquippedStatBonus().attackSpeed || 0) : 0;
   const totalSpeed  = Math.min(0.9, (G.attackSpeedBonus || 0) + equipBonus);
   const speedPct    = Math.round(totalSpeed * 100);
-  const curInterval = typeof getAttackInterval === 'function' ? (getAttackInterval()/1000).toFixed(1) : '6.0';
+  const curInterval = typeof getAttackInterval === 'function' ? (getAttackInterval()/1000).toFixed(1) : '3.0';
 
   const pulse = avail > 0 ? 'box-shadow:0 0 12px rgba(255,200,40,.5);animation:pulse 1.5s infinite' : '';
   area.innerHTML = `
@@ -300,7 +300,7 @@ function _renderSkillTreeFull() {
   const equipBonus  = typeof getEquippedStatBonus === 'function' ? (getEquippedStatBonus().attackSpeed || 0) : 0;
   const totalSpeed  = Math.min(0.9, (G.attackSpeedBonus || 0) + equipBonus);
   const speedPct    = Math.round(totalSpeed * 100);
-  const curInterval = typeof getAttackInterval === 'function' ? (getAttackInterval()/1000).toFixed(1) : '6.0';
+  const curInterval = typeof getAttackInterval === 'function' ? (getAttackInterval()/1000).toFixed(1) : '3.0';
   const equipSpeedPct = Math.round(equipBonus * 100);
 
   let html = `
