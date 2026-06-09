@@ -1829,8 +1829,8 @@ body.preload{visibility:hidden}
   grid-template-columns: 1fr auto 1.4fr;
   align-items: center;
   gap: 1rem;
-  min-height: 180px;
-  padding: 1.2rem 1.4rem;
+  min-height: 240px;
+  padding: 1.4rem 1.6rem;
   position: relative;
   background-size: cover;
   background-position: center;
@@ -1844,7 +1844,7 @@ body.preload{visibility:hidden}
 #idle-panel[data-zone="5"] #idle-stage { background-image: linear-gradient(rgba(6,10,20,.5),rgba(6,10,20,.72)), url("../assets/bg/battle/zone5.png"); }
 #idle-panel[data-zone="6"] #idle-stage { background-image: linear-gradient(rgba(6,10,20,.5),rgba(6,10,20,.72)), url("../assets/bg/battle/zone6.png"); }
 
-/* hero standing on the left of the IDLE stage */
+/* hero standing on the left of the IDLE stage — faces RIGHT toward the mobs */
 .idle-hero {
   display: flex;
   flex-direction: column;
@@ -1854,8 +1854,8 @@ body.preload{visibility:hidden}
 }
 .idle-hero-sprite { transition: transform .12s; }
 .idle-hero-sprite img,
-.idle-hero-sprite .png-sprite-wrap img { width: 72px; height: 72px; image-rendering: pixelated; }
-.idle-hero-sprite.atk { transform: translateX(14px) scale(1.08); filter: brightness(1.5) drop-shadow(0 0 6px #ffcc44); }
+.idle-hero-sprite .png-sprite-wrap img { width: 112px; height: 112px; image-rendering: pixelated; }
+.idle-hero-sprite.atk { transform: translateX(20px) scale(1.1); filter: brightness(1.5) drop-shadow(0 0 8px #ffcc44); }
 .idle-hero.dead .idle-hero-sprite { opacity: .35; filter: grayscale(1); }
 .idle-hero-hp { background: linear-gradient(90deg,#22aa44,#55ff77) !important; }
 .idle-respawn { font-size: .6rem; color: #ff8888; margin-top: 3px; font-weight: 700; animation: pulse 1s infinite; }
@@ -1864,21 +1864,40 @@ body.preload{visibility:hidden}
 
 .idle-mobs-wrap {
   display: flex; align-items: flex-end; justify-content: flex-start;
-  gap: 1.2rem; flex-wrap: wrap;
+  gap: 1.4rem; flex-wrap: wrap;
 }
 .idle-mob {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 72px;
+  width: 104px;
 }
-.idle-mob-sprite { font-size: 2.6rem; line-height: 1; transition: transform .15s; }
-.idle-mob-sprite img { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; }
-.idle-mob.hit .idle-mob-sprite { transform: scale(.85) translateX(-4px); filter: brightness(2.2) sepia(1) hue-rotate(-30deg); }
+/* mob sprite is flipped to face LEFT toward the hero */
+.idle-mob-sprite { font-size: 3.6rem; line-height: 1; transition: transform .15s; transform: scaleX(-1); }
+.idle-mob-sprite img { width: 88px; height: 88px; object-fit: contain; image-rendering: pixelated; }
+.idle-mob.hit .idle-mob-sprite { transform: scaleX(-1) scale(.88) translateX(-4px); filter: brightness(2.2) sepia(1) hue-rotate(-30deg); }
 .idle-mob.dead .idle-mob-sprite { animation: idleMobDie .5s forwards; }
 @keyframes idleMobDie {
-  to { opacity: 0; transform: scale(.3) rotate(20deg); }
+  to { opacity: 0; transform: scaleX(-1) scale(.3) rotate(20deg); }
+}
+/* slash / hit effect over the targeted mob */
+.idle-fx {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 64px; height: 64px;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+  z-index: 8;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  animation: idleFxPop .4s ease-out forwards;
+}
+@keyframes idleFxPop {
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(.5) rotate(-15deg); }
+  35%  { opacity: 1; transform: translate(-50%,-50%) scale(1.15) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1) rotate(10deg); }
 }
 .idle-mob-name { font-size: .62rem; color: #cdd; margin-top: .25rem; white-space: nowrap; text-shadow: 0 1px 2px #000; }
 

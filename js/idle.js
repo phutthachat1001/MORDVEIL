@@ -176,6 +176,21 @@ function _floatAboveIdleMob(idx, html, cls) {
   setTimeout(() => el.remove(), 1700);
 }
 
+// class-based slash/hit effect over the targeted mob
+const _IDLE_FX = { warrior:'slash', mage:'explosion', rogue:'dark', archer:'arrow', paladin:'holy' };
+function _showIdleFx(idx) {
+  const stage = document.getElementById('idle-stage');
+  if (!stage) return;
+  const wrap = stage.querySelector(`.idle-mob[data-idx="${idx}"] .idle-mob-sprite`);
+  if (!wrap) return;
+  const fx = _IDLE_FX[G.classId] || 'slash';
+  const el = document.createElement('div');
+  el.className = 'idle-fx';
+  el.style.backgroundImage = `url('./assets/effects/${fx}.png')`;
+  wrap.parentElement.appendChild(el);
+  setTimeout(() => el.remove(), 400);
+}
+
 // ---------- combat tick ----------
 function _idleAttackTick() {
   // pause while the panel isn't on screen (Hub, hidden arena, no game)
@@ -213,6 +228,7 @@ function _idleAttackTick() {
 
   mob.hp -= atk;
   _updateIdleMobHp(idx);
+  _showIdleFx(idx);
   _floatAboveIdleMob(idx, `${isCrit ? '💥' : ''}${atk}`, 'idle-dmg-float' + (isCrit ? ' crit' : ''));
 
   if (mob.hp <= 0) {
