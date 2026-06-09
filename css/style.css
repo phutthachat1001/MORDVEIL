@@ -1852,11 +1852,13 @@ body.preload{visibility:hidden}
   justify-self: center;
   position: relative;
 }
-/* hero is on the RIGHT now → flip to face LEFT toward the mobs */
-.idle-hero-sprite { transition: transform .12s; transform: scaleX(-1); }
+/* hero is on the RIGHT now → flip the sprite to face LEFT toward the mobs.
+   Flip the innermost img/svg directly so cosmetic wrappers can't cancel it. */
+.idle-hero-sprite { transition: transform .12s; }
 .idle-hero-sprite img,
-.idle-hero-sprite .png-sprite-wrap img { width: 112px; height: 112px; image-rendering: pixelated; }
-.idle-hero-sprite.atk { transform: scaleX(-1) translateX(20px) scale(1.1); filter: brightness(1.5) drop-shadow(0 0 8px #ffcc44); }
+.idle-hero-sprite svg,
+.idle-hero-sprite .png-sprite-wrap img { width: 112px; height: 112px; image-rendering: pixelated; transform: scaleX(-1); }
+.idle-hero-sprite.atk { transform: translateX(-20px) scale(1.1); filter: brightness(1.5) drop-shadow(0 0 8px #ffcc44); }
 .idle-hero.dead .idle-hero-sprite { opacity: .35; filter: grayscale(1); }
 .idle-hero-hp { background: linear-gradient(90deg,#22aa44,#55ff77) !important; }
 .idle-respawn { font-size: .6rem; color: #ff8888; margin-top: 3px; font-weight: 700; animation: pulse 1s infinite; }
