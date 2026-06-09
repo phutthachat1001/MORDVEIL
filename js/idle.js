@@ -112,17 +112,48 @@ function _renderIdleStage() {
       </div>`;
   });
 
+  // Layout: mobs on the LEFT, hero on the RIGHT (they face each other).
   stage.innerHTML = `
+    <div class="idle-mobs-wrap">${mobsHtml}</div>
+    <div class="idle-vs">⚔</div>
     <div class="idle-hero${_idleDead ? ' dead' : ''}">
       <div class="idle-hero-sprite" id="idle-hero-sprite">${playerSprite}</div>
       <div class="idle-mob-name">คุณ</div>
       <div class="idle-mob-hp"><div class="idle-mob-hp-fill idle-hero-hp" style="width:${hpPct}%"></div></div>
       ${_idleDead ? '<div class="idle-respawn">💀 รอเกิด...</div>' : ''}
-    </div>
-    <div class="idle-vs">⚔</div>
-    <div class="idle-mobs-wrap">${mobsHtml}</div>`;
+    </div>`;
 
+  _renderIdleSkillBar();
   _updateIdleHeader();
+}
+
+// ---------- skill bar (shows active IDLE skills + cooldown gauges) ----------
+function _renderIdleSkillBar() {
+  const bar = document.getElementById('idle-skillbar');
+  if (!bar) return;
+  const equipped = (G.equippedSkills || []).filter(sid => _IDLE_SKILL_DMG[sid]);
+  if (!equipped.length) {
+    bar.innerHTML = '<span class="idle-skillbar-empty">ยังไม่มีสกิลโจมตี — อัพ Skill Tree เพื่อปลดล็อค</span>';
+    return;
+  }
+  const allSkills = (typeof _getSkills === 'function') ? _getSkills() : [];
+  const now = performance.now();
+  bar.innerHTML = equipped.map(sid => {
+    const def  = _IDLE_SKILL_DMG[sid];
+    const meta = allSkills.find(s => s.id === sid) || { cd: 3, name: sid };
+    const cdMs = (meta.cd || 3) * getAttackInterval();
+    const readyAt = _idleSkillReady[sid] || 0;
+    const remain  = Math.max(0, readyAt - now);
+    const pct = cdMs > 0 ? Math.max(0, Math.min(100, (remain / cdMs) * 100)) : 0;
+    const ready = remain <= 0;
+    return `
+      <div class="idle-skill${ready ? ' ready' : ''}" data-sid="${sid}" title="${meta.name}">
+        <span class="idle-skill-icon">${(def.label || '⚡').split(' ')[0]}</span>
+        <span class="idle-skill-name">${meta.name}</span>
+        <div class="idle-skill-cd"><div class="idle-skill-cd-fill" style="width:${100 - pct}%"></div></div>
+        <span class="idle-skill-cd-text">${ready ? 'พร้อม!' : (remain/1000).toFixed(1) + 'วิ'}</span>
+      </div>`;
+  }).join('');
 }
 
 function _updateIdleHeader() {
@@ -135,6 +166,27 @@ function _updateIdleHeader() {
   }
   const killEl = document.getElementById('idle-panel-kills');
   if (killEl) killEl.textContent = `💀 ${_idleSessionKills}`;
+  _updateIdleSkillCooldowns();
+}
+
+// update only the cooldown gauges (cheap, runs every tick)
+function _updateIdleSkillCooldowns() {
+  const bar = document.getElementById('idle-skillbar');
+  if (!bar) return;
+  const allSkills = (typeof _getSkills === 'function') ? _getSkills() : [];
+  const now = performance.now();
+  bar.querySelectorAll('.idle-skill').forEach(el => {
+    const sid = el.dataset.sid;
+    const meta = allSkills.find(s => s.id === sid) || { cd: 3 };
+    const cdMs = (meta.cd || 3) * getAttackInterval();
+    const remain = Math.max(0, (_idleSkillReady[sid] || 0) - now);
+    const pct = cdMs > 0 ? Math.max(0, Math.min(100, (remain / cdMs) * 100)) : 0;
+    const fill = el.querySelector('.idle-skill-cd-fill');
+    const txt  = el.querySelector('.idle-skill-cd-text');
+    if (fill) fill.style.width = `${100 - pct}%`;
+    if (txt)  txt.textContent = remain <= 0 ? 'พร้อม!' : (remain/1000).toFixed(1) + 'วิ';
+    el.classList.toggle('ready', remain <= 0);
+  });
 }
 
 function _fmtNum(n) {
@@ -386,7 +438,7 @@ function _idleDropItem(zone, tier) {
 
 // ---------- lifecycle ----------
 function startIdleFarm() {
-  if (_idleLoopTimer) { _updateIdleHeader(); return; }
+  if (_idleLoopTimer) { _renderIdleSkillBar(); _updateIdleHeader(); return; }
   if (!G.classId) return; // not in a game yet
   _idlePlayerHp = _idlePlayerMax = _idlePlayerMaxHp();
   _idleDead = false;

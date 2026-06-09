@@ -323,7 +323,17 @@ function _renderSkillTreeFull() {
     const label = ROW_LABELS[row] || `Row ${row}`;
     const isSeparator = row === 5;
     html += `
-    ${isSeparator ? `<div style="border-top:1px solid #335;margin:.7rem 0;padding-top:.4rem"><span style="color:#88aaff;font-size:.78rem;font-weight:700">── IDLE SYSTEM ──</span></div>` : ''}
+    ${isSeparator ? `
+      <div style="border-top:1px solid #335;margin:.9rem 0 .6rem;padding-top:.5rem">
+        <span style="color:#88aaff;font-size:.85rem;font-weight:700">── ⚙ IDLE SYSTEM ──</span>
+      </div>
+      <div style="background:rgba(20,40,80,.3);border:1px solid #2a4a7a;border-radius:8px;padding:.6rem .8rem;margin-bottom:.7rem;font-size:.72rem;color:#aaccdd;line-height:1.6">
+        🌙 <b style="color:#bdf">ระบบ IDLE</b> — ตัวละครจะฟาร์มมอนอัตโนมัติในกรอบด้านล่างจอ ตลอดเวลา<br>
+        ⚡ <b>ลดเวลาตี</b> — ยิ่งลดมาก ยิ่งตีถี่ (ทั้ง IDLE และมอนด่าน), เริ่มต้น 3.0 วิ/ตี<br>
+        ❤ <b>เพิ่ม HP / ⚔ ATK</b> — เพิ่มพลังให้ทั้งสองโหมด<br>
+        💎 <b>เพิ่ม Drop</b> — โอกาสดรอปไอเทมจากการฟาร์มสูงขึ้น<br>
+        ✨ <b>สกิลที่ปลดล็อค</b> จะออโต้แคสต์ใน IDLE เมื่อพ้นคูลดาวน์ (คูลดาวน์เป็นวินาที)
+      </div>` : ''}
     <div style="color:#888;font-size:.72rem;margin:.3rem 0 .35rem .2rem;font-weight:600">${label}</div>
     <div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem">`;
 
