@@ -164,6 +164,7 @@ function renderAll() {
   if (typeof renderEquipSlots      !== 'undefined') renderEquipSlots();
   if (typeof updateDiffLabel       !== 'undefined') updateDiffLabel();
   if (typeof renderMapPins         !== 'undefined') renderMapPins();
+  if (typeof startIdleFarm         !== 'undefined') startIdleFarm();
   if (G.gameMode === 'fullrpg') {
     if (typeof renderRpgQuestPanel  !== 'undefined') renderRpgQuestPanel();
     if (typeof renderRpgDailyPanel  !== 'undefined') renderRpgDailyPanel();

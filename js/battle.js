@@ -39,6 +39,7 @@ function renderZoneTabs() {
       if (arena) { arena.innerHTML = ''; arena.style.display = 'none'; }
       renderZoneTabs();
       renderMonsterList();
+      if (typeof refreshIdleFarm === 'function') refreshIdleFarm();
       if (typeof rpgOnExplore === 'function') rpgOnExplore(z.id);
       if (typeof npcCheckZoneEntry === 'function') npcCheckZoneEntry(z.id);
     };
@@ -2804,6 +2805,7 @@ function monsterDie() {
               logBattle(`<span class="log-sys">✅ ผ่าน ${monster.name}! → ถัดไป: ${nextMonster.name}</span>`);
               saveGame();
               _clearAttackCooldown();
+              if (typeof refreshIdleFarm === 'function') refreshIdleFarm();
               setTimeout(() => { hideBattleContent(); renderMonsterList(); }, 800);
               updateTopBar(); updateCharPanel(); renderInventory(); renderDailyQuests();
               return;
