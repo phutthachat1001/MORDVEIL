@@ -351,7 +351,8 @@ function _renderSkillTreeFull() {
         : `<div style="font-size:.62rem;color:${textCol};margin-top:2px">${_formatStatShort(node.stat)}</div>`;
       const lockIcon = !unlocked && !canGet ? '<span style="position:absolute;top:2px;left:4px;font-size:.65rem">🔒</span>' : '';
       const checkIcon = unlocked ? '<span style="position:absolute;top:2px;left:4px;font-size:.65rem">✓</span>' : '';
-      html += `<div onclick="${canGet?`unlockNodeFromFull('${node.id}')`:''}" title="${isSkill ? (node.skill?.name+': '+node.skill?.desc) : _formatStatShort(node.stat)}"
+      const tip = isSkill ? _skillNodeTip(node).replace(/"/g, '&quot;') : _formatStatShort(node.stat);
+      html += `<div onclick="${canGet?`unlockNodeFromFull('${node.id}')`:''}" title="${tip}"
         style="position:relative;min-width:78px;max-width:96px;padding:.5rem .4rem;background:${bgColor};border:1px solid ${border};border-radius:10px;text-align:center;cursor:${cursor};transition:all .2s;flex:0 0 auto">
         ${branchTag}${lockIcon}${checkIcon}
         <div style="font-size:1.5rem">${node.icon}</div>
@@ -375,6 +376,22 @@ function unlockNodeFromFull(nodeId) {
     if (typeof renderAll === 'function') renderAll();
     renderSkillTree();
   });
+}
+
+// tooltip for a skill node: explains what it does in the zone fight vs IDLE
+function _skillNodeTip(node) {
+  const sk = node.skill;
+  if (!sk) return node.name;
+  const cd = sk.cooldown || sk.cd || 3;
+  let tip = `✨ ${sk.name}\n${sk.desc}\n\n`;
+  tip += `⚔ มอนด่าน: กดใช้เอง — คูลดาวน์ ${cd} เทิร์น\n`;
+  const idleDmg = (typeof _IDLE_SKILL_DMG !== 'undefined') ? _IDLE_SKILL_DMG[sk.id] : null;
+  if (idleDmg) {
+    tip += `🌙 IDLE: ออโต้แคสต์ — โจมตี ×${idleDmg.mult}${idleDmg.hits > 1 ? ` (${idleDmg.hits} ครั้ง)` : ''} คูลดาวน์ ${cd}×ความเร็ว วิ`;
+  } else {
+    tip += `🌙 IDLE: สกิลบัฟ/สนับสนุน — ไม่ออโต้แคสต์ใน IDLE`;
+  }
+  return tip;
 }
 
 function _formatStatShort(s) {

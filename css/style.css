@@ -1852,12 +1852,12 @@ body.preload{visibility:hidden}
   justify-self: center;
   position: relative;
 }
-/* hero is on the RIGHT now → flip the sprite to face LEFT toward the mobs.
-   Flip the innermost img/svg directly so cosmetic wrappers can't cancel it. */
+/* hero is on the RIGHT (same as battle scene) → use natural facing, NO flip.
+   In battle the right-side player isn't flipped and faces left correctly. */
 .idle-hero-sprite { transition: transform .12s; }
 .idle-hero-sprite img,
 .idle-hero-sprite svg,
-.idle-hero-sprite .png-sprite-wrap img { width: 112px; height: 112px; image-rendering: pixelated; transform: scaleX(-1); }
+.idle-hero-sprite .png-sprite-wrap img { width: 112px; height: 112px; image-rendering: pixelated; }
 .idle-hero-sprite.atk { transform: translateX(-20px) scale(1.1); filter: brightness(1.5) drop-shadow(0 0 8px #ffcc44); }
 .idle-hero.dead .idle-hero-sprite { opacity: .35; filter: grayscale(1); }
 .idle-hero-hp { background: linear-gradient(90deg,#22aa44,#55ff77) !important; }
@@ -1876,13 +1876,14 @@ body.preload{visibility:hidden}
   align-items: center;
   width: 104px;
 }
-/* mob is on the LEFT now → use its natural facing (right, toward the hero) */
-.idle-mob-sprite { font-size: 3.6rem; line-height: 1; transition: transform .15s; }
+/* mob is on the LEFT → flip scaleX(-1) like the battle scene's #pixel-monster
+   so it faces RIGHT toward the hero. */
+.idle-mob-sprite { font-size: 3.6rem; line-height: 1; transition: transform .15s; transform: scaleX(-1); }
 .idle-mob-sprite img { width: 88px; height: 88px; object-fit: contain; image-rendering: pixelated; }
-.idle-mob.hit .idle-mob-sprite { transform: scale(.88) translateX(4px); filter: brightness(2.2) sepia(1) hue-rotate(-30deg); }
+.idle-mob.hit .idle-mob-sprite { transform: scaleX(-1) scale(.88) translateX(-4px); filter: brightness(2.2) sepia(1) hue-rotate(-30deg); }
 .idle-mob.dead .idle-mob-sprite { animation: idleMobDie .5s forwards; }
 @keyframes idleMobDie {
-  to { opacity: 0; transform: scale(.3) rotate(20deg); }
+  to { opacity: 0; transform: scaleX(-1) scale(.3) rotate(20deg); }
 }
 /* slash / hit effect over the targeted mob */
 .idle-fx {
