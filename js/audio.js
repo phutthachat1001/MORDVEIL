@@ -4,12 +4,36 @@
 
 let audioCtx = null;
 
+// ── mute preference (device-level, stored outside the save) ──
+let _muted = (() => {
+  try { return localStorage.getItem('wq_muted') === '1'; } catch(e) { return false; }
+})();
+
+function isMuted() { return _muted; }
+
+function toggleMute() {
+  _muted = !_muted;
+  try { localStorage.setItem('wq_muted', _muted ? '1' : '0'); } catch(e) {}
+  if (_muted && window.speechSynthesis) window.speechSynthesis.cancel();
+  updateMuteButton();
+  return _muted;
+}
+
+function updateMuteButton() {
+  document.querySelectorAll('.btn-mute').forEach(btn => {
+    btn.textContent = _muted ? '🔇' : '🔊';
+    btn.title = _muted ? 'เปิดเสียง' : 'ปิดเสียง';
+    btn.classList.toggle('muted', _muted);
+  });
+}
+
 function getAudio() {
   if (!audioCtx) try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
   return audioCtx;
 }
 
 function playSound(type) {
+  if (_muted) return;
   const ctx = getAudio();
   if (!ctx) return;
   const o = ctx.createOscillator(), g = ctx.createGain();
@@ -84,6 +108,7 @@ const _DEATH_GRUNTS = {
 };
 
 function playEnemyDeathVoice(zone, isBoss) {
+  if (_muted) return;
   if (!window.speechSynthesis) return;
 
   let pool;

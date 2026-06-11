@@ -3097,3 +3097,7 @@ body.preload{visibility:hidden}
   box-shadow:0 3px 12px rgba(140,60,220,.5); transition:transform .12s;
 }
 .tut-next:hover{ transform:scale(1.03); }
+
+/* mute toggle */
+.btn-mute{ transition:opacity .15s; }
+.btn-mute.muted{ opacity:.55; filter:grayscale(.6); }

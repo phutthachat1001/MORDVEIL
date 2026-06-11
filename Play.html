@@ -241,6 +241,7 @@
     <button onclick="showStats()"        style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">สถิติ</button>
     <button onclick="showAchievements()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">ความสำเร็จ</button>
     <button onclick="replayTutorial()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">❔ วิธีเล่น</button>
+    <button class="btn-mute" onclick="toggleMute()" title="ปิดเสียง" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .5rem;border-radius:4px;cursor:pointer;font-size:.9rem">🔊</button>
     <span style="display:none"><span id="chest-count-display">0</span><span id="inv-count">0</span><span id="inv-full-badge"></span></span>
     <button onclick="openShop()" style="background:linear-gradient(135deg,#1a2a40,#0f1a2e);border:2px solid var(--gold);color:var(--gold);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🏪 ร้านค้า</button>
     <button id="btn-manualsave" onclick="manualSave()" style="background:linear-gradient(135deg,#1a3a1a,#0f2e0f);border:2px solid #4caf50;color:#7dff7d;padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">💾 เซฟ</button>
@@ -261,6 +262,7 @@
     <button onclick="showStats()"             style="border-color:var(--border2)">📊 สถิติ</button>
     <button onclick="showAchievements()"      style="border-color:var(--border2)">🏆 ความสำเร็จ</button>
     <button onclick="replayTutorial()"        style="border-color:var(--border2)">❔ วิธีเล่น</button>
+    <button class="btn-mute" onclick="toggleMute()" style="border-color:var(--border2)">🔊</button>
     <button onclick="openShop()"              style="border-color:var(--gold);color:var(--gold)">🏪 ร้านค้า</button>
     <button onclick="manualSave()"            style="border-color:#4caf50;color:#7dff7d">💾 เซฟ</button>
     <button onclick="confirmNewGame()"        style="border-color:var(--red);color:var(--red)">🔄 เริ่มใหม่</button>
@@ -851,6 +853,7 @@
   // Override window.onload to handle both buttons properly
   window.onload = () => {
     loadGame();
+    if (typeof updateMuteButton === 'function') updateMuteButton();
     const btnContinue = document.getElementById('btn-continue');
     const hint        = document.getElementById('continue-hint');
 
