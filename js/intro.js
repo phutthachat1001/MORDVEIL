@@ -119,10 +119,15 @@ function confirmClass() {
       logBattle(`<span class="log-sys">🗺 ${ZONES[0].name} — ${ZONE_LORE[1]}</span>`);
     }
   }
-  // Show lore stone popup once on new game
+  // First-time onboarding for new players (covers the lore + core systems).
+  // Falls back to the lore-stone popup if the tutorial module isn't present.
   setTimeout(() => {
-    const overlay = document.getElementById('lore-popup-overlay');
-    if (overlay) overlay.classList.add('active');
+    if (typeof maybeStartTutorial === 'function' && !G.tutorialDone) {
+      maybeStartTutorial();
+    } else {
+      const overlay = document.getElementById('lore-popup-overlay');
+      if (overlay) overlay.classList.add('active');
+    }
   }, 600);
   });
 }

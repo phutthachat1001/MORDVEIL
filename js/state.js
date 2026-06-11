@@ -87,6 +87,8 @@ let G = {
   doubleStrikeChance: 0,   // chance for an extra hit
   damageReduction: 0,      // % incoming damage reduced
   hasRevive: false,        // revive once per Infinity Trial run (secret paladin)
+  secretClassesFound: [],  // ['warrior_S', ...] secret tiers ever discovered (for Codex)
+  tutorialDone: false,     // first-time onboarding shown
   unlockedSkills: [],      // skill ids unlocked via skill tree
   equippedSkills: [],      // skill ids currently equipped (max 4)
   critBonusFromTree: 0,

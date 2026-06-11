@@ -386,7 +386,12 @@ const ACHIEVEMENTS = [
   {id:'boss_kill',   name:'ผู้ปราบบอส',       desc:'ฆ่าบอสตัวแรก',             icon:'👑', check:s=>s.bossKills>=1},
   {id:'boss5',       name:'นักปราบบอส',       desc:'ฆ่าบอส 5 ตัว',            icon:'⚡', check:s=>s.bossKills>=5},
   {id:'prestige',    name:'เหนือกว่า',         desc:'Prestige ครั้งแรก',        icon:'✨', check:s=>s.prestigeCount>=1},
-  {id:'inventory_full',name:'นักสะสม',        desc:'กระเป๋าเต็ม 50 ชิ้น',     icon:'🎒', check:s=>s.inventory&&s.inventory.length>=50}
+  {id:'inventory_full',name:'นักสะสม',        desc:'กระเป๋าเต็ม 50 ชิ้น',     icon:'🎒', check:s=>s.inventory&&s.inventory.length>=50},
+  // ── Evolution / Infinity Trial ──
+  {id:'trial_done',  name:'ผู้ผ่านการทดสอบ',  desc:'จบการทดสอบนิรันดร์ครั้งแรก', icon:'♾️', check:s=>(s.classTier||1)>=3},
+  {id:'tier4',       name:'ร่างสูงสุด',        desc:'วิวัฒนาการถึง Tier 4',      icon:'🌌', check:s=>(s.classTier||1)>=4},
+  {id:'secret_class',name:'ผู้ค้นพบความลับ',   desc:'ปลดล็อกคลาส Tier ลับ',     icon:'🩸', check:s=>(s.classEvolutionHistory||[]).some(e=>e.secret)},
+  {id:'secret_max',  name:'ตำนานที่ไม่ควรมีอยู่',desc:'ไปถึง Tier 4 สายลับ',     icon:'💮', check:s=>s.classBranch==='S'&&(s.classTier||1)>=4}
 ];
 
 const DAILY_QUEST_POOL = [

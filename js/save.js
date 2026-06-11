@@ -95,6 +95,9 @@ function loadGame() {
       if (G.doubleStrikeChance === undefined) G.doubleStrikeChance = 0;
       if (G.damageReduction    === undefined) G.damageReduction    = 0;
       if (G.hasRevive          === undefined) G.hasRevive          = false;
+      if (!G.secretClassesFound)              G.secretClassesFound = [];
+      // existing saves have already learned the game → don't show onboarding
+      if (G.tutorialDone === undefined)       G.tutorialDone       = true;
       // transient flags — reset battle state on reload.
       // _idleMode defaults ON (IDLE game) but don't resume an active battle loop.
       G._idleMode = true;

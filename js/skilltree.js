@@ -111,17 +111,6 @@ function updateEvoQuestProgress() {
   });
 }
 
-// ── branch selection ──
-function selectBranch(branch) {
-  if (G.classBranch) return; // already chosen
-  if (G.classTier < 2) return;
-  G.classBranch = branch;
-  logBattle(`<span class="log-exp">🔱 เลือกเส้นทาง ${branch === 'A' ? 'สายซ้าย' : 'สายขวา'}!</span>`);
-  saveGame();
-  renderSkillTree();
-  renderEvolutionButton();
-}
-
 // ── override getNextEvolution to support branching ──
 function getNextEvolution() {
   if (!G.classId) return null;
@@ -163,6 +152,13 @@ function evolveClass(forced) {
   if (b.damageReduction) G.damageReduction    = Math.max(G.damageReduction || 0, b.damageReduction);
   if (b.reviveOnce)      G.hasRevive = true;
 
+  // remember secret-tier discovery for the Codex (persists across classes)
+  if (next.secret) {
+    if (!G.secretClassesFound) G.secretClassesFound = [];
+    const key = `${G.classId}_S`;
+    if (!G.secretClassesFound.includes(key)) G.secretClassesFound.push(key);
+  }
+
   // weapon reward
   if (next.rewardWeapon) {
     const w = {...next.rewardWeapon, uid: Date.now() + Math.random(), level: G.level };
@@ -182,50 +178,7 @@ function evolveClass(forced) {
   renderSkillTree();
 }
 
-// ── branch picker UI ──
-function openBranchPicker() {
-  const path = CLASS_EVOLUTIONS[G.classId] || [];
-  const tier3 = path.filter(e => e.tier === 3);
-  if (tier3.length < 2) return;
-  const [A, B] = tier3;
-  const overlay = document.getElementById('branch-picker-overlay');
-  if (!overlay) return;
-  overlay.innerHTML = `
-    <div class="branch-picker-box">
-      <div class="branch-picker-title">🔱 เลือกเส้นทางวิวัฒนาการ</div>
-      <div class="branch-picker-row">
-        <div class="branch-card" onclick="chooseBranchAndEvolve('A')">
-          <div class="branch-icon">${A.icon}</div>
-          <div class="branch-name" style="color:${A.color}">${A.name}</div>
-          <div class="branch-lore">${A.lore}</div>
-          <div class="branch-bonus">${formatBonuses(A.bonuses)}</div>
-          <div class="branch-weapon">🎁 ${A.rewardWeapon?.name || ''}</div>
-        </div>
-        <div class="branch-vs">VS</div>
-        <div class="branch-card" onclick="chooseBranchAndEvolve('B')">
-          <div class="branch-icon">${B.icon}</div>
-          <div class="branch-name" style="color:${B.color}">${B.name}</div>
-          <div class="branch-lore">${B.lore}</div>
-          <div class="branch-bonus">${formatBonuses(B.bonuses)}</div>
-          <div class="branch-weapon">🎁 ${B.rewardWeapon?.name || ''}</div>
-        </div>
-      </div>
-      <button onclick="closeBranchPicker()" style="margin-top:1rem;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.4rem 1.2rem;border-radius:6px;cursor:pointer">ยกเลิก</button>
-    </div>`;
-  overlay.classList.add('active');
-}
-
-function chooseBranchAndEvolve(branch) {
-  G.classBranch = branch;
-  closeBranchPicker();
-  evolveClass();
-}
-
-function closeBranchPicker() {
-  const overlay = document.getElementById('branch-picker-overlay');
-  if (overlay) overlay.classList.remove('active');
-}
-
+// formatBonuses — used by the Infinity Trial result + evolution UI
 function formatBonuses(b) {
   if (!b) return '';
   let s = [];

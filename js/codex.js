@@ -7,9 +7,61 @@ let _codexZone = 1;
 // ── Collection Log ────────────────────────────────────────────
 
 function renderCodex() {
+  _renderClassCodex();
   _renderCodexZoneTabs();
   _renderCodexContent(_codexZone);
   _renderWeeklyBoss();
+}
+
+// ── Class Evolution Codex — โชว์สายวิวัฒนาการ + Tier ลับ ──
+function _renderClassCodex() {
+  const el = document.getElementById('class-codex');
+  if (!el) return;
+  const path = (typeof CLASS_EVOLUTIONS !== 'undefined') ? CLASS_EVOLUTIONS[G.classId] : null;
+  if (!path) { el.innerHTML = '<div style="color:#888;font-size:.78rem">ยังไม่ได้เลือกคลาส</div>'; return; }
+
+  const curTier   = G.classTier || 1;
+  const curBranch = G.classBranch || null;
+  // names this player has actually been (revealed for sure)
+  const history   = new Set((G.classEvolutionHistory || []).map(e => e.name));
+  const foundSecret = (G.classEvolutionHistory || []).some(e => e.secret);
+
+  // count secret classes discovered across all base classes (persisted flag)
+  const secretFound = G.secretClassesFound || [];
+
+  const cell = (evo) => {
+    if (!evo) return '';
+    const isCur     = (curTier === evo.tier) && ((evo.branch||null) === curBranch || (!evo.branch && curTier === evo.tier));
+    const wasBeen   = history.has(evo.name);
+    // secret cells stay hidden until discovered (this class OR globally seen)
+    const secretHidden = evo.secret && !wasBeen && !secretFound.includes(`${G.classId}_S`);
+    const known = wasBeen || (!evo.secret && (evo.tier <= curTier));
+    const color = evo.color || '#aaa';
+    if (secretHidden) {
+      return `<div class="cc-node cc-secret-locked" title="ปลดล็อกผ่าน Tier ลับใน Infinity Trial">
+        <div class="cc-icon">❓</div><div class="cc-name">Tier ลับ</div></div>`;
+    }
+    return `<div class="cc-node${isCur?' cc-current':''}${evo.secret?' cc-secret':''}${known?'':' cc-unknown'}"
+      title="${(evo.lore||'').replace(/"/g,'')}">
+      <div class="cc-icon" style="${known?`filter:drop-shadow(0 0 6px ${color})`:''}">${known?evo.icon:'🔒'}</div>
+      <div class="cc-name" style="color:${known?color:'#666'}">${known?evo.name:'???'}</div>
+      ${evo.secret?'<div class="cc-tag">★ ลับ</div>':''}
+      ${isCur?'<div class="cc-you">● ตอนนี้</div>':''}
+    </div>`;
+  };
+
+  const t1 = path.find(e=>e.tier===1);
+  const t2 = path.find(e=>e.tier===2);
+  const t3 = ['A','B','S'].map(b => path.find(e=>e.tier===3&&e.branch===b));
+  const t4 = ['A','B','S'].map(b => path.find(e=>e.tier===4&&e.branch===b));
+
+  el.innerHTML = `
+    <div class="cc-row cc-row-single">${cell(t1)}<span class="cc-arrow">→</span>${cell(t2)}</div>
+    <div class="cc-tierlabel">Tier 3 — ตัดสินด้วยการทดสอบนิรันดร์</div>
+    <div class="cc-row">${t3.map(cell).join('')}</div>
+    <div class="cc-tierlabel">Tier 4 — เส้นตรงตามสายที่เลือก</div>
+    <div class="cc-row">${t4.map(cell).join('')}</div>
+    ${foundSecret ? '<div class="cc-secret-banner">🩸 คุณได้ค้นพบ Tier ลับของคลาสนี้แล้ว!</div>' : ''}`;
 }
 
 function _renderCodexZoneTabs() {

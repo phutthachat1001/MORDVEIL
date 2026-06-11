@@ -2691,28 +2691,6 @@ body.preload{visibility:hidden}
 .node-stat-text{font-size:.58rem;color:var(--gold);margin-top:.15rem;opacity:.85}
 .node-branch-tag{position:absolute;top:1px;right:2px;font-size:.55rem;opacity:.7}
 
-/* ===== BRANCH PICKER ===== */
-#branch-picker-overlay.active{display:flex!important}
-.branch-picker-box{
-  background:linear-gradient(180deg,var(--bg2),var(--bg));
-  border:2px solid var(--gold);border-radius:14px;
-  padding:1.5rem;max-width:700px;width:95%;text-align:center;
-  box-shadow:0 0 40px rgba(255,215,0,.2);
-}
-.branch-picker-title{font-family:'Chakra Petch',sans-serif;font-size:1.1rem;color:var(--gold);margin-bottom:1rem}
-.branch-picker-row{display:flex;gap:1rem;align-items:stretch}
-.branch-card{
-  flex:1;background:var(--bg3);border:2px solid var(--border2);border-radius:10px;
-  padding:1rem;cursor:pointer;transition:all .2s;
-}
-.branch-card:hover{border-color:var(--gold);background:rgba(255,215,0,.08);transform:translateY(-2px)}
-.branch-icon{font-size:2rem;margin-bottom:.4rem}
-.branch-name{font-size:.95rem;font-weight:700;margin-bottom:.4rem}
-.branch-lore{font-size:.75rem;color:var(--text2);margin-bottom:.5rem;line-height:1.4}
-.branch-bonus{font-size:.72rem;color:var(--text);margin-bottom:.3rem}
-.branch-weapon{font-size:.72rem;color:var(--gold)}
-.branch-vs{display:flex;align-items:center;font-size:1.2rem;color:var(--text2);font-weight:700;padding:0 .3rem}
-
 /* ===== MODE SELECT ===== */
 #screen-mode{
   flex-direction:column;align-items:center;justify-content:center;
@@ -3044,3 +3022,78 @@ body.preload{visibility:hidden}
   35%{ transform:translate(-50%,-10px) scale(1); }
   100%{ opacity:0; transform:translate(-50%,-48px) scale(1); }
 }
+
+/* ════════════════════════════════════════════════════════════
+   CLASS EVOLUTION CODEX
+   ════════════════════════════════════════════════════════════ */
+.cc-row{ display:flex; gap:.4rem; justify-content:center; margin-bottom:.5rem; }
+.cc-row-single{ align-items:center; }
+.cc-arrow{ color:#666; align-self:center; font-size:1rem; }
+.cc-tierlabel{ font-size:.66rem; color:#888; text-align:center; margin:.5rem 0 .3rem; }
+.cc-node{
+  flex:1; min-width:0; max-width:120px; background:rgba(255,255,255,.04);
+  border:1px solid #2a2a3a; border-radius:8px; padding:.4rem .3rem; text-align:center;
+  position:relative; transition:transform .15s;
+}
+.cc-node:hover{ transform:translateY(-2px); }
+.cc-icon{ font-size:1.5rem; line-height:1.2; }
+.cc-name{ font-size:.6rem; line-height:1.2; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; margin-top:.15rem; }
+.cc-unknown{ opacity:.55; }
+.cc-current{ border-color:var(--gold); background:rgba(255,215,0,.08);
+  box-shadow:0 0 10px rgba(255,215,0,.25); }
+.cc-you{ font-size:.55rem; color:var(--gold); margin-top:.1rem; }
+.cc-tag{ font-size:.5rem; color:#ff00cc; margin-top:.1rem; }
+.cc-secret{ border-color:#aa0066; background:rgba(255,0,204,.07); }
+.cc-secret-locked{
+  flex:1; max-width:120px; background:repeating-linear-gradient(45deg,rgba(80,0,60,.2),rgba(80,0,60,.2) 6px,rgba(40,0,30,.2) 6px,rgba(40,0,30,.2) 12px);
+  border:1px dashed #aa0066; border-radius:8px; padding:.4rem .3rem; text-align:center;
+}
+.cc-secret-locked .cc-icon{ font-size:1.5rem; filter:grayscale(1) opacity(.6); }
+.cc-secret-locked .cc-name{ font-size:.58rem; color:#cc66aa; margin-top:.15rem; }
+.cc-secret-banner{
+  margin-top:.6rem; padding:.4rem; text-align:center; font-size:.74rem; font-weight:700;
+  color:#ff66cc; background:rgba(255,0,204,.1); border:1px solid #aa0066; border-radius:8px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   TUTORIAL / ONBOARDING
+   ════════════════════════════════════════════════════════════ */
+#tutorial-overlay{
+  display:none; position:fixed; inset:0; z-index:900;
+  background:rgba(5,3,12,.86); align-items:center; justify-content:center; padding:1rem;
+}
+#tutorial-overlay.active{ display:flex; }
+.tut-box{
+  position:relative; max-width:440px; width:100%;
+  background:linear-gradient(180deg,#1a1430,#0d0a1a);
+  border:2px solid #6a4aaa; border-radius:16px; padding:1.8rem 1.4rem 1.3rem;
+  text-align:center; box-shadow:0 0 50px rgba(120,70,200,.4);
+  animation:tutIn .3s ease-out;
+}
+@keyframes tutIn{ from{opacity:0;transform:translateY(14px) scale(.96);} to{opacity:1;transform:none;} }
+.tut-skip{
+  position:absolute; top:.6rem; right:.7rem; background:none; border:none;
+  color:#8877aa; font-size:.78rem; cursor:pointer;
+}
+.tut-skip:hover{ color:#fff; }
+.tut-icon{ font-size:3.4rem; line-height:1; margin-bottom:.5rem;
+  filter:drop-shadow(0 0 14px rgba(160,100,255,.6)); }
+.tut-title{ font-size:1.25rem; font-weight:800; color:#cc99ff; margin-bottom:.6rem; }
+.tut-body{ font-size:.9rem; color:#ddd; line-height:1.65; margin-bottom:1rem; }
+.tut-body b{ color:#ffcc66; }
+.tut-dots{ display:flex; gap:.4rem; justify-content:center; margin-bottom:1rem; }
+.tut-dot{ width:8px; height:8px; border-radius:50%; background:#443a66; transition:all .2s; }
+.tut-dot.on{ background:#cc99ff; width:20px; border-radius:4px; }
+.tut-actions{ display:flex; justify-content:space-between; align-items:center; gap:.6rem; }
+.tut-back{
+  background:none; border:1px solid #443a66; color:#aa99cc;
+  padding:.5rem .9rem; border-radius:8px; cursor:pointer; font-size:.85rem;
+}
+.tut-back:hover{ border-color:#6a4aaa; color:#fff; }
+.tut-next{
+  flex:1; background:linear-gradient(90deg,#7a3acc,#aa55ee); color:#fff; border:none;
+  padding:.6rem 1rem; border-radius:8px; cursor:pointer; font-size:.95rem; font-weight:700;
+  box-shadow:0 3px 12px rgba(140,60,220,.5); transition:transform .12s;
+}
+.tut-next:hover{ transform:scale(1.03); }
