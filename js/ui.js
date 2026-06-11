@@ -33,6 +33,17 @@ function updateTopBar() {
     if (weapon) tbWeapon.style.color = RARITIES[weapon.rarity]?.color || 'var(--text)';
     else tbWeapon.style.color = '';
   }
+
+  // mobile stat strip (desktop pills are hidden on phones)
+  const msGold = document.getElementById('ms-gold-val');
+  if (msGold) {
+    msGold.textContent = G.gold.toLocaleString();
+    document.getElementById('ms-atk-val').textContent = totalAtk;
+    document.getElementById('ms-def-val').textContent = totalDef;
+    const msW = document.getElementById('ms-weapon-val');
+    msW.textContent = weapon ? weapon.name : 'ไม่มีอาวุธ';
+    msW.style.color = weapon ? (RARITIES[weapon.rarity]?.color || '') : '';
+  }
 }
 
 function updateCharPanel() {
@@ -233,9 +244,17 @@ function switchMobileTab(tab) {
   if (tab === 'left') {
     const lp = document.getElementById(leftId);
     if (lp) lp.classList.add('mobile-active');
-  } else if (tab === 'battle') {
+  } else if (tab === 'battle' || tab === 'idle') {
+    // IDLE lives inside the battle panel — show it, then scroll the IDLE
+    // panel into view (so the IDLE tab jumps straight to the farm view).
     const bp = document.querySelector('.main-layout .battle-panel');
     if (bp) bp.classList.add('mobile-active');
+    if (tab === 'idle') {
+      requestAnimationFrame(() => {
+        const idle = document.getElementById('idle-panel');
+        if (idle) idle.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      });
+    }
   } else if (tab === 'char') {
     const cp = document.getElementById('panel-char');
     if (cp) cp.classList.add('mobile-active');
@@ -243,7 +262,7 @@ function switchMobileTab(tab) {
 
   // sync bottom nav active state
   document.querySelectorAll('#mobile-nav .mnav-btn').forEach(b => b.classList.remove('active'));
-  const btnMap = { left:'mnav-left', battle:'mnav-battle', char:'mnav-char' };
+  const btnMap = { left:'mnav-left', battle:'mnav-battle', idle:'mnav-idle', char:'mnav-char' };
   const activeBtn = document.getElementById(btnMap[tab]);
   if (activeBtn) activeBtn.classList.add('active');
 

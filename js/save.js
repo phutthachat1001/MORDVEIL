@@ -7,6 +7,7 @@ const SAVE_BACKUP = 'workquest_save_backup';
 
 function saveGame() {
   try {
+    if (G.classId) G.lastSeenTime = Date.now(); // for offline progress
     const data = JSON.stringify(G);
     localStorage.setItem(SAVE_KEY, data);
     localStorage.setItem(SAVE_BACKUP, data);
@@ -42,6 +43,9 @@ function loadGame() {
     // validate ว่าเป็น object จริงและมี classId field
     if (parsed && typeof parsed === 'object') {
       Object.assign(G, parsed);
+      // snapshot for offline progress — saveGame() refreshes G.lastSeenTime
+      // during boot, so keep the original "when did the player leave" aside
+      window._offlineLastSeen = parsed.lastSeenTime || 0;
       // migrate: เซฟเก่าอาจไม่มี equippedSlots
       if (!G.equippedSlots) {
         G.equippedSlots = { weapon:null, helmet:null, armor:null, gloves:null, pants:null, boots:null };

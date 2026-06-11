@@ -1,4 +1,4 @@
-const CACHE = 'mordveil-v34';
+const CACHE = 'mordveil-v36';
 const ASSETS = [
   './Play.html',
   './css/style.css',
@@ -22,6 +22,10 @@ const ASSETS = [
   './js/achievements.js',
   './js/cosmetic.js',
   './js/audio.js',
+  './js/infinity.js',
+  './js/idle-events.js',
+  './js/tutorial.js',
+  './js/offline.js',
   './assets/button/playnext.png',
   './assets/button/newgame.png',
   './assets/effects/slash.png',

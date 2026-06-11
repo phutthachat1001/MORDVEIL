@@ -74,6 +74,39 @@ function equipItemToSlot(item) {
   logBattle(`<span class="log-sys">✅ สวมใส่ ${item.icon||''} ${item.name}${item.attackSpeed ? ` ⚡-${Math.round(item.attackSpeed*100)}%` : ''}!</span>`);
 }
 
+// ---------- auto-equip best gear ----------
+
+// crude power score used to rank items in the same slot
+function _itemPowerScore(item) {
+  return (item.atk || 0) * 2
+       + (item.def || 0) * 1.5
+       + (item.hp  || 0) * 0.3
+       + (item.crit || 0) * 2
+       + (item.attackSpeed || 0) * 100;
+}
+
+// equip the strongest usable item in every slot with one click
+function autoEquipBest() {
+  if (!G.inventory || !G.inventory.length) return;
+  if (!G.equippedSlots) G.equippedSlots = {};
+  let changed = 0;
+  SLOT_SLOTS.forEach(slot => {
+    const candidates = G.inventory.filter(i => (i.slot || 'weapon') === slot && canEquipItem(i));
+    if (!candidates.length) return;
+    const best = candidates.reduce((a, b) => _itemPowerScore(b) > _itemPowerScore(a) ? b : a);
+    if (G.equippedSlots[slot] !== best.uid) {
+      equipItemToSlot(best);
+      changed++;
+    }
+  });
+  if (changed > 0) {
+    logBattle(`<span class="log-exp">⚡ จัดชุดอัตโนมัติ: เปลี่ยนอุปกรณ์ ${changed} ชิ้นเป็นของที่ดีที่สุด!</span>`);
+    if (typeof playSound === 'function') playSound('exp');
+  } else {
+    logBattle('<span class="log-sys">✅ ใส่ของที่ดีที่สุดอยู่แล้วทุกช่อง</span>');
+  }
+}
+
 function unequipSlot(slot) {
   if (!G.equippedSlots) return;
   const uid = G.equippedSlots[slot];
@@ -119,7 +152,7 @@ function generateShopStock() {
   G.shopStock = stock;
   const isNewDay = G.shopStockDate !== today;
   G.shopStockDate = today;
-  if (isNewDay) G.shopFreeRefreshUsed = false;
+  if (isNewDay) { G.shopFreeRefreshUsed = false; G.shopPaidRefreshCount = 0; }
   saveGame();
 }
 
@@ -252,13 +285,15 @@ function renderShopBuy() {
   if (!G.shopStock) { panel.innerHTML = ''; return; }
 
   const today = new Date().toDateString();
-  const canRefresh = !G.shopFreeRefreshUsed || G.shopStockDate !== today;
+  const freeLeft = !G.shopFreeRefreshUsed || G.shopStockDate !== today;
+  const paidCost = _shopPaidRefreshCost();
+  const canPaid  = G.gold >= paidCost;
 
   panel.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;gap:.4rem;flex-wrap:wrap">
       <span style="font-size:.8rem;color:var(--text2)">ร้านรีเฟรชทุกวัน</span>
-      <button class="btn-shop-refresh${canRefresh?'':' disabled'}" onclick="handleShopRefresh()">
-        🔄 รีเฟรชร้าน ${canRefresh ? '(ฟรี)' : '(ใช้แล้ว)'}
+      <button class="btn-shop-refresh${(freeLeft||canPaid)?'':' disabled'}" onclick="handleShopRefresh()">
+        🔄 รีเฟรชร้าน ${freeLeft ? '(ฟรี 1 ครั้ง/วัน)' : `(💰${paidCost.toLocaleString()})`}
       </button>
     </div>
     <div class="shop-buy-grid">
@@ -282,13 +317,34 @@ function renderShopBuy() {
     </div>`;
 }
 
+// paid reroll cost scales with level + how many times rerolled today (gold sink)
+function _shopPaidRefreshCost() {
+  const n = G.shopPaidRefreshCount || 0;
+  return Math.floor((100 + (G.level || 1) * 15) * Math.pow(1.6, n));
+}
+
 function handleShopRefresh() {
   const today = new Date().toDateString();
-  if (G.shopFreeRefreshUsed && G.shopStockDate === today) {
-    logBattle('<span class="log-sys">⚠ ใช้ฟรีรีเฟรชแล้ววันนี้ (รอรีเฟรชอัตโนมัติพรุ่งนี้)</span>');
+  const freeLeft = !G.shopFreeRefreshUsed || G.shopStockDate !== today;
+  if (freeLeft) {
+    refreshShopStock();
     return;
   }
-  refreshShopStock();
+  // paid reroll — repeatable gold sink, price climbs each time today
+  const cost = _shopPaidRefreshCost();
+  if (G.gold < cost) {
+    logBattle(`<span class="log-sys">⚠ รีเฟรชต้องใช้ 💰${cost.toLocaleString()} (ทองไม่พอ)</span>`);
+    return;
+  }
+  G.gold -= cost;
+  G.shopPaidRefreshCount = (G.shopPaidRefreshCount || 0) + 1;
+  G.shopStock = null;
+  generateShopStock();
+  updateTopBar();
+  renderShopBuy();
+  const goldEl = document.getElementById('shop-gold-display');
+  if (goldEl) goldEl.textContent = G.gold;
+  logBattle(`<span class="log-exp">🔄 รีเฟรชร้าน -💰${cost.toLocaleString()} (ครั้งถัดไปแพงขึ้น)</span>`);
 }
 
 function buyShopItem(shopUid) {

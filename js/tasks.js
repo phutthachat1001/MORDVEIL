@@ -74,7 +74,7 @@ function completeTask(id) {
   if (chestType) G.chests[chestType] = (G.chests[chestType] || 0) + 1;
 
   // gold
-  let goldGain = Math.floor(exp * 0.5);
+  let goldGain = Math.floor(exp * 0.3); // ลดจาก 0.5 กันเงินเฟ้อ
   if (cls && cls.bonuses.goldMult) goldGain = Math.floor(goldGain * cls.bonuses.goldMult);
   G.gold += goldGain;
 

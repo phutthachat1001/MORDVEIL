@@ -207,8 +207,8 @@ function _showMonsterDropTooltip(el, m) {
     const lines = [`💎 ดรอปของ 1-2 ชิ้น (100%)`, `ความหายาก: ${rarityNames[r]||r} ขึ้นไป`];
     showDropTooltip(el, lines, '👑 บอส: ดรอปของแน่นอน');
   } else {
-    const baseRate = 0.08 + (zone - 1) * 0.02;
-    const total    = Math.min(0.95, baseRate + dropBonus + (G.dropBonusFromTree || 0));
+    const baseRate = 0.06 + (zone - 1) * 0.015; // sync กับ monsterDie
+    const total    = Math.min(0.30, baseRate + dropBonus + (G.dropBonusFromTree || 0));
     const pctStr   = `${Math.round(total * 100)}%`;
     const rarityLabel = {1:'ธรรมดา-พิเศษ', 2:'พิเศษ-หายาก', 3:'หายาก-ยอดเยี่ยม', 4:'หายาก-ยอดเยี่ยม', 5:'ยอดเยี่ยม-ตำนาน', 6:'ยอดเยี่ยม-โบราณ'}[zone] || '';
     const lines = [`📦 ดรอปโดยตรง (ไม่มีกล่อง)`, `ด่าน ${zone}: ${rarityLabel}`];
@@ -1560,8 +1560,29 @@ function startBattle(monster, isReplay) {
   const spd = (getAttackInterval() / 1000).toFixed(1);
   logBattle(`<span class="log-sys">⚔ ${monsterObj.name}${tierLabel} — HP:${stats.maxHp} ATK:${stats.atk} — คูลดาวน์โจมตี ${spd} วิ</span>`);
 
+  // cinematic boss intro splash
+  if (monsterObj.isBoss) _showBossSplash(monsterObj.name);
+
   // Zone monster = MANUAL fight. Player taps Attack; the button goes on
   // cooldown for getAttackInterval() ms. (IDLE farming is a separate panel.)
+}
+
+// full-screen boss announcement — dark flash + name sweep, auto-dismisses
+function _showBossSplash(name) {
+  let el = document.getElementById('boss-splash');
+  if (el) el.remove();
+  el = document.createElement('div');
+  el.id = 'boss-splash';
+  el.innerHTML = `
+    <div class="boss-splash-inner">
+      <div class="boss-splash-label">⚠ BOSS ⚠</div>
+      <div class="boss-splash-name">${name}</div>
+      <div class="boss-splash-line"></div>
+    </div>`;
+  document.body.appendChild(el);
+  if (typeof playSound === 'function') playSound('event_danger');
+  if (typeof evShakeScreen === 'function') evShakeScreen();
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 450); }, 1700);
 }
 
 function _startAutoIfNeeded() {
@@ -2709,9 +2730,10 @@ function monsterDie() {
     if (Math.random() < 0.5) _dropDirectItem(bossRarity);
   } else {
     // normal monster: lower drop rate than boss (boss = guaranteed)
-    // base drop rate scales with zone (8% → 18%), bonus from class + tree
-    const baseRate = 0.08 + (G.currentZone - 1) * 0.02;
-    const dropRate = baseRate + dropBonus + (G.dropBonusFromTree || 0);
+    // base drop rate scales with zone (6% → 13.5%), bonus from class + tree
+    // capped at 30% so drops stay exciting, not routine
+    const baseRate = 0.06 + (G.currentZone - 1) * 0.015;
+    const dropRate = Math.min(0.30, baseRate + dropBonus + (G.dropBonusFromTree || 0));
     if (Math.random() < dropRate) {
       const rarity = _dropRarityForZone(G.currentZone, false, monster.tier);
       _dropDirectItem(rarity);
@@ -2719,7 +2741,7 @@ function monsterDie() {
   }
 
   // Gold: boss = atk × 3 (baseline); normal = 35% of that ≈ atk × 1.05
-  let goldGain = Math.floor(stats.atk * 3 * rewardMult);
+  let goldGain = Math.floor(stats.atk * 1.5 * rewardMult); // ลดจาก ×3 กันเงินเฟ้อ
   if (cls && cls.bonuses.goldMult) goldGain = Math.floor(goldGain * cls.bonuses.goldMult);
   if ((G.goldBonusFromTree || 0) > 0) goldGain = Math.floor(goldGain * (1 + G.goldBonusFromTree));
   goldGain = Math.max(1, goldGain);

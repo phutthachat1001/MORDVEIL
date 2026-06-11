@@ -59,7 +59,7 @@ function _spawnIdleBoss() {
   const base = pool[Math.floor(Math.random() * pool.length)] || { name:'มอน', tier:1, zone:1 };
   const full = getMonsterStats(base.zone, Math.min(6, (base.tier||1)+2), true);
   const hp = Math.max(50, Math.floor(full.maxHp * IDLE_HP_MULT * IDLE_ENC.bossHpMult));
-  const bountyGold = Math.floor(full.atk * 12) + 200;
+  const bountyGold = Math.floor(full.atk * 6) + 100; // ลดครึ่งกันเงินเฟ้อ
 
   const boss = {
     name: '👑 ' + (base.name || 'จอมมอน') + ' (บอสลับ)',
@@ -89,7 +89,7 @@ function _spawnIdleRaider() {
   const curZone = G.currentZone || 1;
   const full = getMonsterStats(curZone, 4, false);
   const hp = Math.max(40, Math.floor(full.maxHp * IDLE_HP_MULT * IDLE_ENC.raiderHpMult));
-  const lootGold = Math.floor(full.atk * 8) + 120;
+  const lootGold = Math.floor(full.atk * 4) + 60; // ลดครึ่งกันเงินเฟ้อ
 
   const raider = {
     name: `🗡️ ${name} (Lv.${G.level + (tier-2)})`,
@@ -215,7 +215,7 @@ function _tickCombo() {
 
   // milestones → reward + flashy popup
   if (_idleComboCount > 0 && _idleComboCount % 10 === 0) {
-    const bonusGold = _idleComboCount * 5;
+    const bonusGold = _idleComboCount * 2; // ลดจาก ×5
     G.gold += bonusGold;
     const mult = 1 + Math.floor(_idleComboCount / 10) * 0.1;
     logBattle(`<span class="log-exp">🔥 COMBO ×${_idleComboCount}! +${bonusGold} ทองโบนัส (EXP×${mult.toFixed(1)})</span>`);

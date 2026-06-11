@@ -41,7 +41,7 @@ const HUB_NPCS = [
     actions: () => {
       const maxHp = G.maxHp + (typeof getEquippedStatBonus === 'function' ? (getEquippedStatBonus().hp || 0) : 0);
       const missing = maxHp - G.hp;
-      const healCost = Math.max(0, Math.floor(missing * 2));
+      const healCost = Math.max(0, Math.floor(missing * 3)); // แพงขึ้น — ตายมีราคา (gold sink)
       const freeHeal = Math.floor(maxHp * 0.2);
       const canFreeHeal = !G.hubFreeHealUsed || G.hubFreeHealDate !== new Date().toDateString();
       const acts = [];

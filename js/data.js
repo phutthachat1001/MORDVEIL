@@ -337,7 +337,9 @@ const SLOT_META = {
 };
 
 // ราคาซื้อ/ขาย ตาม rarity
-const SHOP_SELL_PRICE = {common:30,uncommon:100,rare:400,epic:1200,legend:4000,ancient:12000,mythic:40000};
+// ขาย ≈ 5-8% ของราคาซื้อ — กันเงินเฟ้อจากการฟาร์มของมาขาย
+// อยากได้ของร้านต้องเก็บเงินจริงจัง (ทำให้เกมท้าทาย+มีเป้าหมาย)
+const SHOP_SELL_PRICE = {common:10,uncommon:40,rare:150,epic:500,legend:1500,ancient:5000,mythic:15000};
 const SHOP_BUY_PRICE  = {common:200,uncommon:600,rare:2000,epic:6000,legend:20000,ancient:60000,mythic:200000};
 
 // Class hierarchy — tier สูงกว่า inherit สิทธิ์ tier ต่ำ
@@ -391,7 +393,13 @@ const ACHIEVEMENTS = [
   {id:'trial_done',  name:'ผู้ผ่านการทดสอบ',  desc:'จบการทดสอบนิรันดร์ครั้งแรก', icon:'♾️', check:s=>(s.classTier||1)>=3},
   {id:'tier4',       name:'ร่างสูงสุด',        desc:'วิวัฒนาการถึง Tier 4',      icon:'🌌', check:s=>(s.classTier||1)>=4},
   {id:'secret_class',name:'ผู้ค้นพบความลับ',   desc:'ปลดล็อกคลาส Tier ลับ',     icon:'🩸', check:s=>(s.classEvolutionHistory||[]).some(e=>e.secret)},
-  {id:'secret_max',  name:'ตำนานที่ไม่ควรมีอยู่',desc:'ไปถึง Tier 4 สายลับ',     icon:'💮', check:s=>s.classBranch==='S'&&(s.classTier||1)>=4}
+  {id:'secret_max',  name:'ตำนานที่ไม่ควรมีอยู่',desc:'ไปถึง Tier 4 สายลับ',     icon:'💮', check:s=>s.classBranch==='S'&&(s.classTier||1)>=4},
+  // ── IDLE FARM achievements (แยกหมวด — นับเฉพาะการฟาร์มอัตโนมัติ) ──
+  {id:'idle_first', cat:'idle', name:'เริ่มฟาร์ม',      desc:'ฟาร์ม IDLE สังหารตัวแรก',     icon:'🌙', check:s=>(s.idleKills||0)>=1},
+  {id:'idle_100',   cat:'idle', name:'นักฟาร์ม',        desc:'ฟาร์ม IDLE ครบ 100 ตัว',       icon:'🌾', check:s=>(s.idleKills||0)>=100},
+  {id:'idle_1000',  cat:'idle', name:'เครื่องจักรฟาร์ม',desc:'ฟาร์ม IDLE ครบ 1,000 ตัว',    icon:'⚙️', check:s=>(s.idleKills||0)>=1000},
+  {id:'idle_5000',  cat:'idle', name:'เจ้าแห่ง IDLE',   desc:'ฟาร์ม IDLE ครบ 5,000 ตัว',    icon:'🏭', check:s=>(s.idleKills||0)>=5000},
+  {id:'idle_10000', cat:'idle', name:'ตำนานสายฟาร์ม',   desc:'ฟาร์ม IDLE ครบ 10,000 ตัว',   icon:'💫', check:s=>(s.idleKills||0)>=10000}
 ];
 
 const DAILY_QUEST_POOL = [

@@ -242,7 +242,6 @@
     <button onclick="showAchievements()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">ความสำเร็จ</button>
     <button onclick="replayTutorial()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">❔ วิธีเล่น</button>
     <button class="btn-mute" onclick="toggleMute()" title="ปิดเสียง" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .5rem;border-radius:4px;cursor:pointer;font-size:.9rem">🔊</button>
-    <span style="display:none"><span id="chest-count-display">0</span><span id="inv-count">0</span><span id="inv-full-badge"></span></span>
     <button onclick="openShop()" style="background:linear-gradient(135deg,#1a2a40,#0f1a2e);border:2px solid var(--gold);color:var(--gold);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🏪 ร้านค้า</button>
     <button id="btn-manualsave" onclick="manualSave()" style="background:linear-gradient(135deg,#1a3a1a,#0f2e0f);border:2px solid #4caf50;color:#7dff7d;padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">💾 เซฟ</button>
     <button class="btn-newgame" onclick="confirmNewGame()">🔄 เริ่มใหม่</button>
@@ -256,6 +255,14 @@
 
   <!-- EVENT: active buffs row (desktop only) -->
   <div id="ev-active-buffs" style="display:flex;flex-wrap:wrap;gap:.3rem;padding:.3rem 1rem;min-height:28px" class="desktop-only"></div>
+
+  <!-- MOBILE STAT STRIP — ทอง/ATK/DEF/อาวุธ (desktop pills ถูกซ่อนบนมือถือ) -->
+  <div id="mob-stat-strip">
+    <span class="ms-gold">💰 <span id="ms-gold-val">0</span></span>
+    <span class="ms-atk">⚔ <span id="ms-atk-val">10</span></span>
+    <span class="ms-def">🛡 <span id="ms-def-val">5</span></span>
+    <span class="ms-weapon">🗡 <span id="ms-weapon-val">ไม่มีอาวุธ</span></span>
+  </div>
 
   <!-- MOBILE ACTION BAR (ปุ่มที่ซ่อนจาก topbar) -->
   <div id="mobile-action-bar">
@@ -555,6 +562,9 @@
     <button class="mnav-btn"        id="mnav-battle" onclick="switchMobileTab('battle')">
       <span class="mnav-icon">⚔</span><span>สนามรบ</span>
     </button>
+    <button class="mnav-btn"        id="mnav-idle"   onclick="switchMobileTab('idle')">
+      <span class="mnav-icon">🌙</span><span>IDLE</span>
+    </button>
     <button class="mnav-btn"        id="mnav-char"   onclick="switchMobileTab('char')">
       <span class="mnav-icon">👤</span><span>ตัวละคร</span>
     </button>
@@ -578,6 +588,7 @@
           📦 <span id="chest-count-display">0</span>
         </span>
       </span>
+      <button class="btn-auto-equip" onclick="autoEquipBest()" title="สวมของที่ดีที่สุดทุกช่องอัตโนมัติ">⚡ จัดชุด</button>
       <button class="inv-popup-close" onclick="closeInventoryPopup()">✕</button>
     </div>
     <div class="inv-popup-body">
@@ -656,6 +667,20 @@
         <button class="btn-close-modal" onclick="closeChestModal()">เก็บลงกระเป๋า</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ===== OFFLINE PROGRESS (welcome back) OVERLAY ===== -->
+<div class="offline-overlay" id="offline-overlay">
+  <div class="offline-modal">
+    <div class="offline-moon">🌙</div>
+    <div class="offline-title">ยินดีต้อนรับกลับ!</div>
+    <div class="offline-sub">ฮีโร่ของคุณฟาร์มต่อระหว่างที่คุณไม่อยู่</div>
+    <div class="offline-time-row">⏰ หายไป <b id="offline-time"></b>
+      <span id="offline-capped" style="display:none;color:var(--orange);font-size:.75rem">(นับสูงสุด 8 ชม.)</span>
+    </div>
+    <div class="offline-rewards" id="offline-rewards"></div>
+    <button class="offline-claim" onclick="claimOfflineRewards()">🎁 รับรางวัล</button>
   </div>
 </div>
 
@@ -842,6 +867,7 @@
 <script src="js/npc-encounter.js"></script>
 <script src="js/battle.js"></script>
 <script src="js/idle.js"></script>
+<script src="js/offline.js"></script>
 <script src="js/idle-events.js"></script>
 <script src="js/codex.js"></script>
 <script src="js/tasks.js"></script>

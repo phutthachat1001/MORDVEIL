@@ -1320,7 +1320,7 @@ body.preload{visibility:hidden}
 .drop-tooltip-note{font-size:.72rem;color:var(--text2);margin-top:.4rem;border-top:1px solid var(--border);padding-top:.35rem}
 
 /* ITEM TOOLTIP */
-.tooltip-overlay{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;background:#00000066}
+.tooltip-overlay{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;background:#00000066}
 .tooltip-overlay.active{display:flex}
 .tooltip-box{background:var(--bg2);border:2px solid var(--border2);border-radius:12px;padding:1.5rem;max-width:320px;width:90%}
 .tooltip-name{font-family:'Chakra Petch',sans-serif;font-size:1.2rem;margin-bottom:.3rem}
@@ -1339,6 +1339,15 @@ body.preload{visibility:hidden}
 .ach-icon{font-size:1.2rem;margin-right:.4rem}
 .ach-name{font-weight:600;color:var(--text)}
 .ach-desc{color:var(--text2);font-size:.75rem}
+.ach-group-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:.5rem;padding:.3rem .6rem .25rem;
+  font-family:'Chakra Petch',sans-serif;font-size:.82rem;font-weight:700;
+  color:var(--gold);letter-spacing:.5px;
+  border-bottom:1px solid var(--border2);
+}
+.ach-group-header:first-child{margin-top:0}
+.ach-group-count{color:var(--text2);font-size:.72rem;font-weight:600}
 
 .tabs{display:flex;gap:.3rem;padding:.4rem;background:var(--bg3)}
 .tab{background:var(--bg4);border:1px solid var(--border);color:var(--text2);padding:.3rem .7rem;border-radius:6px;cursor:pointer;font-size:.8rem}
@@ -1498,6 +1507,9 @@ body.preload{visibility:hidden}
 #mobile-nav .mnav-btn.active { color: var(--gold); background: rgba(255,215,0,.07); }
 #mobile-nav .mnav-btn:active { background: rgba(255,255,255,.06); }
 
+/* ── Mobile stat strip (ทอง/ATK/DEF — มือถือเท่านั้น) ── */
+#mob-stat-strip { display: none; }
+
 /* ── Mobile Action Bar (ใต้ topbar) ── */
 #mobile-action-bar {
   display: none;
@@ -1555,7 +1567,7 @@ body.preload{visibility:hidden}
   .main-layout {
     grid-template-columns: 1fr !important;
     grid-template-rows: 1fr !important;
-    height: calc(100dvh - 44px - 40px - 58px); /* topbar + action-bar + bottom-nav */
+    height: calc(100dvh - 44px - 24px - 40px - 58px); /* topbar + stat-strip + action-bar + bottom-nav */
     overflow: hidden;
   }
 
@@ -1599,7 +1611,7 @@ body.preload{visibility:hidden}
 
   /* quest panel pane heights */
   #rpq-pane-main,
-  #rpq-pane-daily { max-height: calc(100dvh - 44px - 40px - 58px - 90px) !important; }
+  #rpq-pane-daily { max-height: calc(100dvh - 44px - 24px - 40px - 58px - 90px) !important; }
 
   /* skill bar bigger tap targets */
   .skill-btn { min-width: 64px; font-size: .68rem; min-height: 50px; }
@@ -1710,6 +1722,38 @@ body.preload{visibility:hidden}
   /* NPC encounter — bottom sheet on mobile */
   #npc-encounter-overlay { padding-bottom: 68px; }
   #npc-encounter-box { border-radius: 12px 12px 0 0; }
+
+  /* ── IDLE panel on mobile ──
+     The IDLE panel lives at the bottom of the scrollable battle-arena.
+     On phones it was easy to miss (large 240px stage pushed below the fold),
+     so: shrink the stage, mark it clearly, and add bottom spacing so it can
+     scroll fully into view above the bottom nav. */
+  #idle-panel {
+    margin-top: .5rem;
+    margin-bottom: 1rem;        /* breathing room above the nav when scrolled */
+    border-color: #3a4a6a;
+    box-shadow: 0 0 0 1px rgba(120,160,220,.12), 0 -2px 12px rgba(0,0,0,.4);
+    scroll-margin-bottom: 64px; /* scrollIntoView lands it above the nav */
+  }
+  #idle-panel-header {
+    position: sticky;            /* header stays visible while stage scrolls */
+    top: 0;
+    z-index: 2;
+    font-size: .72rem;
+    padding: .4rem .6rem;
+    gap: .2rem .6rem;
+  }
+  #idle-panel-header > span:first-child { width: 100%; color: #9fc0ee; }
+  #idle-stage {
+    min-height: 150px;          /* was 240px — fits a phone without scrolling past */
+    padding: .9rem .8rem;
+    gap: .5rem;
+  }
+  /* keep the fighters from overflowing the tighter stage */
+  #idle-stage .idle-hero-sprite img,
+  #idle-stage .idle-hero-sprite svg,
+  #idle-stage .idle-mob-sprite img,
+  #idle-stage .idle-mob-sprite svg { width: 56px !important; height: 56px !important; }
 }
 
 /* ============================================================
@@ -3101,3 +3145,122 @@ body.preload{visibility:hidden}
 /* mute toggle */
 .btn-mute{ transition:opacity .15s; }
 .btn-mute.muted{ opacity:.55; filter:grayscale(.6); }
+
+/* ════════════════ BOSS SPLASH — ฉากเปิดตัวบอส ════════════════ */
+#boss-splash{
+  position:fixed;inset:0;z-index:800;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center, rgba(60,0,0,.55) 0%, rgba(0,0,0,.82) 75%);
+  animation:bossSplashIn .35s ease;
+}
+#boss-splash.out{animation:bossSplashOut .45s ease forwards}
+@keyframes bossSplashIn{from{opacity:0}to{opacity:1}}
+@keyframes bossSplashOut{from{opacity:1}to{opacity:0}}
+.boss-splash-inner{text-align:center;font-family:'Chakra Petch',sans-serif}
+.boss-splash-label{
+  color:#ff5544;font-size:1rem;letter-spacing:10px;font-weight:700;
+  text-shadow:0 0 18px #ff220088;
+  animation:bossLabelPulse .9s ease-in-out infinite;
+}
+@keyframes bossLabelPulse{0%,100%{opacity:.75}50%{opacity:1}}
+.boss-splash-name{
+  color:#ffe9d0;font-size:2.1rem;font-weight:800;letter-spacing:3px;
+  margin:.4rem 0 .55rem;
+  text-shadow:0 0 30px #ff663366, 0 3px 6px #000;
+  animation:bossNameZoom .5s cubic-bezier(.18,.89,.32,1.28);
+}
+@keyframes bossNameZoom{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
+.boss-splash-line{
+  height:2px;width:0;margin:0 auto;
+  background:linear-gradient(90deg,transparent,#ff6644,transparent);
+  animation:bossLineGrow .7s ease forwards .2s;
+}
+@keyframes bossLineGrow{to{width:min(420px,80vw)}}
+
+/* ── auto-equip button in bag header ── */
+.btn-auto-equip{
+  background:linear-gradient(135deg,#3a2c08,#241c06);
+  border:1px solid #e8b860;color:#ffd980;
+  padding:.25rem .7rem;border-radius:6px;cursor:pointer;
+  font-size:.78rem;font-weight:700;font-family:'Sarabun',sans-serif;
+  margin-left:auto;margin-right:.5rem;
+  transition:box-shadow .2s, transform .12s;
+}
+.btn-auto-equip:hover{box-shadow:0 0 12px #e8b86055;transform:translateY(-1px)}
+
+/* ════════════════ MOBILE UI PASS ════════════════ */
+@media(max-width:700px){
+  /* gold + key stats readout (desktop pills are hidden on mobile) */
+  #mob-stat-strip{
+    display:flex;align-items:center;gap:.7rem;
+    padding:.22rem .6rem;font-size:.72rem;font-weight:700;
+    background:linear-gradient(180deg,#14141f,#0e0e16);
+    border-bottom:1px solid var(--border);
+    color:var(--text2);white-space:nowrap;overflow-x:auto;
+  }
+  #mob-stat-strip .ms-gold{color:var(--gold)}
+  #mob-stat-strip .ms-atk{color:#ff9c7c}
+  #mob-stat-strip .ms-def{color:#8fb6ff}
+  #mob-stat-strip .ms-weapon{color:var(--uncommon);overflow:hidden;text-overflow:ellipsis;max-width:38vw}
+
+  /* bottom nav: respect notch / home-indicator phones */
+  #mobile-nav{padding-bottom:env(safe-area-inset-bottom,0)}
+
+  /* item tooltip: bigger tap targets + near-bottom placement */
+  .tooltip-box{width:min(94vw,360px)}
+  .tooltip-actions button{padding:.6rem .9rem;font-size:.9rem}
+
+  /* bag popup: taller on phones, bigger cells */
+  .inv-popup-box{width:min(96vw,460px);max-height:88dvh}
+  .inv-bag-grid{grid-template-columns:repeat(4,1fr);gap:6px}
+
+  /* boss splash scales down */
+  .boss-splash-name{font-size:1.45rem}
+  .boss-splash-label{font-size:.82rem;letter-spacing:6px}
+
+  /* shop: full-width friendly */
+  .shop-buy-grid{grid-template-columns:repeat(2,1fr) !important;gap:.45rem}
+
+  /* battle action buttons: thumb-sized */
+  #rpg-cmd-menu .rpg-cmd-btn{min-height:52px}
+}
+
+/* ════════════════ OFFLINE PROGRESS — welcome back ════════════════ */
+.offline-overlay{
+  position:fixed;inset:0;z-index:700;display:none;
+  align-items:center;justify-content:center;background:#000000cc;
+}
+.offline-overlay.active{display:flex}
+.offline-modal{
+  width:min(94vw,360px);text-align:center;
+  background:linear-gradient(170deg,#101830,#0a0a14 70%);
+  border:2px solid #3a5a9a;border-radius:16px;padding:1.6rem 1.4rem 1.3rem;
+  box-shadow:0 0 60px #3a5a9a66, inset 0 0 50px #00000088;
+  font-family:'Sarabun',sans-serif;
+  animation:offlinePopIn .35s ease;
+}
+@keyframes offlinePopIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.offline-moon{font-size:2.6rem;animation:offlineFloat 3s ease-in-out infinite}
+@keyframes offlineFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.offline-title{
+  font-family:'Chakra Petch',sans-serif;color:#88bbff;font-size:1.25rem;
+  font-weight:700;margin:.3rem 0 .15rem;letter-spacing:1px;
+}
+.offline-sub{color:var(--text2);font-size:.82rem;margin-bottom:.8rem}
+.offline-time-row{font-size:.9rem;color:var(--text);margin-bottom:.8rem}
+.offline-time-row b{color:#88bbff}
+.offline-rewards{
+  background:#00000055;border:1px solid #2a3a5a;border-radius:10px;
+  padding:.7rem 1rem;margin-bottom:1rem;
+}
+.offline-reward-row{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.9rem;padding:.22rem 0;color:var(--text2);
+}
+.offline-reward-row b{font-size:.95rem;color:var(--text)}
+.offline-claim{
+  background:linear-gradient(135deg,#1a3a6a,#102448);border:2px solid #5588dd;color:#aaccff;
+  padding:.55rem 2rem;border-radius:10px;cursor:pointer;font-size:1rem;font-weight:700;
+  font-family:'Sarabun',sans-serif;transition:transform .12s, box-shadow .2s;
+}
+.offline-claim:hover{transform:translateY(-1px);box-shadow:0 0 20px #5588dd88}

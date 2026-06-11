@@ -41,6 +41,7 @@ function continueGame() {
       if (typeof startEventTimers        === 'function') startEventTimers();
       if (typeof renderActiveBuffs       === 'function') renderActiveBuffs();
       if (typeof checkStreakEvents       === 'function') checkStreakEvents();
+      if (typeof checkOfflineProgress    === 'function') checkOfflineProgress();
     });
   } else {
     showClassSelect();

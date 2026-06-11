@@ -380,15 +380,18 @@ function _idleMobDie(idx, mob) {
   expGain = Math.max(1, Math.floor(expGain * expBoostMult * comboMult * (1 + (G.expBonusFromTree || 0))));
   if (mob.special) expGain = Math.floor(expGain * 3);  // bonus EXP for special kills
 
-  let goldGain = Math.max(1, Math.floor(full.atk * 3 * IDLE_REWARD_MULT));
+  let goldGain = Math.max(1, Math.floor(full.atk * 1.2 * IDLE_REWARD_MULT)); // IDLE = ฟรี/อัตโนมัติ ทองต้องน้อยกว่าสู้เอง
   const clsB = (typeof CLASSES !== 'undefined') ? CLASSES.find(c => c.id === G.classId) : null;
   if (clsB && clsB.bonuses && clsB.bonuses.goldMult) goldGain = Math.floor(goldGain * clsB.bonuses.goldMult);
   if ((G.goldBonusFromTree || 0) > 0) goldGain = Math.floor(goldGain * (1 + G.goldBonusFromTree));
 
   G.gold += goldGain;
-  G.totalKills = (G.totalKills || 0) + 1;
+  // IDLE kills are tracked separately — they do NOT count toward
+  // achievements / evolution quests (those are for manual zone fights only).
+  G.idleKills = (G.idleKills || 0) + 1;
   _idleSessionKills++;
   if (typeof giveExp === 'function') giveExp(expGain);
+  if (typeof checkAchievements === 'function') checkAchievements('idle');
 
   // track for per-minute rate
   _idleRewardLog.push({ t: performance.now(), exp: expGain, gold: goldGain });
@@ -397,8 +400,9 @@ function _idleMobDie(idx, mob) {
 
   // item drop (lower rate than zone monster) — floats above head
   const dropBonus = clsB && clsB.bonuses && clsB.bonuses.dropBonus ? clsB.bonuses.dropBonus : 0;
-  const baseRate = 0.06 + ((mob.zone || 1) - 1) * 0.015;
-  let dropRate = baseRate + dropBonus + (G.dropBonusFromTree || 0);
+  // IDLE ดรอปน้อยกว่าสู้เอง — ฟาร์มฟรีต้องไม่ล้นกระเป๋า (cap 18%)
+  const baseRate = 0.04 + ((mob.zone || 1) - 1) * 0.01;
+  let dropRate = Math.min(0.18, baseRate + dropBonus + (G.dropBonusFromTree || 0));
   if (mob.special) dropRate = 1;   // special kills always drop loot
   if (Math.random() < dropRate) {
     const dropped = _idleDropItem(mob.zone, mob.special === 'boss' ? 6 : mob.tier);

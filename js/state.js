@@ -21,8 +21,9 @@ let G = {
   currentMonster: null,
   defeatedMonsters: {},
   totalTasks: 0,
-  totalKills: 0,
+  totalKills: 0,   // manual zone-fight kills (drives achievements/evo quests)
   bossKills: 0,
+  idleKills: 0,    // IDLE-farm kills (separate, no achievement credit)
   totalExpGained: 0,
   streak: 0,
   maxStreak: 0,
