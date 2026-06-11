@@ -815,6 +815,11 @@
 <!-- ===== BRANCH PICKER OVERLAY ===== -->
 <div id="branch-picker-overlay" style="display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.85);align-items:center;justify-content:center;flex-direction:column"></div>
 
+<!-- ===== INFINITY TRIAL OVERLAY ===== -->
+<div id="infinity-overlay" style="display:none;position:fixed;inset:0;z-index:810;background:radial-gradient(circle at 50% 30%,#1a0524,#05000a 70%);align-items:center;justify-content:center;flex-direction:column">
+  <div id="infinity-stage" class="infinity-stage"></div>
+</div>
+
 <!-- ===== SCRIPTS (โหลดตามลำดับ dependency) ===== -->
 <script src="js/data.js"></script>
 <script src="js/state.js"></script>
@@ -823,6 +828,7 @@
 <script src="js/achievements.js"></script>
 <script src="js/daily.js"></script>
 <script src="js/evolution.js"></script>
+<script src="js/infinity.js"></script>
 <script src="js/skilltree.js"></script>
 <script src="js/exp.js"></script>
 <script src="js/shop.js"></script>
@@ -833,6 +839,7 @@
 <script src="js/npc-encounter.js"></script>
 <script src="js/battle.js"></script>
 <script src="js/idle.js"></script>
+<script src="js/idle-events.js"></script>
 <script src="js/codex.js"></script>
 <script src="js/tasks.js"></script>
 <script src="js/hub.js"></script>

@@ -137,23 +137,31 @@ function getNextEvolution() {
 }
 
 // ── override evolveClass to give weapon reward ──
-function evolveClass() {
-  const next = getNextEvolution();
+// `forced` lets the Infinity Trial push a specific Tier-3 evolution (incl. the
+// secret branch) without going through the level/quest condition gate.
+function evolveClass(forced) {
+  const next = forced || getNextEvolution();
   if (!next) {
-    // tier 3 และยังไม่เลือก branch → เปิด branch picker
-    if ((G.classTier || 1) === 2) { openBranchPicker(); return; }
+    // Tier 2 → Tier 3 is decided by the Infinity Trial, not a free pick.
+    if ((G.classTier || 1) === 2 && typeof openInfinityTrial === 'function') { openInfinityTrial(); return; }
     return;
   }
-  if (!canEvolve()) return;
+  if (!forced && !canEvolve()) return;
 
-  const oldTier = G.classTier;
   G.classTier   = next.tier;
-  G.classEvolutionHistory.push({ tier:next.tier, name:next.name, level:G.level, branch: next.branch||null });
+  if (next.branch) G.classBranch = next.branch;
+  G.classEvolutionHistory.push({ tier:next.tier, name:next.name, level:G.level, branch: next.branch||null, secret:!!next.secret });
 
   const b = next.bonuses || {};
   if (b.hpMult)  { G.maxHp  = Math.floor(G.maxHp  * b.hpMult);  G.hp = G.maxHp; }
   if (b.atkMult) G.baseAtk = Math.floor(G.baseAtk * b.atkMult);
   if (b.defMult) G.baseDef = Math.floor(G.baseDef * b.defMult);
+  // persistent combat traits granted by evolutions (esp. secret tiers)
+  if (b.critBonus)       G.critBonusFromTree  = (G.critBonusFromTree || 0) + b.critBonus;
+  if (b.lifesteal)       G.lifestealBonus     = (G.lifestealBonus    || 0) + b.lifesteal;
+  if (b.doubleStrike)    G.doubleStrikeChance = Math.max(G.doubleStrikeChance || 0, b.doubleStrike);
+  if (b.damageReduction) G.damageReduction    = Math.max(G.damageReduction || 0, b.damageReduction);
+  if (b.reviveOnce)      G.hasRevive = true;
 
   // weapon reward
   if (next.rewardWeapon) {
@@ -163,7 +171,9 @@ function evolveClass() {
     logBattle(`<span class="log-exp">🎁 รับอาวุธพิเศษ: ${w.icon} ${w.name}!</span>`);
   }
 
-  logBattle(`<span class="log-exp">✨ วิวัฒนาการ! ${next.icon} คุณกลายเป็น "${next.name}" (Tier ${next.tier})!</span>`);
+  const tag = next.secret ? '<span style="color:#ff00cc">★ TIER ลับ ★</span> ' : '';
+  logBattle(`<span class="log-exp">✨ วิวัฒนาการ! ${tag}${next.icon} คุณกลายเป็น "${next.name}" (Tier ${next.tier})!</span>`);
+  if (typeof rpgOnEvolution === 'function') rpgOnEvolution(next.tier);
   showEvolutionModal(next);
   checkAchievements();
   saveGame();
@@ -228,6 +238,12 @@ function formatBonuses(b) {
   if (b.regenMult) s.push(`💚 Regen ×${b.regenMult}`);
   if (b.streakMult)s.push(`🔥 Streak ×${b.streakMult}`);
   if (b.damageReduction) s.push(`🛡 รับดาเมจ -${Math.floor(b.damageReduction*100)}%`);
+  if (b.lifesteal)    s.push(`🩸 ดูดเลือด ${Math.floor(b.lifesteal*100)}%`);
+  if (b.doubleStrike) s.push(`⚡ โจมตีซ้ำ ${Math.floor(b.doubleStrike*100)}%`);
+  if (b.reviveOnce)   s.push(`🕊️ ฟื้นชีพ 1 ครั้ง/run`);
+  if (b.spellEcho)    s.push(`🔮 เวทสะท้อน ${Math.floor(b.spellEcho*100)}%`);
+  if (b.pierce)       s.push(`🎯 ทะลุเกราะ ${Math.floor(b.pierce*100)}%`);
+  if (b.multiShot)    s.push(`🏹 ยิงพร้อม ${b.multiShot}`);
   return s.join(' &nbsp;');
 }
 

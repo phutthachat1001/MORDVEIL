@@ -81,7 +81,12 @@ let G = {
   // Skill Tree
   skillTreePoints: 0,
   skillTreeSpent: {},      // nodeId -> true
-  classBranch: null,       // 'A' or 'B' — chosen at tier 3
+  classBranch: null,       // 'A','B','S' — decided by the Infinity Trial at tier 3
+  // Persistent combat traits granted by evolutions (esp. secret tiers)
+  lifestealBonus: 0,       // % of damage healed back
+  doubleStrikeChance: 0,   // chance for an extra hit
+  damageReduction: 0,      // % incoming damage reduced
+  hasRevive: false,        // revive once per Infinity Trial run (secret paladin)
   unlockedSkills: [],      // skill ids unlocked via skill tree
   equippedSkills: [],      // skill ids currently equipped (max 4)
   critBonusFromTree: 0,

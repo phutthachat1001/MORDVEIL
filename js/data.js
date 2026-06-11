@@ -337,8 +337,8 @@ const SLOT_META = {
 };
 
 // ราคาซื้อ/ขาย ตาม rarity
-const SHOP_SELL_PRICE = {common:30,uncommon:100,rare:400,epic:1200,legend:4000,ancient:12000};
-const SHOP_BUY_PRICE  = {common:200,uncommon:600,rare:2000,epic:6000,legend:20000,ancient:60000};
+const SHOP_SELL_PRICE = {common:30,uncommon:100,rare:400,epic:1200,legend:4000,ancient:12000,mythic:40000};
+const SHOP_BUY_PRICE  = {common:200,uncommon:600,rare:2000,epic:6000,legend:20000,ancient:60000,mythic:200000};
 
 // Class hierarchy — tier สูงกว่า inherit สิทธิ์ tier ต่ำ
 const CLASS_HIERARCHY = {
@@ -355,7 +355,8 @@ const RARITIES = {
   rare:    {label:'หายาก',   color:'var(--rare)',    bg:'#0d0d1a'},
   epic:    {label:'มหากาพย์',color:'var(--epic)',    bg:'#1a0d1a'},
   legend:  {label:'ตำนาน',   color:'var(--legend)',  bg:'#1a0d00'},
-  ancient: {label:'โบราณ',   color:'#ff4400',        bg:'#1a0500'}
+  ancient: {label:'โบราณ',   color:'#ff4400',        bg:'#1a0500'},
+  mythic:  {label:'เทพนิยาย',color:'#ff00cc',        bg:'#1a0014'}
 };
 
 const CHEST_TABLES = {
@@ -444,7 +445,16 @@ const CLASS_EVOLUTIONS = {
      lore:'ผู้ที่ยืนหยัดสุดท้าย ไม่มีอะไรทะลุผ่านได้',
      conditions:{level:80,tasks:60,evoQuest:'warrior_4B'},
      bonuses:{hpMult:2.0,defMult:1.8,damageReduction:0.2},
-     rewardWeapon:{name:'โล่ศักดิ์สิทธิ์นิรันดร์',icon:'🏰',slot:'armor',rarity:'legend',atk:20,def:60,requiredClass:'warrior'}}
+     rewardWeapon:{name:'โล่ศักดิ์สิทธิ์นิรันดร์',icon:'🏰',slot:'armor',rarity:'legend',atk:20,def:60,requiredClass:'warrior'}},
+    // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
+    {tier:3,branch:'S',secret:true,name:'นักรบเลือดอสูร',icon:'🩸⚔️',color:'#cc0033',
+     lore:'เลือดของศัตรูนับพันหลอมรวมเข้ากายในการทดสอบนิรันดร์ — ความโกรธคือพลัง',
+     bonuses:{hpMult:1.4,atkMult:1.45,critBonus:0.1,lifesteal:0.08},
+     rewardWeapon:{name:'ดาบกระหายเลือด',icon:'🩸',slot:'weapon',rarity:'legend',atk:70,requiredClass:'warrior'}},
+    {tier:4,branch:'S',parentBranch:'S',secret:true,name:'อสูรสงครามนิรันดร์',icon:'👹⚔️',color:'#aa0022',
+     lore:'ไม่ใช่มนุษย์ ไม่ใช่อสูร — คือสงครามที่มีชีวิต',
+     bonuses:{hpMult:1.8,atkMult:1.8,critBonus:0.25,lifesteal:0.15},
+     rewardWeapon:{name:'มหาดาบอสูรนิรันดร์',icon:'👹',slot:'weapon',rarity:'mythic',atk:120,requiredClass:'warrior'}}
   ],
   mage:[
     {tier:1,name:'จอมเวทย์',icon:'🔮',color:'#aa44ff'},
@@ -472,7 +482,16 @@ const CLASS_EVOLUTIONS = {
      lore:'ผู้รับพลังจากสรวงสวรรค์ ทุกคำอธิษฐานคือสายฟ้า',
      conditions:{level:80,epicTasks:15,evoQuest:'mage_4B'},
      bonuses:{expMult:1.6,hpMult:1.5,regenMult:1.3},
-     rewardWeapon:{name:'ไม้เท้าสวรรค์',icon:'🌟',slot:'weapon',rarity:'legend',atk:70,requiredClass:'mage'}}
+     rewardWeapon:{name:'ไม้เท้าสวรรค์',icon:'🌟',slot:'weapon',rarity:'legend',atk:70,requiredClass:'mage'}},
+    // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
+    {tier:3,branch:'S',secret:true,name:'จอมเวทย์มิติว่างเปล่า',icon:'🕳️🔮',color:'#5500aa',
+     lore:'มองลึกเข้าไปในความว่างเปล่าระหว่างคลื่นศัตรู และความว่างเปล่ามองกลับมา',
+     bonuses:{atkMult:1.5,expMult:1.4,critBonus:0.12,spellEcho:0.15},
+     rewardWeapon:{name:'คทาแห่งความว่างเปล่า',icon:'🕳️',slot:'weapon',rarity:'legend',atk:75,requiredClass:'mage'}},
+    {tier:4,branch:'S',parentBranch:'S',secret:true,name:'ผู้กลืนกินจักรวาล',icon:'🌀🔮',color:'#3300dd',
+     lore:'ดวงดาวดับลงเมื่อเขาท่องคาถา — เวทมนตร์ที่ไม่ควรมีอยู่',
+     bonuses:{atkMult:2.2,expMult:1.7,critBonus:0.3,spellEcho:0.3},
+     rewardWeapon:{name:'คทากลืนจักรวาล',icon:'🌀',slot:'weapon',rarity:'mythic',atk:130,requiredClass:'mage'}}
   ],
   rogue:[
     {tier:1,name:'โจร',icon:'🗡️',color:'#44ff88'},
@@ -500,7 +519,16 @@ const CLASS_EVOLUTIONS = {
      lore:'ทองคือพระเจ้า อำนาจคือศาสนา จักรพรรดิโจรปกครองด้วยความกลัวและความโลภ',
      conditions:{level:80,gold:8000,evoQuest:'rogue_4B'},
      bonuses:{goldMult:2.0,dropBonus:0.15,critBonus:0.08},
-     rewardWeapon:{name:'ดาบจักรพรรดิทอง',icon:'💰',slot:'weapon',rarity:'legend',atk:75,requiredClass:'rogue'}}
+     rewardWeapon:{name:'ดาบจักรพรรดิทอง',icon:'💰',slot:'weapon',rarity:'legend',atk:75,requiredClass:'rogue'}},
+    // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
+    {tier:3,branch:'S',secret:true,name:'นักฆ่าไร้กาลเวลา',icon:'⏳🔪',color:'#00cc99',
+     lore:'ฆ่าศัตรูเร็วจนเวลาหยุดนิ่ง — ในการทดสอบนั้นเขาเรียนรู้ที่จะอยู่ระหว่างวินาที',
+     bonuses:{critBonus:0.22,dropBonus:0.1,goldMult:1.6,doubleStrike:0.2},
+     rewardWeapon:{name:'กริชหยุดเวลา',icon:'⏳',slot:'weapon',rarity:'legend',atk:65,requiredClass:'rogue'}},
+    {tier:4,branch:'S',parentBranch:'S',secret:true,name:'เงาแห่งความตายเที่ยงแท้',icon:'☠️🌑',color:'#00aa77',
+     lore:'ความตายไม่ใช่เป้าหมายของเขา — ความตายคือเครื่องมือของเขา',
+     bonuses:{critBonus:0.4,dropBonus:0.15,goldMult:2.0,doubleStrike:0.4},
+     rewardWeapon:{name:'เคียวมัจจุราชเที่ยงแท้',icon:'☠️',slot:'weapon',rarity:'mythic',atk:115,requiredClass:'rogue'}}
   ],
   archer:[
     {tier:1,name:'นักธนู',icon:'🏹',color:'#ffd700'},
@@ -528,7 +556,16 @@ const CLASS_EVOLUTIONS = {
      lore:'เร็วกว่าฟ้าแลบ แม่นกว่าโชคชะตา เทพสายลมไม่ยิงครั้งเดียว — ยิงพร้อมกันทั้งหมด',
      conditions:{level:80,critCount:100,evoQuest:'archer_4B'},
      bonuses:{atkMult:1.8,critBonus:0.15},
-     rewardWeapon:{name:'ธนูฟ้าผ่า',icon:'⚡',slot:'weapon',rarity:'legend',atk:95,requiredClass:'archer'}}
+     rewardWeapon:{name:'ธนูฟ้าผ่า',icon:'⚡',slot:'weapon',rarity:'legend',atk:95,requiredClass:'archer'}},
+    // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
+    {tier:3,branch:'S',secret:true,name:'นักล่าวิญญาณนิรันดร์',icon:'👁️🏹',color:'#cc44ff',
+     lore:'ในการทดสอบไม่จบสิ้น ดวงตาของเขาเห็นวิญญาณของศัตรูทุกตัวที่จะมาถึง',
+     bonuses:{atkMult:1.5,critBonus:0.2,pierce:0.3,multiShot:2},
+     rewardWeapon:{name:'ธนูล่าวิญญาณ',icon:'👁️',slot:'weapon',rarity:'legend',atk:72,requiredClass:'archer'}},
+    {tier:4,branch:'S',parentBranch:'S',secret:true,name:'เทพแห่งการล่านิรันดร์',icon:'🌌🏹',color:'#9900ff',
+     lore:'ไม่มีเป้าหมายใดหนีพ้น แม้แต่ดวงดาวที่กำลังจะดับ',
+     bonuses:{atkMult:2.1,critBonus:0.35,pierce:0.6,multiShot:3},
+     rewardWeapon:{name:'ธนูพิฆาตนิรันดร์',icon:'🌌',slot:'weapon',rarity:'mythic',atk:125,requiredClass:'archer'}}
   ],
   paladin:[
     {tier:1,name:'อัศวินศักดิ์สิทธิ์',icon:'✨',color:'#4488ff'},
@@ -556,8 +593,41 @@ const CLASS_EVOLUTIONS = {
      lore:'ราชาแห่งการพิฆาต ทุกก้าวคือความตายของศัตรู',
      conditions:{level:80,bossKills:15,evoQuest:'paladin_4B'},
      bonuses:{atkMult:1.6,critBonus:0.12,hpMult:1.2},
-     rewardWeapon:{name:'ดาบราชันพิฆาต',icon:'👑',slot:'weapon',rarity:'legend',atk:95,requiredClass:'paladin'}}
+     rewardWeapon:{name:'ดาบราชันพิฆาต',icon:'👑',slot:'weapon',rarity:'legend',atk:95,requiredClass:'paladin'}},
+    // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
+    {tier:3,branch:'S',secret:true,name:'อัศวินผู้ไม่ตาย',icon:'⚜️🛡',color:'#ffcc66',
+     lore:'ยืนหยัดผ่านคลื่นศัตรูนับไม่ถ้วนโดยไม่ล้มลง — ความตายปฏิเสธที่จะรับเขาไว้',
+     bonuses:{hpMult:1.6,defMult:1.5,regenMult:1.4,reviveOnce:true},
+     rewardWeapon:{name:'ดาบอมตะศักดิ์สิทธิ์',icon:'⚜️',slot:'weapon',rarity:'legend',atk:60,def:20,requiredClass:'paladin'}},
+    {tier:4,branch:'S',parentBranch:'S',secret:true,name:'เทพผู้คุ้มครองนิรันดร์',icon:'🕊️☀️',color:'#ffdd88',
+     lore:'แสงของเขาไม่เคยดับ แม้ในความมืดมิดที่สุดของจักรวาล',
+     bonuses:{hpMult:2.2,defMult:1.9,regenMult:1.8,damageReduction:0.25,reviveOnce:true},
+     rewardWeapon:{name:'ดาบเทพผู้คุ้มครอง',icon:'🕊️',slot:'weapon',rarity:'mythic',atk:100,def:40,requiredClass:'paladin'}}
   ]
+};
+
+// ============================================================
+// INFINITY TRIAL — โหมดตีมอนไม่จบสิ้น (ปลดล็อกตอน Tier 2)
+// kills จาก trial ตัดสินว่าได้ branch ไหนของ Tier 3
+// ============================================================
+const INFINITY_TRIAL = {
+  // wave scaling — มอนแรงขึ้นเรื่อยๆ ตามคลื่น
+  hpGrowthPerWave:  0.085,   // +8.5% HP ต่อคลื่น (สะสมแบบทบต้น)
+  atkGrowthPerWave: 0.075,   // +7.5% ATK ต่อคลื่น
+  mobsPerWave:      3,       // จำนวนมอนต่อคลื่น
+  baseHpMult:       0.22,    // คลื่นแรกเทียบมอนจริง (ตีไม่กี่ทีตาย → เล่นลื่นแบบ gauntlet)
+  baseAtkMult:      0.4,
+  attackSpeedMult:  0.42,    // trial ตีเร็วกว่าปกติ (× ของ getAttackInterval, ขั้นต่ำ 420ms)
+  // kills → branch ของ Tier 3 (เลือกเส้นทางตามผลงานใน trial)
+  // ตี < tierBKills        → ได้ branch B (เส้นทางพื้นฐาน/ตั้งรับ)
+  // ตี >= tierAKills       → ได้ branch A (เส้นทางบุก/โหด)
+  tierBKills:  15,           // ต่ำกว่านี้ = branch B
+  tierAKills:  40,           // ถึงนี่ = branch A
+  // เงื่อนไข SECRET TIER (สมดุล — ต้องเก่งจริงถึงได้):
+  //   ต้อง kills สูงมาก  AND  ผ่านคลื่นลึก  AND  ผ่าน secret check
+  secretMinKills: 80,        // ต้องตีอย่างน้อย 80 ตัวใน run เดียว
+  secretMinWave:  12,        // และไปถึงคลื่นที่ 12+
+  secretChance:   0.5,       // ถ้าเข้าเงื่อนไขครบ → โอกาส 50% ได้ Secret (ไม่ครบ = ได้ branch A)
 };
 
 // ============================================================

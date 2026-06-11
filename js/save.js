@@ -90,6 +90,11 @@ function loadGame() {
       if (!G.zoneProgress)           G.zoneProgress      = {};
       if (G.attackSpeedBonus === undefined) G.attackSpeedBonus = 0;
       if (G.dropBonusFromTree === undefined) G.dropBonusFromTree = 0;
+      // migrate: Infinity Trial combat traits
+      if (G.lifestealBonus     === undefined) G.lifestealBonus     = 0;
+      if (G.doubleStrikeChance === undefined) G.doubleStrikeChance = 0;
+      if (G.damageReduction    === undefined) G.damageReduction    = 0;
+      if (G.hasRevive          === undefined) G.hasRevive          = false;
       // transient flags — reset battle state on reload.
       // _idleMode defaults ON (IDLE game) but don't resume an active battle loop.
       G._idleMode = true;

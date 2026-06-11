@@ -82,6 +82,8 @@ function _spawnIdleWave() {
   }
   _idleTargetIdx = 0;
   _renderIdleStage();
+  // maybe upgrade this wave into a special encounter (boss / raider)
+  if (typeof idleMaybeSpawnSpecial === 'function') idleMaybeSpawnSpecial();
 }
 
 // ---------- rendering ----------
@@ -125,6 +127,8 @@ function _renderIdleStage() {
 
   _renderIdleSkillBar();
   _updateIdleHeader();
+  // re-apply special-encounter styling/banner after any re-render
+  if (typeof idleRedecorateSpecial === 'function') idleRedecorateSpecial();
 }
 
 // ---------- skill bar (shows active IDLE skills + cooldown gauges) ----------
@@ -167,6 +171,7 @@ function _updateIdleHeader() {
   const killEl = document.getElementById('idle-panel-kills');
   if (killEl) killEl.textContent = `💀 ${_idleSessionKills}`;
   _updateIdleSkillCooldowns();
+  if (typeof idleSpecialTick === 'function') idleSpecialTick();
 }
 
 // update only the cooldown gauges (cheap, runs every tick)
@@ -364,11 +369,16 @@ function _idleHeroDie() {
 }
 
 function _idleMobDie(idx, mob) {
+  // special encounters (boss/raider) grant their own big bounty + combo tick
+  const handledSpecial = (typeof idleOnMobKilled === 'function') ? idleOnMobKilled(mob) : false;
+
   const full = getMonsterStats(mob.zone, mob.tier, false);
   const killExpBase = G.gameMode === 'fullrpg' ? 0.5 : 0.03;
   let expGain = Math.floor(full.maxHp * killExpBase * 3 * IDLE_REWARD_MULT);
   const expBoostMult = (typeof getExpBoostMult === 'function') ? getExpBoostMult() : 1;
-  expGain = Math.max(1, Math.floor(expGain * expBoostMult * (1 + (G.expBonusFromTree || 0))));
+  const comboMult = (typeof idleComboExpMult === 'function') ? idleComboExpMult() : 1;
+  expGain = Math.max(1, Math.floor(expGain * expBoostMult * comboMult * (1 + (G.expBonusFromTree || 0))));
+  if (mob.special) expGain = Math.floor(expGain * 3);  // bonus EXP for special kills
 
   let goldGain = Math.max(1, Math.floor(full.atk * 3 * IDLE_REWARD_MULT));
   const clsB = (typeof CLASSES !== 'undefined') ? CLASSES.find(c => c.id === G.classId) : null;
@@ -388,9 +398,10 @@ function _idleMobDie(idx, mob) {
   // item drop (lower rate than zone monster) — floats above head
   const dropBonus = clsB && clsB.bonuses && clsB.bonuses.dropBonus ? clsB.bonuses.dropBonus : 0;
   const baseRate = 0.06 + ((mob.zone || 1) - 1) * 0.015;
-  const dropRate = baseRate + dropBonus + (G.dropBonusFromTree || 0);
+  let dropRate = baseRate + dropBonus + (G.dropBonusFromTree || 0);
+  if (mob.special) dropRate = 1;   // special kills always drop loot
   if (Math.random() < dropRate) {
-    const dropped = _idleDropItem(mob.zone, mob.tier);
+    const dropped = _idleDropItem(mob.zone, mob.special === 'boss' ? 6 : mob.tier);
     if (dropped) {
       const col = (RARITIES[dropped.rarity] && RARITIES[dropped.rarity].color) || '#aaa';
       _floatAboveIdleMob(idx, `<span style="color:${col}">${dropped.icon||'⚔'} ${dropped.name}</span>`, 'idle-drop-float');

@@ -2921,3 +2921,126 @@ body.preload{visibility:hidden}
   0%{transform:translateX(-50%) scale(.6);opacity:0}
   100%{transform:translateX(-50%) scale(1);opacity:1}
 }
+
+/* ════════════════════════════════════════════════════════════
+   INFINITY TRIAL — โหมดทดสอบนิรันดร์
+   ════════════════════════════════════════════════════════════ */
+#infinity-overlay.active{ display:flex !important; }
+.infinity-stage{
+  width:min(640px,94vw); max-height:92vh; overflow-y:auto;
+  background:rgba(10,2,18,.7); border:1px solid #4a1a66;
+  border-radius:16px; padding:1.4rem 1.2rem;
+  box-shadow:0 0 40px rgba(150,40,200,.35);
+}
+
+/* intro */
+.trial-intro{ text-align:center; color:#eee; }
+.trial-title{ font-size:1.8rem; font-weight:800; color:#cc66ff;
+  text-shadow:0 0 16px rgba(180,60,255,.7); margin-bottom:.3rem; }
+.trial-sub{ color:#bb99cc; font-size:.85rem; margin-bottom:1rem; }
+.trial-rules{ list-style:none; padding:0; margin:0 auto 1rem; max-width:440px;
+  text-align:left; font-size:.85rem; line-height:1.7; color:#ddd; }
+.trial-rules li{ padding:.15rem 0; }
+.trial-thresholds{ display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center;
+  margin-bottom:1.1rem; font-size:.72rem; }
+.trial-thresholds span{ background:rgba(80,20,110,.5); border:1px solid #5a2a7a;
+  border-radius:20px; padding:.25rem .7rem; color:#ddbbf0; }
+
+.btn-trial-start{
+  display:block; width:100%; max-width:320px; margin:.5rem auto;
+  background:linear-gradient(90deg,#aa22cc,#ee44aa); color:#fff;
+  border:none; border-radius:10px; padding:.7rem 1rem; font-size:1rem;
+  font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(200,40,160,.5);
+  transition:transform .12s;
+}
+.btn-trial-start:hover{ transform:scale(1.03); }
+.btn-trial-cancel{
+  display:block; margin:.3rem auto 0; background:none; border:none;
+  color:#9988aa; font-size:.8rem; cursor:pointer; text-decoration:underline;
+}
+
+/* HUD + arena during run */
+.trial-hud{ display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap;
+  font-size:.82rem; color:#eecfff; margin-bottom:.9rem; }
+.trial-hud span{ background:rgba(70,20,100,.45); border-radius:18px;
+  padding:.25rem .8rem; }
+.trial-hud-next{ color:#ffcc66 !important; }
+.trial-arena{ display:flex; align-items:center; justify-content:space-between;
+  gap:.6rem; min-height:180px; }
+
+/* result screen */
+.trial-result{ text-align:center; color:#eee; padding:.4rem; }
+.trial-result.secret{ animation:trialSecretGlow 1.6s ease-in-out infinite; }
+@keyframes trialSecretGlow{
+  0%,100%{ filter:drop-shadow(0 0 6px rgba(255,0,204,.4)); }
+  50%{ filter:drop-shadow(0 0 22px rgba(255,0,204,.9)); }
+}
+.trial-result-dead{ font-size:1.3rem; font-weight:700; color:#ff5577; margin-bottom:.4rem; }
+.trial-result-stats{ color:#ccc; font-size:.88rem; margin-bottom:.6rem; }
+.trial-result-verdict{ font-size:.95rem; font-weight:700; color:#ffcc66; margin-bottom:.5rem; }
+.trial-result-icon{ font-size:3.4rem; line-height:1; margin:.3rem 0; }
+.trial-result-name{ font-size:1.4rem; font-weight:800; margin-bottom:.4rem; }
+.trial-result-lore{ color:#bbaacc; font-size:.82rem; font-style:italic;
+  max-width:420px; margin:0 auto .6rem; line-height:1.5; }
+.trial-result-bonus{ color:var(--gold); font-size:.85rem; margin-bottom:.7rem; }
+.trial-result-hint{ color:#ff88dd; font-size:.8rem; margin-bottom:.8rem; }
+
+/* ════════════════════════════════════════════════════════════
+   IDLE ENCOUNTERS — บอสลับ / ผู้บุกรุก / combo
+   ════════════════════════════════════════════════════════════ */
+#idle-stage{ position:relative; }
+
+/* special-mob glow */
+.idle-mob.idle-special .idle-mob-sprite{ font-size:4.6rem !important; }
+.idle-mob.idle-special-boss .idle-mob-sprite{
+  filter:drop-shadow(0 0 14px #ffcc00) drop-shadow(0 0 6px #ff8800);
+  animation:bossPulse 1s ease-in-out infinite;
+}
+.idle-mob.idle-special-raider .idle-mob-sprite{
+  filter:drop-shadow(0 0 12px #ff4488);
+  animation:raiderBob .9s ease-in-out infinite;
+}
+.idle-mob.idle-special-raider .idle-mob-sprite img{ width:96px; height:96px; transform:scaleX(-1); }
+@keyframes bossPulse{ 0%,100%{transform:scaleX(-1) scale(1);} 50%{transform:scaleX(-1) scale(1.08);} }
+@keyframes raiderBob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
+
+/* countdown banner over the idle stage */
+.idle-special-banner{
+  position:absolute; top:4px; left:50%; transform:translateX(-50%);
+  display:flex; gap:.7rem; align-items:center; z-index:5;
+  padding:.25rem .8rem; border-radius:20px; font-size:.78rem; font-weight:700;
+  white-space:nowrap; box-shadow:0 2px 12px rgba(0,0,0,.5);
+  animation:bannerDrop .35s ease-out;
+}
+.idle-special-banner.sb-boss{ background:linear-gradient(90deg,#7a4a00,#ffaa00); color:#1a0e00; }
+.idle-special-banner.sb-raider{ background:linear-gradient(90deg,#7a0033,#ff4488); color:#fff; }
+.idle-special-banner .sb-timer{ font-variant-numeric:tabular-nums; }
+.idle-special-banner .sb-bounty{ opacity:.95; }
+@keyframes bannerDrop{ from{opacity:0;transform:translate(-50%,-12px);} to{opacity:1;transform:translateX(-50%);} }
+
+/* combo meter in the idle header */
+.idle-combo-meter{
+  margin-left:auto; padding:.1rem .55rem; border-radius:12px;
+  background:rgba(255,120,0,.2); color:#ffaa44; font-weight:700; font-size:.78rem;
+  animation:comboIn .2s ease-out;
+}
+.idle-combo-meter.combo-hot{
+  background:rgba(255,60,0,.35); color:#ff6622;
+  text-shadow:0 0 8px rgba(255,80,0,.8); animation:comboPulse .5s ease-in-out infinite;
+}
+@keyframes comboIn{ from{transform:scale(.6);opacity:0;} to{transform:scale(1);opacity:1;} }
+@keyframes comboPulse{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.12);} }
+
+/* big loot beam text */
+.idle-loot-beam{
+  position:absolute; top:30%; left:50%; transform:translateX(-50%);
+  font-size:1.5rem; font-weight:800; color:#ffd700; z-index:6; pointer-events:none;
+  text-shadow:0 0 12px rgba(255,200,0,.9),0 2px 4px #000;
+  animation:lootBeam 1.8s ease-out forwards;
+}
+@keyframes lootBeam{
+  0%{ opacity:0; transform:translate(-50%,10px) scale(.6); }
+  18%{ opacity:1; transform:translate(-50%,-6px) scale(1.15); }
+  35%{ transform:translate(-50%,-10px) scale(1); }
+  100%{ opacity:0; transform:translate(-50%,-48px) scale(1); }
+}

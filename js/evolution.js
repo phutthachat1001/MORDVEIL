@@ -24,7 +24,16 @@ function getNextEvolution() {
   if (!G.classId) return null;
   const path = CLASS_EVOLUTIONS[G.classId];
   if (!path) return null;
-  return path.find(e => e.tier === G.classTier + 1) || null;
+  const wantTier = G.classTier + 1;
+  const candidates = path.filter(e => e.tier === wantTier);
+  if (!candidates.length) return null;
+  // once a branch is chosen, follow it (matches branch OR parentBranch)
+  if (G.classBranch) {
+    const onBranch = candidates.find(e => (e.branch || e.parentBranch) === G.classBranch);
+    if (onBranch) return onBranch;
+  }
+  // no branch yet (tier 1→2) — return the first non-branched candidate
+  return candidates.find(e => !e.branch) || candidates[0];
 }
 
 function canEvolve() {
@@ -40,20 +49,21 @@ function checkEvolutionConditions(evo) {
   return true;
 }
 
-function evolveClass() {
-  const next = getNextEvolution();
-  if (!next || !canEvolve()) return;
-
-  const oldTier = G.classTier;
-  G.classTier   = next.tier;
+// NOTE: evolveClass / getNextEvolution are overridden by js/skilltree.js
+// (loaded after this file) which is the authoritative version — it handles
+// branch following, weapon rewards, secret-tier traits, and the Infinity Trial
+// gateway. The definitions below are legacy fallbacks kept for safety.
+function evolveClass(forced) {
+  const next = forced || getNextEvolution();
+  if (!next) return;
+  if (!forced && !canEvolve()) return;
+  G.classTier = next.tier;
+  if (next.branch) G.classBranch = next.branch;
   G.classEvolutionHistory.push({ tier:next.tier, name:next.name, level:G.level });
-
-  // apply stat bonuses
   const b = next.bonuses || {};
   if (b.hpMult)  { G.maxHp  = Math.floor(G.maxHp  * b.hpMult);  G.hp = G.maxHp; }
   if (b.atkMult) G.baseAtk = Math.floor(G.baseAtk * b.atkMult);
   if (b.defMult) G.baseDef = Math.floor(G.baseDef * b.defMult);
-
   logBattle(`<span class="log-exp">✨ วิวัฒนาการ! ${next.icon} คุณกลายเป็น "${next.name}" (Tier ${next.tier})!</span>`);
   if (typeof rpgOnEvolution === 'function') rpgOnEvolution(next.tier);
   showEvolutionModal(next);
@@ -153,21 +163,14 @@ function renderEvolutionButton() {
   const area = document.getElementById('evolution-btn-area');
   if (!area) return;
 
-  // tier 3 and no branch chosen yet — show branch picker button
-  if ((G.classTier||1) === 2 && typeof CLASS_EVOLUTIONS !== 'undefined') {
-    const path = CLASS_EVOLUTIONS[G.classId] || [];
-    const tier3 = path.filter(e => e.tier === 3);
-    if (tier3.length >= 2 && !G.classBranch) {
-      // check level condition (min of both branches)
-      const minLevel = Math.min(...tier3.map(e => e.conditions?.level || 0));
-      const levelOk  = G.level >= minLevel;
-      area.innerHTML = `
-        <div style="color:var(--gold);font-size:.85rem;margin-bottom:.3rem">⭐ LV ต้องการ ${minLevel} (ตอนนี้ ${G.level})</div>
-        ${levelOk
-          ? `<button class="btn-evolve" onclick="openBranchPicker()">🔱 เลือกเส้นทาง Tier 3</button>`
-          : `<div style="color:var(--text2);font-size:.8rem">ต้องการ LV ${minLevel}</div>`}`;
-      return;
-    }
+  // Tier 2, no branch chosen yet — the path to Tier 3 is the INFINITY TRIAL,
+  // not a free pick. kills in the trial decide which branch (incl. secret).
+  if ((G.classTier||1) === 2 && !G.classBranch && typeof canEnterTrial === 'function') {
+    area.innerHTML = `
+      <div style="color:#ff88dd;font-size:.85rem;margin-bottom:.3rem">♾️ เส้นทาง Tier 3 ถูกตัดสินด้วยการทดสอบนิรันดร์</div>
+      <div style="color:var(--text2);font-size:.75rem;margin-bottom:.4rem">ตีมอนไม่จบสิ้น — ยิ่งตีเยอะ ยิ่งได้คลาสโหด · มีโอกาสปลดล็อก Tier ลับ</div>
+      <button class="btn-evolve" onclick="openInfinityTrial()">⚔️ เข้าสู่การทดสอบนิรันดร์</button>`;
+    return;
   }
 
   const next = getNextEvolution();
