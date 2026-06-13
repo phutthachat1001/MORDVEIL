@@ -280,11 +280,19 @@ function _idleReadySkill() {
   return null;
 }
 
+// is the IDLE panel actually visible right now? (works for both normal-flow
+// and position:fixed — the mobile IDLE tab pins the panel as a fixed overlay,
+// where offsetParent is always null, so we test rendered size instead)
+function _idlePanelVisible() {
+  const panel = document.getElementById('idle-panel');
+  if (!panel) return false;
+  return panel.offsetWidth > 0 && panel.offsetHeight > 0;
+}
+
 // ---------- combat tick ----------
 function _idleAttackTick() {
   // pause while the panel isn't on screen (Hub, hidden arena, no game)
-  const panel = document.getElementById('idle-panel');
-  if (!panel || panel.offsetParent === null) return;
+  if (!_idlePanelVisible()) return;
 
   // hero dead → wait for respawn
   if (_idleDead) {
