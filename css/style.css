@@ -1581,21 +1581,32 @@ body.preload{visibility:hidden}
   }
   .panel.mobile-active { display: flex !important; }
 
-  /* IDLE tab: show only the auto-farm view. The IDLE panel lives INSIDE
-     #battle-arena, so hide the map + the arena's monster-list/battle children
-     (not #battle-arena itself), then let #idle-panel fill the panel. */
+  /* IDLE tab: pin the auto-farm panel as a full-screen overlay so it never
+     needs scrolling and doesn't depend on the battle panel's flex layout.
+     #idle-panel lives inside #battle-arena, so we lift it out visually with
+     position:fixed and hide its monster-list/map siblings. */
   body.mobile-idle-view #battle-map-wrap,
   body.mobile-idle-view .zone-tabs,
   body.mobile-idle-view #monster-list-area,
   body.mobile-idle-view #battle-content { display: none !important; }
   body.mobile-idle-view #idle-panel {
-    flex: 1;
+    position: fixed !important;
+    top: var(--mtop, 96px);
+    left: 0;
+    right: 0;
+    bottom: var(--mnav, 60px);   /* sit above the bottom nav */
+    margin: 0 !important;
+    z-index: 60;
     display: flex !important;
     flex-direction: column;
-    min-height: 0;
-    margin: 0;
+    overflow: hidden;
+    background: #0a0a14;
   }
-  body.mobile-idle-view #idle-stage { flex: 1; min-height: 0; }
+  body.mobile-idle-view #idle-stage {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
 
   /* panel body fills available space */
   .panel-body { flex: 1; overflow-y: auto; }

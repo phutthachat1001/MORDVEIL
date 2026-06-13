@@ -235,30 +235,35 @@ function switchMobileTab(tab) {
 
   _mobileActiveTab = tab;
 
-  // toggle mobile-active class — only on mobile
+  // IDLE tab → full-screen farm view (a body class drives the CSS overlay).
+  // Set this BEFORE the isMobile guard so it always applies on the IDLE tab,
+  // and make sure the farm loop is actually running when entering it.
+  document.body.classList.toggle('mobile-idle-view', tab === 'idle');
+  if (tab === 'idle') {
+    // measure the real topbar + bottom-nav heights so the fixed IDLE overlay
+    // sits exactly between them on any device
+    const topbar = document.querySelector('.topbar, #topbar');
+    const nav    = document.getElementById('mobile-nav') || document.querySelector('.mobile-nav');
+    const r = document.documentElement.style;
+    r.setProperty('--mtop', (topbar ? topbar.getBoundingClientRect().bottom : 50) + 'px');
+    r.setProperty('--mnav', (nav ? nav.offsetHeight : 58) + 'px');
+    if (typeof startIdleFarm === 'function') startIdleFarm();
+  }
+
+  // panel switching below is mobile-only
   if (!isMobile()) return;
 
   const leftId = G.gameMode === 'fullrpg' ? 'panel-rpg-quests' : 'panel-left';
   document.querySelectorAll('.main-layout .panel').forEach(p => p.classList.remove('mobile-active'));
-  // only the IDLE tab gets the farm-only view; clear it for every other tab
-  if (tab !== 'idle') document.body.classList.remove('mobile-idle-view');
 
   if (tab === 'left') {
     const lp = document.getElementById(leftId);
     if (lp) lp.classList.add('mobile-active');
   } else if (tab === 'battle' || tab === 'idle') {
-    // IDLE lives inside the battle panel. The battle tab shows the map +
-    // monster list; the IDLE tab shows ONLY the auto-farm view. A body class
-    // drives CSS that hides the map/arena in IDLE mode (see style.css).
+    // IDLE lives inside the battle panel; show the panel, the body class
+    // (set above) makes #idle-panel fill the screen for the IDLE tab.
     const bp = document.querySelector('.main-layout .battle-panel');
     if (bp) bp.classList.add('mobile-active');
-    document.body.classList.toggle('mobile-idle-view', tab === 'idle');
-    if (tab === 'idle') {
-      requestAnimationFrame(() => {
-        const idle = document.getElementById('idle-panel');
-        if (idle) idle.scrollIntoView({ behavior: 'auto', block: 'start' });
-      });
-    }
   } else if (tab === 'char') {
     const cp = document.getElementById('panel-char');
     if (cp) cp.classList.add('mobile-active');
