@@ -240,19 +240,23 @@ function switchMobileTab(tab) {
 
   const leftId = G.gameMode === 'fullrpg' ? 'panel-rpg-quests' : 'panel-left';
   document.querySelectorAll('.main-layout .panel').forEach(p => p.classList.remove('mobile-active'));
+  // only the IDLE tab gets the farm-only view; clear it for every other tab
+  if (tab !== 'idle') document.body.classList.remove('mobile-idle-view');
 
   if (tab === 'left') {
     const lp = document.getElementById(leftId);
     if (lp) lp.classList.add('mobile-active');
   } else if (tab === 'battle' || tab === 'idle') {
-    // IDLE lives inside the battle panel — show it, then scroll the IDLE
-    // panel into view (so the IDLE tab jumps straight to the farm view).
+    // IDLE lives inside the battle panel. The battle tab shows the map +
+    // monster list; the IDLE tab shows ONLY the auto-farm view. A body class
+    // drives CSS that hides the map/arena in IDLE mode (see style.css).
     const bp = document.querySelector('.main-layout .battle-panel');
     if (bp) bp.classList.add('mobile-active');
+    document.body.classList.toggle('mobile-idle-view', tab === 'idle');
     if (tab === 'idle') {
       requestAnimationFrame(() => {
         const idle = document.getElementById('idle-panel');
-        if (idle) idle.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        if (idle) idle.scrollIntoView({ behavior: 'auto', block: 'start' });
       });
     }
   } else if (tab === 'char') {
