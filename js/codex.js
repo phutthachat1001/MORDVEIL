@@ -52,15 +52,17 @@ function _renderClassCodex() {
 
   const t1 = path.find(e=>e.tier===1);
   const t2 = path.find(e=>e.tier===2);
-  const t3 = ['A','B','S'].map(b => path.find(e=>e.tier===3&&e.branch===b));
-  const t4 = ['A','B','S'].map(b => path.find(e=>e.tier===4&&e.branch===b));
+  // order branches weakest → strongest:  B, A, C, D, then secret S
+  const order = ['B','A','C','D','S'];
+  const t3 = order.map(b => path.find(e=>e.tier===3&&e.branch===b)).filter(Boolean);
+  const t4 = order.map(b => path.find(e=>e.tier===4&&e.branch===b)).filter(Boolean);
 
   el.innerHTML = `
     <div class="cc-row cc-row-single">${cell(t1)}<span class="cc-arrow">→</span>${cell(t2)}</div>
-    <div class="cc-tierlabel">Tier 3 — ตัดสินด้วยการทดสอบนิรันดร์</div>
-    <div class="cc-row">${t3.map(cell).join('')}</div>
-    <div class="cc-tierlabel">Tier 4 — เส้นตรงตามสายที่เลือก</div>
-    <div class="cc-row">${t4.map(cell).join('')}</div>
+    <div class="cc-tierlabel">Tier 3 — ตัดสินด้วยการทดสอบนิรันดร์ (ยิ่งตีเยอะ ยิ่งสายโหด)</div>
+    <div class="cc-row cc-row-wrap">${t3.map(cell).join('')}</div>
+    <div class="cc-tierlabel">Tier 4 — เส้นตรงตามสายที่ได้</div>
+    <div class="cc-row cc-row-wrap">${t4.map(cell).join('')}</div>
     ${foundSecret ? '<div class="cc-secret-banner">🩸 คุณได้ค้นพบ Tier ลับของคลาสนี้แล้ว!</div>' : ''}`;
 }
 

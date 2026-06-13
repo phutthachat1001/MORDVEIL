@@ -467,7 +467,25 @@ const CLASS_EVOLUTIONS = {
     {tier:4,branch:'S',parentBranch:'S',secret:true,name:'อสูรสงครามนิรันดร์',icon:'👹⚔️',color:'#aa0022',
      lore:'ไม่ใช่มนุษย์ ไม่ใช่อสูร — คือสงครามที่มีชีวิต',
      bonuses:{hpMult:1.8,atkMult:1.8,critBonus:0.25,lifesteal:0.15},
-     rewardWeapon:{name:'มหาดาบอสูรนิรันดร์',icon:'👹',slot:'weapon',rarity:'mythic',atk:120,requiredClass:'warrior'}}
+     rewardWeapon:{name:'มหาดาบอสูรนิรันดร์',icon:'👹',slot:'weapon',rarity:'mythic',atk:120,requiredClass:'warrior'}},
+    // ── branch C (kills 35-60) — เบอร์เซิร์กเกอร์สายดุ ──
+    {tier:3,branch:'C',name:'นักรบคลั่ง',icon:'🪓⚔️',color:'#ff7733',
+     lore:'ยิ่งบาดเจ็บ ยิ่งบ้าคลั่ง ความเจ็บปวดคือเชื้อเพลิง',
+     bonuses:{hpMult:1.3,atkMult:1.35,critBonus:0.12,lifesteal:0.05},
+     rewardWeapon:{name:'ขวานคลั่งสงคราม',icon:'🪓',slot:'weapon',rarity:'epic',atk:58,requiredClass:'warrior'}},
+    {tier:4,branch:'C',parentBranch:'C',name:'ปีศาจสงครามเลือด',icon:'🔥🪓',color:'#dd3311',
+     lore:'สนามรบคือบ้าน เลือดศัตรูคืออาหาร',
+     bonuses:{hpMult:1.5,atkMult:1.6,critBonus:0.22,lifesteal:0.1},
+     rewardWeapon:{name:'ขวานสังหารหมู่',icon:'🔥',slot:'weapon',rarity:'legend',atk:98,requiredClass:'warrior'}},
+    // ── branch D (kills 60-90) — จอมทัพรอบด้าน ──
+    {tier:3,branch:'D',name:'แม่ทัพเหล็ก',icon:'🎖⚔️',color:'#ffaa44',
+     lore:'นำทัพนับพันโดยไม่เคยพ่าย ทุกคำสั่งคือชัยชนะ',
+     bonuses:{hpMult:1.4,atkMult:1.35,defMult:1.25,critBonus:0.08},
+     rewardWeapon:{name:'ดาบแม่ทัพ',icon:'🎖',slot:'weapon',rarity:'epic',atk:62,requiredClass:'warrior'}},
+    {tier:4,branch:'D',parentBranch:'D',name:'จอมจักรพรรดิสงคราม',icon:'👑⚔️',color:'#ffcc00',
+     lore:'อาณาจักรสั่นสะเทือนเมื่อเขายกดาบ',
+     bonuses:{hpMult:1.7,atkMult:1.7,defMult:1.4,critBonus:0.2,lifesteal:0.08},
+     rewardWeapon:{name:'มหาดาบจักรพรรดิ',icon:'👑',slot:'weapon',rarity:'legend',atk:108,requiredClass:'warrior'}}
   ],
   mage:[
     {tier:1,name:'จอมเวทย์',icon:'🔮',color:'#aa44ff'},
@@ -504,7 +522,25 @@ const CLASS_EVOLUTIONS = {
     {tier:4,branch:'S',parentBranch:'S',secret:true,name:'ผู้กลืนกินจักรวาล',icon:'🌀🔮',color:'#3300dd',
      lore:'ดวงดาวดับลงเมื่อเขาท่องคาถา — เวทมนตร์ที่ไม่ควรมีอยู่',
      bonuses:{atkMult:2.2,expMult:1.7,critBonus:0.3,spellEcho:0.3},
-     rewardWeapon:{name:'คทากลืนจักรวาล',icon:'🌀',slot:'weapon',rarity:'mythic',atk:130,requiredClass:'mage'}}
+     rewardWeapon:{name:'คทากลืนจักรวาล',icon:'🌀',slot:'weapon',rarity:'mythic',atk:130,requiredClass:'mage'}},
+    // ── branch C (kills 35-60) — เวทไฟล้างผลาญ ──
+    {tier:3,branch:'C',name:'จอมเวทย์เพลิงพิโรธ',icon:'🔥🔮',color:'#ff5522',
+     lore:'เปลวไฟไม่เคยถามว่าใครคือศัตรู มันเผาทุกสิ่ง',
+     bonuses:{atkMult:1.45,expMult:1.25,critBonus:0.12},
+     rewardWeapon:{name:'คทาเพลิงพิโรธ',icon:'🔥',slot:'weapon',rarity:'epic',atk:56,requiredClass:'mage'}},
+    {tier:4,branch:'C',parentBranch:'C',name:'เทพอัคนีประลัยกัลป์',icon:'☄️🔮',color:'#ff3300',
+     lore:'เปลวไฟแห่งวันสิ้นโลกอยู่ในกำมือของเขา',
+     bonuses:{atkMult:1.8,expMult:1.4,critBonus:0.2,spellEcho:0.12},
+     rewardWeapon:{name:'คทาอัคนีประลัย',icon:'☄️',slot:'weapon',rarity:'legend',atk:96,requiredClass:'mage'}},
+    // ── branch D (kills 60-90) — มหาเวทกาลเวลา ──
+    {tier:3,branch:'D',name:'จอมเวทย์กาลเวลา',icon:'⏳🔮',color:'#44ccdd',
+     lore:'ผู้บงการเวลา ทุกคาถาเกิดซ้ำก่อนศัตรูจะรู้ตัว',
+     bonuses:{atkMult:1.5,expMult:1.35,critBonus:0.14,spellEcho:0.1},
+     rewardWeapon:{name:'คทากาลเวลา',icon:'⏳',slot:'weapon',rarity:'epic',atk:60,requiredClass:'mage'}},
+    {tier:4,branch:'D',parentBranch:'D',name:'เทพผู้บงการกาลเวลา',icon:'🌌⏳',color:'#22aaff',
+     lore:'อดีต ปัจจุบัน อนาคต — ทั้งหมดคือสนามเด็กเล่นของเขา',
+     bonuses:{atkMult:1.85,expMult:1.5,critBonus:0.22,spellEcho:0.18},
+     rewardWeapon:{name:'คทาบงการกาลเวลา',icon:'🌌',slot:'weapon',rarity:'legend',atk:112,requiredClass:'mage'}}
   ],
   rogue:[
     {tier:1,name:'โจร',icon:'🗡️',color:'#44ff88'},
@@ -536,12 +572,30 @@ const CLASS_EVOLUTIONS = {
     // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
     {tier:3,branch:'S',secret:true,name:'นักฆ่าไร้กาลเวลา',icon:'⏳🔪',color:'#00cc99',
      lore:'ฆ่าศัตรูเร็วจนเวลาหยุดนิ่ง — ในการทดสอบนั้นเขาเรียนรู้ที่จะอยู่ระหว่างวินาที',
-     bonuses:{critBonus:0.22,dropBonus:0.1,goldMult:1.6,doubleStrike:0.2},
+     bonuses:{atkMult:1.3,critBonus:0.25,dropBonus:0.1,goldMult:1.6,doubleStrike:0.25,lifesteal:0.05},
      rewardWeapon:{name:'กริชหยุดเวลา',icon:'⏳',slot:'weapon',rarity:'legend',atk:65,requiredClass:'rogue'}},
     {tier:4,branch:'S',parentBranch:'S',secret:true,name:'เงาแห่งความตายเที่ยงแท้',icon:'☠️🌑',color:'#00aa77',
      lore:'ความตายไม่ใช่เป้าหมายของเขา — ความตายคือเครื่องมือของเขา',
-     bonuses:{critBonus:0.4,dropBonus:0.15,goldMult:2.0,doubleStrike:0.4},
-     rewardWeapon:{name:'เคียวมัจจุราชเที่ยงแท้',icon:'☠️',slot:'weapon',rarity:'mythic',atk:115,requiredClass:'rogue'}}
+     bonuses:{atkMult:1.5,critBonus:0.4,dropBonus:0.15,goldMult:2.0,doubleStrike:0.4,lifesteal:0.08},
+     rewardWeapon:{name:'เคียวมัจจุราชเที่ยงแท้',icon:'☠️',slot:'weapon',rarity:'mythic',atk:115,requiredClass:'rogue'}},
+    // ── branch C (kills 35-60) — นักฆ่าพิษ ──
+    {tier:3,branch:'C',name:'นักฆ่าพิษอสรพิษ',icon:'🐍🔪',color:'#66cc44',
+     lore:'ดาบจุ่มพิษงู เหยื่อไม่มีวันรู้ว่าตายเพราะอะไร',
+     bonuses:{atkMult:1.3,critBonus:0.14,doubleStrike:0.1,lifesteal:0.05},
+     rewardWeapon:{name:'กริชอสรพิษ',icon:'🐍',slot:'weapon',rarity:'epic',atk:54,requiredClass:'rogue'}},
+    {tier:4,branch:'C',parentBranch:'C',name:'ราชาพิษมรณะ',icon:'☠️🐍',color:'#44aa22',
+     lore:'อาณาจักรพิษที่ไม่มีใครรอดชีวิตกลับไปเล่า',
+     bonuses:{atkMult:1.55,critBonus:0.22,doubleStrike:0.2,lifesteal:0.1},
+     rewardWeapon:{name:'กริชมรณะอสรพิษ',icon:'☠️',slot:'weapon',rarity:'legend',atk:94,requiredClass:'rogue'}},
+    // ── branch D (kills 60-90) — นักฆ่าสายฟ้า ──
+    {tier:3,branch:'D',name:'นักฆ่าสายฟ้า',icon:'⚡🔪',color:'#ffdd44',
+     lore:'เร็วกว่าสายตา ก่อนเสียงฟ้าผ่าจะดัง เหยื่อก็สิ้นใจแล้ว',
+     bonuses:{atkMult:1.4,critBonus:0.16,doubleStrike:0.15,goldMult:1.4},
+     rewardWeapon:{name:'กริชสายฟ้า',icon:'⚡',slot:'weapon',rarity:'epic',atk:60,requiredClass:'rogue'}},
+    {tier:4,branch:'D',parentBranch:'D',name:'เทพสังหารสายฟ้า',icon:'🌩🔪',color:'#ffcc00',
+     lore:'หนึ่งกะพริบตา หนึ่งร้อยศพ',
+     bonuses:{atkMult:1.65,critBonus:0.26,doubleStrike:0.3,goldMult:1.6},
+     rewardWeapon:{name:'กริชเทพสายฟ้า',icon:'🌩',slot:'weapon',rarity:'legend',atk:102,requiredClass:'rogue'}}
   ],
   archer:[
     {tier:1,name:'นักธนู',icon:'🏹',color:'#ffd700'},
@@ -578,7 +632,25 @@ const CLASS_EVOLUTIONS = {
     {tier:4,branch:'S',parentBranch:'S',secret:true,name:'เทพแห่งการล่านิรันดร์',icon:'🌌🏹',color:'#9900ff',
      lore:'ไม่มีเป้าหมายใดหนีพ้น แม้แต่ดวงดาวที่กำลังจะดับ',
      bonuses:{atkMult:2.1,critBonus:0.35,pierce:0.6,multiShot:3},
-     rewardWeapon:{name:'ธนูพิฆาตนิรันดร์',icon:'🌌',slot:'weapon',rarity:'mythic',atk:125,requiredClass:'archer'}}
+     rewardWeapon:{name:'ธนูพิฆาตนิรันดร์',icon:'🌌',slot:'weapon',rarity:'mythic',atk:125,requiredClass:'archer'}},
+    // ── branch C (kills 35-60) — นักธนูเพลิง ──
+    {tier:3,branch:'C',name:'นักธนูเพลิงมาร',icon:'🔥🏹',color:'#ff6622',
+     lore:'ลูกธนูทุกดอกลุกเป็นไฟ เผาทั้งกายและวิญญาณ',
+     bonuses:{atkMult:1.5,critBonus:0.16,pierce:0.2,multiShot:1},
+     rewardWeapon:{name:'ธนูเพลิงมาร',icon:'🔥',slot:'weapon',rarity:'epic',atk:57,requiredClass:'archer'}},
+    {tier:4,branch:'C',parentBranch:'C',name:'เทพธนูเพลิงประลัย',icon:'☄️🏹',color:'#ff3300',
+     lore:'ฝนลูกธนูเพลิงตกลงมาราวกับวันสิ้นโลก',
+     bonuses:{atkMult:1.85,critBonus:0.26,pierce:0.4,multiShot:2},
+     rewardWeapon:{name:'ธนูเพลิงประลัย',icon:'☄️',slot:'weapon',rarity:'legend',atk:100,requiredClass:'archer'}},
+    // ── branch D (kills 60-90) — พรานเงา ──
+    {tier:3,branch:'D',name:'พรานเงาไร้เสียง',icon:'🌑🏹',color:'#8866cc',
+     lore:'ไม่มีใครได้ยินคันธนู มีเพียงเสียงร่างล้มลง',
+     bonuses:{atkMult:1.55,critBonus:0.22,pierce:0.3,multiShot:1},
+     rewardWeapon:{name:'ธนูพรานเงา',icon:'🌑',slot:'weapon',rarity:'epic',atk:61,requiredClass:'archer'}},
+    {tier:4,branch:'D',parentBranch:'D',name:'เทพพรานแห่งความมืด',icon:'🌒🏹',color:'#6644aa',
+     lore:'ความมืดคือลูกธนู เงาคือคันศร เป้าหมายคือทุกสิ่ง',
+     bonuses:{atkMult:1.95,critBonus:0.3,pierce:0.5,multiShot:2},
+     rewardWeapon:{name:'ธนูเทพมืด',icon:'🌒',slot:'weapon',rarity:'legend',atk:106,requiredClass:'archer'}}
   ],
   paladin:[
     {tier:1,name:'อัศวินศักดิ์สิทธิ์',icon:'✨',color:'#4488ff'},
@@ -615,7 +687,25 @@ const CLASS_EVOLUTIONS = {
     {tier:4,branch:'S',parentBranch:'S',secret:true,name:'เทพผู้คุ้มครองนิรันดร์',icon:'🕊️☀️',color:'#ffdd88',
      lore:'แสงของเขาไม่เคยดับ แม้ในความมืดมิดที่สุดของจักรวาล',
      bonuses:{hpMult:2.2,defMult:1.9,regenMult:1.8,damageReduction:0.25,reviveOnce:true},
-     rewardWeapon:{name:'ดาบเทพผู้คุ้มครอง',icon:'🕊️',slot:'weapon',rarity:'mythic',atk:100,def:40,requiredClass:'paladin'}}
+     rewardWeapon:{name:'ดาบเทพผู้คุ้มครอง',icon:'🕊️',slot:'weapon',rarity:'mythic',atk:100,def:40,requiredClass:'paladin'}},
+    // ── branch C (kills 35-60) — อัศวินครูเสด ──
+    {tier:3,branch:'C',name:'อัศวินครูเสด',icon:'⚔️✨',color:'#ddbb44',
+     lore:'ดาบและศรัทธาเป็นหนึ่งเดียว ทั้งโจมตีและปกป้อง',
+     bonuses:{hpMult:1.3,atkMult:1.35,defMult:1.2,critBonus:0.1},
+     rewardWeapon:{name:'ดาบครูเสด',icon:'⚔️',slot:'weapon',rarity:'epic',atk:55,requiredClass:'paladin'}},
+    {tier:4,branch:'C',parentBranch:'C',name:'จอมพลครูเสดศักดิ์สิทธิ์',icon:'🛡☀️',color:'#ffaa22',
+     lore:'นำกองทัพแสงพิชิตความมืด ดาบไม่เคยพ่าย',
+     bonuses:{hpMult:1.5,atkMult:1.6,defMult:1.3,critBonus:0.2,regenMult:1.2},
+     rewardWeapon:{name:'ดาบจอมพลครูเสด',icon:'🛡',slot:'weapon',rarity:'legend',atk:95,requiredClass:'paladin'}},
+    // ── branch D (kills 60-90) — เทพแห่งการพิพากษา ──
+    {tier:3,branch:'D',name:'ผู้พิพากษาศักดิ์สิทธิ์',icon:'⚖️✨',color:'#ffcc66',
+     lore:'ตราชั่งแห่งความยุติธรรม บาปหนักเท่าใด ดาบก็หนักเท่านั้น',
+     bonuses:{hpMult:1.45,atkMult:1.4,defMult:1.35,critBonus:0.12,regenMult:1.2},
+     rewardWeapon:{name:'ดาบผู้พิพากษา',icon:'⚖️',slot:'weapon',rarity:'epic',atk:59,requiredClass:'paladin'}},
+    {tier:4,branch:'D',parentBranch:'D',name:'เทพแห่งการพิพากษา',icon:'👁☀️',color:'#ffbb33',
+     lore:'คำตัดสินสุดท้ายของจักรวาลอยู่ในมือของเขา',
+     bonuses:{hpMult:1.7,atkMult:1.65,defMult:1.5,critBonus:0.22,regenMult:1.4,damageReduction:0.1},
+     rewardWeapon:{name:'ดาบพิพากษาสวรรค์',icon:'👁',slot:'weapon',rarity:'legend',atk:104,requiredClass:'paladin'}}
   ]
 };
 
@@ -631,16 +721,22 @@ const INFINITY_TRIAL = {
   baseHpMult:       0.22,    // คลื่นแรกเทียบมอนจริง (ตีไม่กี่ทีตาย → เล่นลื่นแบบ gauntlet)
   baseAtkMult:      0.4,
   attackSpeedMult:  0.42,    // trial ตีเร็วกว่าปกติ (× ของ getAttackInterval, ขั้นต่ำ 420ms)
-  // kills → branch ของ Tier 3 (เลือกเส้นทางตามผลงานใน trial)
-  // ตี < tierBKills        → ได้ branch B (เส้นทางพื้นฐาน/ตั้งรับ)
-  // ตี >= tierAKills       → ได้ branch A (เส้นทางบุก/โหด)
-  tierBKills:  15,           // ต่ำกว่านี้ = branch B
-  tierAKills:  40,           // ถึงนี่ = branch A
-  // เงื่อนไข SECRET TIER (สมดุล — ต้องเก่งจริงถึงได้):
-  //   ต้อง kills สูงมาก  AND  ผ่านคลื่นลึก  AND  ผ่าน secret check
-  secretMinKills: 80,        // ต้องตีอย่างน้อย 80 ตัวใน run เดียว
+
+  // ── kills → branch (5 ชั้น, ยิ่งตีเยอะ ยิ่งได้คลาสโหด) ──
+  // ตรวจจากบนลงล่าง: ใช้ branch แรกที่ kills ถึง minKills
+  // เรียงพลังจากอ่อน→โหด:  B (~20-50) < A (~40-60) < C (~65-90) < D (~90-120)
+  // ค่า score เป็นแนวเทียบ (จาก bonuses) ไว้ดูสมดุล ไม่ได้ใช้ใน logic
+  killTiers: [
+    { branch:'B', minKills:0,  label:'เส้นทางตั้งรับ',  rank:'C' },
+    { branch:'A', minKills:15, label:'เส้นทางบุก',       rank:'B' },
+    { branch:'C', minKills:35, label:'เส้นทางพิฆาต',     rank:'A' },
+    { branch:'D', minKills:60, label:'เส้นทางจอมทัพ',    rank:'S' },
+  ],
+
+  // ── SECRET TIER (branch S) — เหนือทุกชั้น, ต้องเก่งจริง + โชค ──
+  secretMinKills: 90,        // ต้องตีอย่างน้อย 90 ตัวใน run เดียว
   secretMinWave:  12,        // และไปถึงคลื่นที่ 12+
-  secretChance:   0.5,       // ถ้าเข้าเงื่อนไขครบ → โอกาส 50% ได้ Secret (ไม่ครบ = ได้ branch A)
+  secretChance:   0.5,       // เข้าเงื่อนไขครบ → 50% ได้ Secret (ไม่งั้นตกชั้น D)
 };
 
 // ============================================================

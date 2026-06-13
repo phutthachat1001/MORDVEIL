@@ -57,9 +57,9 @@ function _renderTrialIntro() {
         <li>★ ตีได้ ${T.secretMinKills}+ ตัว ทะลุคลื่นที่ ${T.secretMinWave}+ — อาจปลดล็อก <span style="color:#ff00cc">Tier ลับ</span></li>
       </ul>
       <div class="trial-thresholds">
-        <span>&lt; ${T.tierBKills} ตี → เส้นทางตั้งรับ</span>
-        <span>${T.tierAKills}+ ตี → เส้นทางบุก</span>
-        <span style="color:#ff00cc">${T.secretMinKills}+ ตี → Tier ลับ?</span>
+        ${(T.killTiers || []).map(t =>
+          `<span>${t.minKills > 0 ? t.minKills + '+' : '0'} ตี → ${t.label} (${t.rank})</span>`).join('')}
+        <span style="color:#ff00cc">${T.secretMinKills}+ ตี · คลื่น ${T.secretMinWave}+ → Tier ลับ? (SS)</span>
       </div>
       <button class="btn-trial-start" onclick="startInfinityTrial()">⚔️ เริ่มการทดสอบ</button>
       <button class="btn-trial-cancel" onclick="closeInfinityTrial()">ยังไม่พร้อม</button>
@@ -241,22 +241,23 @@ function _endTrial() {
   _renderTrialResult(result);
 }
 
-// decide which Tier-3 branch the player earned
+// decide which Tier-3 branch the player earned (5-tier ladder + secret)
 function _rollTrialBranch(kills, deepestWave) {
   const T = INFINITY_TRIAL;
-  // SECRET: needs high kills AND deep wave AND a roll
+  // SECRET (branch S): highest, needs lots of kills AND a deep wave AND a roll
   const secretEligible = kills >= T.secretMinKills && deepestWave >= T.secretMinWave;
-  let branch;
+  let branch, rank, label;
   if (secretEligible && Math.random() < T.secretChance) {
-    branch = 'S';
-  } else if (kills >= T.tierAKills) {
-    branch = 'A';
+    branch = 'S'; rank = 'SS'; label = 'TIER ลับ';
   } else {
-    branch = 'B';
+    // pick the highest kill-tier the player reached
+    const tiers = (T.killTiers || []).slice().sort((a, b) => b.minKills - a.minKills);
+    const hit = tiers.find(t => kills >= t.minKills) || tiers[tiers.length - 1];
+    branch = hit.branch; rank = hit.rank; label = hit.label;
   }
   const path = CLASS_EVOLUTIONS[G.classId] || [];
   const evo  = path.find(e => e.tier === 3 && (e.branch === branch));
-  return { branch, evo, kills, deepestWave, secretEligible };
+  return { branch, rank, label, evo, kills, deepestWave, secretEligible };
 }
 
 function _renderTrialResult(result) {
@@ -264,8 +265,9 @@ function _renderTrialResult(result) {
   if (!stage || !result.evo) return;
   const evo = result.evo;
   const secret = result.branch === 'S';
-  const tierLabel = secret ? '<span style="color:#ff00cc">★ TIER ลับ ★</span>'
-    : (result.branch === 'A' ? 'เส้นทางบุก' : 'เส้นทางตั้งรับ');
+  const tierLabel = secret
+    ? '<span style="color:#ff00cc">★ TIER ลับ ★</span>'
+    : `<span class="trial-rank trial-rank-${result.rank}">${result.rank}</span> ${result.label}`;
 
   const missedSecret = result.secretEligible && !secret;
   stage.innerHTML = `
@@ -335,14 +337,22 @@ function _updateTrialHud() {
   const hud = document.getElementById('trial-hud');
   if (hud) {
     const T = INFINITY_TRIAL;
-    let next = '';
-    if (_trialKills < T.tierBKills)      next = `อีก ${T.tierBKills - _trialKills} ตัว → เส้นทางบุก?`;
-    else if (_trialKills < T.tierAKills) next = `อีก ${T.tierAKills - _trialKills} ตัว → เส้นทางบุก`;
-    else if (_trialKills < T.secretMinKills) next = `อีก ${T.secretMinKills - _trialKills} ตัว → ลุ้น Tier ลับ`;
-    else next = `<span style="color:#ff00cc">★ เข้าเงื่อนไข Tier ลับแล้ว!</span>`;
+    // current tier the kills have earned so far + what the next step needs
+    const tiers = (T.killTiers || []).slice().sort((a, b) => a.minKills - b.minKills);
+    const cur = tiers.filter(t => _trialKills >= t.minKills).pop() || tiers[0];
+    const nextTier = tiers.find(t => t.minKills > _trialKills);
+    let next;
+    if (nextTier) {
+      next = `อีก ${nextTier.minKills - _trialKills} ตัว → <b>${nextTier.label}</b> (${nextTier.rank})`;
+    } else if (_trialKills < T.secretMinKills) {
+      next = `อีก ${T.secretMinKills - _trialKills} ตัว → ลุ้น <span style="color:#ff00cc">Tier ลับ</span>`;
+    } else {
+      next = `<span style="color:#ff00cc">★ เข้าเงื่อนไข Tier ลับแล้ว!</span>`;
+    }
     hud.innerHTML = `
       <span>🌊 คลื่น ${_trialWave}</span>
       <span>💀 ${_trialKills} ตัว</span>
+      <span>ตอนนี้: <b>${cur.rank}</b></span>
       <span class="trial-hud-next">${next}</span>`;
   }
   const hpFill = document.getElementById('trial-hero-hp');
