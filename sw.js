@@ -1,4 +1,4 @@
-const CACHE = 'mordveil-v40';
+const CACHE = 'mordveil-v43';
 const ASSETS = [
   './Play.html',
   './css/style.css',
@@ -23,6 +23,7 @@ const ASSETS = [
   './js/cosmetic.js',
   './js/audio.js',
   './js/infinity.js',
+  './js/t4dungeon.js',
   './js/idle-events.js',
   './js/tutorial.js',
   './js/offline.js',

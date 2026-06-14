@@ -68,7 +68,15 @@ function renderClassGrid() {
   grid.innerHTML = '';
   CLASSES.forEach(c => {
     const card = document.createElement('div');
-    card.className = 'class-card';
+    card.className = 'class-card' + (c.locked ? ' locked' : '');
+    if (c.locked) {
+      card.innerHTML = `<div class="class-icon">${c.icon}</div>
+        <div class="class-name">${c.name}</div>
+        <div class="class-desc">🔒 เร็วๆ นี้</div>
+        <div class="class-stats" style="color:${c.color}">เร็วๆ นี้</div>`;
+      grid.appendChild(card);
+      return;
+    }
     card.innerHTML = `<div class="class-icon">${c.icon}</div>
       <div class="class-name">${c.name}</div>
       <div class="class-desc">${c.desc}</div>

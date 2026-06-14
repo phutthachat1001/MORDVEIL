@@ -22,11 +22,21 @@ let _trialSkillCd  = {};   // skillId -> ready timestamp(ms)
 let _trialDeepestWave = 0;
 
 // ---------- entry / gate ----------
+const TRIAL_MIN_LEVEL = 35;   // ต้องถึง Lv35 ก่อนเข้าการทดสอบ (T2→T3)
+
 function canEnterTrial() {
-  return G.classId && (G.classTier || 1) === 2 && !G.classBranch;
+  return G.classId && (G.classTier || 1) === 2 && !G.classBranch
+    && (G.level || 1) >= TRIAL_MIN_LEVEL;
 }
 
 function openInfinityTrial() {
+  // ยังไม่ถึงเลเวลขั้นต่ำ — บอกผู้เล่นแทนที่จะเปิดเงียบๆ
+  if (G.classId && (G.classTier || 1) === 2 && !G.classBranch
+      && (G.level || 1) < TRIAL_MIN_LEVEL) {
+    if (typeof logBattle === 'function')
+      logBattle(`<span class="log-sys">🔒 ต้องถึงเลเวล ${TRIAL_MIN_LEVEL} ก่อนจึงจะเข้าการทดสอบนิรันดร์ได้ (ตอนนี้ Lv ${G.level||1})</span>`);
+    return;
+  }
   if (!canEnterTrial()) return;
   const overlay = document.getElementById('infinity-overlay');
   if (!overlay) return;

@@ -107,6 +107,8 @@ body.preload{visibility:hidden}
 .class-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;max-width:1000px;width:100%;margin-bottom:2rem}
 .class-card{background:var(--bg2);border:2px solid var(--border);border-radius:12px;padding:1.5rem 1rem;cursor:pointer;transition:all .3s;text-align:center}
 .class-card:hover,.class-card.selected{border-color:var(--purple);box-shadow:0 0 15px #aa44ff44;background:var(--bg3)}
+.class-card.locked{cursor:not-allowed;opacity:.45;filter:grayscale(.7)}
+.class-card.locked:hover{border-color:var(--border);box-shadow:none;background:var(--bg2)}
 .class-icon{font-size:3rem;margin-bottom:.8rem}
 .class-name{font-family:'Chakra Petch',sans-serif;font-size:1rem;color:var(--gold);margin-bottom:.5rem}
 .class-desc{font-size:.8rem;color:var(--text2);line-height:1.4}
@@ -2975,6 +2977,7 @@ body.preload{visibility:hidden}
    INFINITY TRIAL — โหมดทดสอบนิรันดร์
    ════════════════════════════════════════════════════════════ */
 #infinity-overlay.active{ display:flex !important; }
+#t4d-overlay.active{ display:flex !important; }
 .infinity-stage{
   width:min(640px,94vw); max-height:92vh; overflow-y:auto;
   background:rgba(10,2,18,.7); border:1px solid #4a1a66;
@@ -2994,6 +2997,22 @@ body.preload{visibility:hidden}
   margin-bottom:1.1rem; font-size:.72rem; }
 .trial-thresholds span{ background:rgba(80,20,110,.5); border:1px solid #5a2a7a;
   border-radius:20px; padding:.25rem .7rem; color:#ddbbf0; }
+
+/* ── T4 Dungeon — แผงชิ้นของ 6 ช่อง ── */
+.t4d-pieces{ display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem;
+  max-width:420px; margin:0 auto 1rem; }
+.t4d-piece{ background:rgba(40,40,60,.6); border:1px solid #444; border-radius:10px;
+  padding:.5rem .3rem; text-align:center; opacity:.6; }
+.t4d-piece.got{ opacity:1; border-color:#ffcc44; background:rgba(90,70,20,.4);
+  box-shadow:0 0 10px rgba(255,200,60,.3); }
+.t4d-piece-icon{ font-size:1.6rem; line-height:1.3; }
+.t4d-piece-label{ font-size:.62rem; color:#aaa; }
+.t4d-piece-name{ font-size:.6rem; color:#ddd; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; }
+.t4d-piece.got .t4d-piece-name{ color:#ffdd88; }
+.t4d-progress{ font-size:.82rem; color:#ddd; margin-bottom:1rem; }
+.t4d-foe .idle-mob-sprite img{ filter:drop-shadow(0 0 6px #ff4488); }
+@media (max-width:480px){ .t4d-pieces{ grid-template-columns:repeat(3,1fr); gap:.35rem; } }
 
 .btn-trial-start{
   display:block; width:100%; max-width:320px; margin:.5rem auto;
@@ -3119,6 +3138,7 @@ body.preload{visibility:hidden}
 }
 .cc-node:hover{ transform:translateY(-2px); }
 .cc-icon{ font-size:1.5rem; line-height:1.2; }
+.cc-img{ width:42px; height:42px; object-fit:contain; display:block; margin:0 auto; }
 .cc-name{ font-size:.6rem; line-height:1.2; overflow:hidden; text-overflow:ellipsis;
   white-space:nowrap; margin-top:.15rem; }
 .cc-unknown{ opacity:.55; }

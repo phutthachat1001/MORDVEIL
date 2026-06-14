@@ -46,6 +46,8 @@ function checkEvolutionConditions(evo) {
   const c = evo.conditions;
   if (!c) return true;
   if (c.level && G.level < c.level) return false;
+  // Tier 4 ต้องเก็บของในดันเจี้ยนครบ 6 ชิ้น + ทำเควสประจำอาชีพเสร็จก่อน
+  if (evo.tier === 4 && typeof canForgeT4 === 'function' && !canForgeT4()) return false;
   return true;
 }
 
@@ -166,10 +168,15 @@ function renderEvolutionButton() {
   // Tier 2, no branch chosen yet — the path to Tier 3 is the INFINITY TRIAL,
   // not a free pick. kills in the trial decide which branch (incl. secret).
   if ((G.classTier||1) === 2 && !G.classBranch && typeof canEnterTrial === 'function') {
+    const minLv = (typeof TRIAL_MIN_LEVEL !== 'undefined') ? TRIAL_MIN_LEVEL : 35;
+    const lvOk = (G.level || 1) >= minLv;
     area.innerHTML = `
       <div style="color:#ff88dd;font-size:.85rem;margin-bottom:.3rem">♾️ เส้นทาง Tier 3 ถูกตัดสินด้วยการทดสอบนิรันดร์</div>
       <div style="color:var(--text2);font-size:.75rem;margin-bottom:.4rem">ตีมอนไม่จบสิ้น — ยิ่งตีเยอะ ยิ่งได้คลาสโหด · มีโอกาสปลดล็อก Tier ลับ</div>
-      <button class="btn-evolve" onclick="openInfinityTrial()">⚔️ เข้าสู่การทดสอบนิรันดร์</button>`;
+      ${lvOk
+        ? `<button class="btn-evolve" onclick="openInfinityTrial()">⚔️ เข้าสู่การทดสอบนิรันดร์</button>`
+        : `<div class="evo-cond fail" style="margin-bottom:.3rem">⭐ LV: ${G.level||1}/${minLv}</div>
+           <div style="color:var(--text2);font-size:.8rem">🔒 ต้องถึงเลเวล ${minLv} ก่อน</div>`}`;
     return;
   }
 
@@ -186,6 +193,27 @@ function renderEvolutionButton() {
   const ready = canEvolve();
   const c = next.conditions || {};
   const condHtml = c.level ? condLine('⭐ LV', c.level, G.level) : '';
+
+  // ── Tier 4: ต้องผ่านดันเจี้ยนหาของ 6 ชิ้น + เควสประจำอาชีพ ──
+  if (next.tier === 4 && typeof canEnterT4Dungeon === 'function') {
+    const lvOk    = !c.level || G.level >= c.level;
+    const gearN   = (typeof t4GearCount === 'function') ? t4GearCount() : 0;
+    const gearOk  = (typeof hasAllT4Gear === 'function') ? hasAllT4Gear() : false;
+    const questOk = (typeof t4QuestDone === 'function') ? t4QuestDone() : true;
+    area.innerHTML = `
+      <div class="evo-next-name" style="color:${next.color||'var(--gold)'}">${next.icon} ${next.name} (Tier ${next.tier})</div>
+      <div class="evo-conds">
+        ${condHtml}
+        <div class="evo-cond${gearOk?'':' fail'}">🧩 ของในดันเจี้ยน: ${gearN}/6</div>
+        <div class="evo-cond${questOk?'':' fail'}">📜 เควสประจำอาชีพ: ${questOk?'เสร็จ':'ยังไม่เสร็จ'}</div>
+      </div>
+      ${ready
+        ? `<button class="btn-evolve" onclick="evolveClass()">✨ วิวัฒนาการ!</button>`
+        : !lvOk
+          ? `<div style="color:var(--text2);font-size:.8rem">ต้องถึง LV ${c.level} ก่อน</div>`
+          : `<button class="btn-evolve" onclick="openT4Dungeon()">⚔️ เข้าดันเจี้ยนหาของ T4</button>`}`;
+    return;
+  }
 
   area.innerHTML = `
     <div class="evo-next-name" style="color:${next.color||'var(--gold)'}">${next.icon} ${next.name} (Tier ${next.tier})</div>

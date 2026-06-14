@@ -41,9 +41,19 @@ function _renderClassCodex() {
       return `<div class="cc-node cc-secret-locked" title="ปลดล็อกผ่าน Tier ลับใน Infinity Trial">
         <div class="cc-icon">❓</div><div class="cc-name">Tier ลับ</div></div>`;
     }
+    // show the real PNG artwork for unlocked forms (fallback to emoji icon)
+    let iconHtml;
+    if (known) {
+      const suffix = (evo.tier >= 3 && evo.branch) ? `-${evo.branch}` : '';
+      const img = `assets/sprites/${G.classId}_T${evo.tier}${suffix}.png`;
+      iconHtml = `<img src="${img}" class="cc-img" style="image-rendering:pixelated;filter:drop-shadow(0 0 6px ${color})" `
+        + `onerror="this.outerHTML='<span style=&quot;filter:drop-shadow(0 0 6px ${color})&quot;>${evo.icon}</span>'">`;
+    } else {
+      iconHtml = '🔒';
+    }
     return `<div class="cc-node${isCur?' cc-current':''}${evo.secret?' cc-secret':''}${known?'':' cc-unknown'}"
       title="${(evo.lore||'').replace(/"/g,'')}">
-      <div class="cc-icon" style="${known?`filter:drop-shadow(0 0 6px ${color})`:''}">${known?evo.icon:'🔒'}</div>
+      <div class="cc-icon" style="${known?'':''}">${iconHtml}</div>
       <div class="cc-name" style="color:${known?color:'#666'}">${known?evo.name:'???'}</div>
       ${evo.secret?'<div class="cc-tag">★ ลับ</div>':''}
       ${isCur?'<div class="cc-you">● ตอนนี้</div>':''}

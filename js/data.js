@@ -19,7 +19,7 @@ const CLASSES = [
    desc:'Streak bonus ×1.5 เมื่อทำครบ 5 งาน/วัน สถิติสมดุล',
    stats:'Streak ×1.5 @5งาน/วัน',
    bonuses:{streakMult:1.5,streakThreshold:5}},
-  {id:'paladin',name:'อัศวินศักดิ์สิทธิ์',icon:'✨',color:'#4488ff',
+  {id:'paladin',name:'อัศวินศักดิ์สิทธิ์',icon:'✨',color:'#4488ff',locked:true,
    desc:'ฟื้น HP 10% หลังสู้ทุกครั้ง ทนทานสูง',
    stats:'+10% HP regen/fight, +10% HP',
    bonuses:{hpMult:1.1,regenAfterFight:0.1}}
@@ -432,7 +432,7 @@ const CLASS_EVOLUTIONS = {
     {tier:1,name:'นักรบ',icon:'🗡',color:'#ff6644'},
     {tier:2,name:'อัศวิน',icon:'⚔️',color:'#ff8844',
      lore:'ผ่านศึกนับร้อย ร่างกายและจิตใจถูกหลอมเป็นเหล็กกล้า',
-     conditions:{level:20,kills:30},
+     conditions:{level:15,kills:30},
      bonuses:{hpMult:1.2,atkMult:1.15},
      rewardWeapon:{name:'ดาบอัศวิน',icon:'⚔️',slot:'weapon',rarity:'uncommon',atk:18,requiredClass:'warrior'}},
     // tier3 branch A
@@ -450,13 +450,13 @@ const CLASS_EVOLUTIONS = {
     // tier4 branch A→A
     {tier:4,branch:'A',parentBranch:'A',name:'อัศวินแห่งหายนะ',icon:'💀⚔️',color:'#cc2200',
      lore:'ระหว่างแสงและมืด — คุณเลือกเส้นทางที่สาม: หายนะ',
-     conditions:{level:80,bossKills:10,evoQuest:'warrior_4A'},
+     conditions:{level:60,bossKills:10,evoQuest:'warrior_4A'},
      bonuses:{hpMult:1.5,atkMult:1.4,defMult:1.3,critBonus:0.2},
      rewardWeapon:{name:'ดาบหายนะนิรันดร์',icon:'💀',slot:'weapon',rarity:'legend',atk:90,requiredClass:'warrior'}},
     // tier4 branch B→B
     {tier:4,branch:'B',parentBranch:'B',name:'ผู้พิทักษ์นิรันดร์',icon:'🏰🛡',color:'#4466ff',
      lore:'ผู้ที่ยืนหยัดสุดท้าย ไม่มีอะไรทะลุผ่านได้',
-     conditions:{level:80,tasks:60,evoQuest:'warrior_4B'},
+     conditions:{level:60,tasks:60,evoQuest:'warrior_4B'},
      bonuses:{hpMult:2.0,defMult:1.8,damageReduction:0.2},
      rewardWeapon:{name:'โล่ศักดิ์สิทธิ์นิรันดร์',icon:'🏰',slot:'armor',rarity:'legend',atk:20,def:60,requiredClass:'warrior'}},
     // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
@@ -466,6 +466,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ดาบกระหายเลือด',icon:'🩸',slot:'weapon',rarity:'legend',atk:70,requiredClass:'warrior'}},
     {tier:4,branch:'S',parentBranch:'S',secret:true,name:'อสูรสงครามนิรันดร์',icon:'👹⚔️',color:'#aa0022',
      lore:'ไม่ใช่มนุษย์ ไม่ใช่อสูร — คือสงครามที่มีชีวิต',
+     conditions:{evoQuest:'warrior_4S'},
      bonuses:{hpMult:1.8,atkMult:1.8,critBonus:0.25,lifesteal:0.15},
      rewardWeapon:{name:'มหาดาบอสูรนิรันดร์',icon:'👹',slot:'weapon',rarity:'mythic',atk:120,requiredClass:'warrior'}},
     // ── branch C (kills 35-60) — เบอร์เซิร์กเกอร์สายดุ ──
@@ -475,6 +476,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ขวานคลั่งสงคราม',icon:'🪓',slot:'weapon',rarity:'epic',atk:58,requiredClass:'warrior'}},
     {tier:4,branch:'C',parentBranch:'C',name:'ปีศาจสงครามเลือด',icon:'🔥🪓',color:'#dd3311',
      lore:'สนามรบคือบ้าน เลือดศัตรูคืออาหาร',
+     conditions:{evoQuest:'warrior_4C'},
      bonuses:{hpMult:1.5,atkMult:1.6,critBonus:0.22,lifesteal:0.1},
      rewardWeapon:{name:'ขวานสังหารหมู่',icon:'🔥',slot:'weapon',rarity:'legend',atk:98,requiredClass:'warrior'}},
     // ── branch D (kills 60-90) — จอมทัพรอบด้าน ──
@@ -484,6 +486,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ดาบแม่ทัพ',icon:'🎖',slot:'weapon',rarity:'epic',atk:62,requiredClass:'warrior'}},
     {tier:4,branch:'D',parentBranch:'D',name:'จอมจักรพรรดิสงคราม',icon:'👑⚔️',color:'#ffcc00',
      lore:'อาณาจักรสั่นสะเทือนเมื่อเขายกดาบ',
+     conditions:{evoQuest:'warrior_4D'},
      bonuses:{hpMult:1.7,atkMult:1.7,defMult:1.4,critBonus:0.2,lifesteal:0.08},
      rewardWeapon:{name:'มหาดาบจักรพรรดิ',icon:'👑',slot:'weapon',rarity:'legend',atk:108,requiredClass:'warrior'}}
   ],
@@ -491,7 +494,7 @@ const CLASS_EVOLUTIONS = {
     {tier:1,name:'จอมเวทย์',icon:'🔮',color:'#aa44ff'},
     {tier:2,name:'อาร์เคนเมจ',icon:'✨🔮',color:'#bb55ff',
      lore:'กระแสเวทมนตร์โบราณซึมซับเข้าสู่ร่าง',
-     conditions:{level:20,tasks:20},
+     conditions:{level:15,tasks:20},
      bonuses:{expMult:1.2,atkMult:1.3},
      rewardWeapon:{name:'คทาอาร์เคน',icon:'🪄',slot:'weapon',rarity:'uncommon',atk:22,requiredClass:'mage'}},
     {tier:3,branch:'A',name:'จอมเวทย์มืด',icon:'🌑🔮',color:'#8822cc',
@@ -506,12 +509,12 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'คทาแสงศักดิ์สิทธิ์',icon:'☀️',slot:'weapon',rarity:'epic',atk:40,requiredClass:'mage'}},
     {tier:4,branch:'A',parentBranch:'A',name:'เทพแห่งเวทมนตร์',icon:'🌌',color:'#6600ff',
      lore:'จักรวาลโน้มตัวเคารพ คำพูดกลายเป็นกฎ',
-     conditions:{level:80,tasks:60,evoQuest:'mage_4A'},
+     conditions:{level:60,tasks:60,evoQuest:'mage_4A'},
      bonuses:{expMult:1.5,atkMult:2.0},
      rewardWeapon:{name:'คทาผู้พิพากษา',icon:'🌌',slot:'weapon',rarity:'legend',atk:100,requiredClass:'mage'}},
     {tier:4,branch:'B',parentBranch:'B',name:'นักบวชสวรรค์',icon:'🌟',color:'#ffee44',
      lore:'ผู้รับพลังจากสรวงสวรรค์ ทุกคำอธิษฐานคือสายฟ้า',
-     conditions:{level:80,epicTasks:15,evoQuest:'mage_4B'},
+     conditions:{level:60,epicTasks:15,evoQuest:'mage_4B'},
      bonuses:{expMult:1.6,hpMult:1.5,regenMult:1.3},
      rewardWeapon:{name:'ไม้เท้าสวรรค์',icon:'🌟',slot:'weapon',rarity:'legend',atk:70,requiredClass:'mage'}},
     // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
@@ -521,6 +524,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'คทาแห่งความว่างเปล่า',icon:'🕳️',slot:'weapon',rarity:'legend',atk:75,requiredClass:'mage'}},
     {tier:4,branch:'S',parentBranch:'S',secret:true,name:'ผู้กลืนกินจักรวาล',icon:'🌀🔮',color:'#3300dd',
      lore:'ดวงดาวดับลงเมื่อเขาท่องคาถา — เวทมนตร์ที่ไม่ควรมีอยู่',
+     conditions:{evoQuest:'mage_4S'},
      bonuses:{atkMult:2.2,expMult:1.7,critBonus:0.3,spellEcho:0.3},
      rewardWeapon:{name:'คทากลืนจักรวาล',icon:'🌀',slot:'weapon',rarity:'mythic',atk:130,requiredClass:'mage'}},
     // ── branch C (kills 35-60) — เวทไฟล้างผลาญ ──
@@ -530,6 +534,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'คทาเพลิงพิโรธ',icon:'🔥',slot:'weapon',rarity:'epic',atk:56,requiredClass:'mage'}},
     {tier:4,branch:'C',parentBranch:'C',name:'เทพอัคนีประลัยกัลป์',icon:'☄️🔮',color:'#ff3300',
      lore:'เปลวไฟแห่งวันสิ้นโลกอยู่ในกำมือของเขา',
+     conditions:{evoQuest:'mage_4C'},
      bonuses:{atkMult:1.8,expMult:1.4,critBonus:0.2,spellEcho:0.12},
      rewardWeapon:{name:'คทาอัคนีประลัย',icon:'☄️',slot:'weapon',rarity:'legend',atk:96,requiredClass:'mage'}},
     // ── branch D (kills 60-90) — มหาเวทกาลเวลา ──
@@ -539,6 +544,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'คทากาลเวลา',icon:'⏳',slot:'weapon',rarity:'epic',atk:60,requiredClass:'mage'}},
     {tier:4,branch:'D',parentBranch:'D',name:'เทพผู้บงการกาลเวลา',icon:'🌌⏳',color:'#22aaff',
      lore:'อดีต ปัจจุบัน อนาคต — ทั้งหมดคือสนามเด็กเล่นของเขา',
+     conditions:{evoQuest:'mage_4D'},
      bonuses:{atkMult:1.85,expMult:1.5,critBonus:0.22,spellEcho:0.18},
      rewardWeapon:{name:'คทาบงการกาลเวลา',icon:'🌌',slot:'weapon',rarity:'legend',atk:112,requiredClass:'mage'}}
   ],
@@ -546,7 +552,7 @@ const CLASS_EVOLUTIONS = {
     {tier:1,name:'โจร',icon:'🗡️',color:'#44ff88'},
     {tier:2,name:'นักฆ่า',icon:'🔪',color:'#55ff99',
      lore:'นิ้วที่รวดเร็วกว่าสายตา นักฆ่าไม่สังหาร — พวกเขา "แก้ปัญหา"',
-     conditions:{level:20,critCount:20},
+     conditions:{level:15,critCount:20},
      bonuses:{critBonus:0.08,dropBonus:0.05},
      rewardWeapon:{name:'กริชนักฆ่า',icon:'🔪',slot:'weapon',rarity:'uncommon',atk:20,requiredClass:'rogue'}},
     {tier:3,branch:'A',name:'นักฆ่าเงา',icon:'🌑🔪',color:'#22cc66',
@@ -561,23 +567,24 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ดาบโจรสลัด',icon:'⚓',slot:'weapon',rarity:'epic',atk:42,requiredClass:'rogue'}},
     {tier:4,branch:'A',parentBranch:'A',name:'ราชาเงามืด',icon:'👑🌑',color:'#008844',
      lore:'ไม่มีใครเห็นหน้าราชาเงา แต่ทุกคนรู้สึกถึงการมีอยู่... ก่อนที่จะล้มลง',
-     conditions:{level:80,critCount:150,evoQuest:'rogue_4A'},
+     conditions:{level:60,critCount:150,evoQuest:'rogue_4A'},
      bonuses:{critBonus:0.15,dropBonus:0.05,goldMult:1.5},
      rewardWeapon:{name:'กระบี่ราชาเงา',icon:'👑',slot:'weapon',rarity:'legend',atk:88,requiredClass:'rogue'}},
     {tier:4,branch:'B',parentBranch:'B',name:'จักรพรรดิโจร',icon:'💰👑',color:'#ffaa00',
      lore:'ทองคือพระเจ้า อำนาจคือศาสนา จักรพรรดิโจรปกครองด้วยความกลัวและความโลภ',
-     conditions:{level:80,gold:8000,evoQuest:'rogue_4B'},
+     conditions:{level:60,gold:8000,evoQuest:'rogue_4B'},
      bonuses:{goldMult:2.0,dropBonus:0.15,critBonus:0.08},
      rewardWeapon:{name:'ดาบจักรพรรดิทอง',icon:'💰',slot:'weapon',rarity:'legend',atk:75,requiredClass:'rogue'}},
     // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
-    {tier:3,branch:'S',secret:true,name:'นักฆ่าไร้กาลเวลา',icon:'⏳🔪',color:'#00cc99',
-     lore:'ฆ่าศัตรูเร็วจนเวลาหยุดนิ่ง — ในการทดสอบนั้นเขาเรียนรู้ที่จะอยู่ระหว่างวินาที',
+    {tier:3,branch:'S',secret:true,name:'เนโครแมนเซอร์',icon:'💀🔮',color:'#9b30ff',
+     lore:'ในการทดสอบนิรันดร์ เขาเรียนรู้ที่จะปลุกศพศัตรูที่ล้มลงให้รับใช้ — ความตายไม่ใช่จุดจบ แต่คือจุดเริ่มต้น',
      bonuses:{atkMult:1.3,critBonus:0.25,dropBonus:0.1,goldMult:1.6,doubleStrike:0.25,lifesteal:0.05},
-     rewardWeapon:{name:'กริชหยุดเวลา',icon:'⏳',slot:'weapon',rarity:'legend',atk:65,requiredClass:'rogue'}},
-    {tier:4,branch:'S',parentBranch:'S',secret:true,name:'เงาแห่งความตายเที่ยงแท้',icon:'☠️🌑',color:'#00aa77',
-     lore:'ความตายไม่ใช่เป้าหมายของเขา — ความตายคือเครื่องมือของเขา',
+     rewardWeapon:{name:'คทาเรียกวิญญาณ',icon:'💀',slot:'weapon',rarity:'legend',atk:65,requiredClass:'rogue'}},
+    {tier:4,branch:'S',parentBranch:'S',secret:true,name:'จักรพรรดิเงา',icon:'👑🌑',color:'#6a0dad',
+     lore:'กองทัพของผู้ตายคุกเข่าให้เขา เงาทุกเงาในแผ่นดินคือบัลลังก์ — จักรพรรดิผู้ปกครองทั้งคนเป็นและคนตาย',
+     conditions:{evoQuest:'rogue_4S'},
      bonuses:{atkMult:1.5,critBonus:0.4,dropBonus:0.15,goldMult:2.0,doubleStrike:0.4,lifesteal:0.08},
-     rewardWeapon:{name:'เคียวมัจจุราชเที่ยงแท้',icon:'☠️',slot:'weapon',rarity:'mythic',atk:115,requiredClass:'rogue'}},
+     rewardWeapon:{name:'คทาจักรพรรดิเงา',icon:'👑',slot:'weapon',rarity:'mythic',atk:115,requiredClass:'rogue'}},
     // ── branch C (kills 35-60) — นักฆ่าพิษ ──
     {tier:3,branch:'C',name:'นักฆ่าพิษอสรพิษ',icon:'🐍🔪',color:'#66cc44',
      lore:'ดาบจุ่มพิษงู เหยื่อไม่มีวันรู้ว่าตายเพราะอะไร',
@@ -585,6 +592,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'กริชอสรพิษ',icon:'🐍',slot:'weapon',rarity:'epic',atk:54,requiredClass:'rogue'}},
     {tier:4,branch:'C',parentBranch:'C',name:'ราชาพิษมรณะ',icon:'☠️🐍',color:'#44aa22',
      lore:'อาณาจักรพิษที่ไม่มีใครรอดชีวิตกลับไปเล่า',
+     conditions:{evoQuest:'rogue_4C'},
      bonuses:{atkMult:1.55,critBonus:0.22,doubleStrike:0.2,lifesteal:0.1},
      rewardWeapon:{name:'กริชมรณะอสรพิษ',icon:'☠️',slot:'weapon',rarity:'legend',atk:94,requiredClass:'rogue'}},
     // ── branch D (kills 60-90) — นักฆ่าสายฟ้า ──
@@ -594,6 +602,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'กริชสายฟ้า',icon:'⚡',slot:'weapon',rarity:'epic',atk:60,requiredClass:'rogue'}},
     {tier:4,branch:'D',parentBranch:'D',name:'เทพสังหารสายฟ้า',icon:'🌩🔪',color:'#ffcc00',
      lore:'หนึ่งกะพริบตา หนึ่งร้อยศพ',
+     conditions:{evoQuest:'rogue_4D'},
      bonuses:{atkMult:1.65,critBonus:0.26,doubleStrike:0.3,goldMult:1.6},
      rewardWeapon:{name:'กริชเทพสายฟ้า',icon:'🌩',slot:'weapon',rarity:'legend',atk:102,requiredClass:'rogue'}}
   ],
@@ -601,7 +610,7 @@ const CLASS_EVOLUTIONS = {
     {tier:1,name:'นักธนู',icon:'🏹',color:'#ffd700'},
     {tier:2,name:'นักล่า',icon:'🦅🏹',color:'#ffcc00',
      lore:'ป่าสอนให้รู้จักความอดทน นักล่าเรียนรู้จากธรรมชาติ',
-     conditions:{level:20,streak:5},
+     conditions:{level:15,streak:5},
      bonuses:{streakMult:1.2,atkMult:1.1},
      rewardWeapon:{name:'ธนูนักล่า',icon:'🦅',slot:'weapon',rarity:'uncommon',atk:19,requiredClass:'archer'}},
     {tier:3,branch:'A',name:'นักล่าป่า',icon:'🌿🏹',color:'#ffaa00',
@@ -616,12 +625,12 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ธนูพายุ',icon:'🌪️',slot:'weapon',rarity:'epic',atk:50,requiredClass:'archer'}},
     {tier:4,branch:'A',parentBranch:'A',name:'จอมล่าแห่งจักรวาล',icon:'🌠🏹',color:'#ff8800',
      lore:'เป้าหมายคือดวงดาว — จอมล่าแห่งจักรวาลยิงสู่นิรันดร์',
-     conditions:{level:80,streak:25,evoQuest:'archer_4A'},
+     conditions:{level:60,streak:25,evoQuest:'archer_4A'},
      bonuses:{streakMult:3.0,atkMult:1.5},
      rewardWeapon:{name:'ธนูจักรวาล',icon:'🌠',slot:'weapon',rarity:'legend',atk:92,requiredClass:'archer'}},
     {tier:4,branch:'B',parentBranch:'B',name:'เทพสายลม',icon:'⚡🌪️',color:'#44eeff',
      lore:'เร็วกว่าฟ้าแลบ แม่นกว่าโชคชะตา เทพสายลมไม่ยิงครั้งเดียว — ยิงพร้อมกันทั้งหมด',
-     conditions:{level:80,critCount:100,evoQuest:'archer_4B'},
+     conditions:{level:60,critCount:100,evoQuest:'archer_4B'},
      bonuses:{atkMult:1.8,critBonus:0.15},
      rewardWeapon:{name:'ธนูฟ้าผ่า',icon:'⚡',slot:'weapon',rarity:'legend',atk:95,requiredClass:'archer'}},
     // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
@@ -631,6 +640,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ธนูล่าวิญญาณ',icon:'👁️',slot:'weapon',rarity:'legend',atk:72,requiredClass:'archer'}},
     {tier:4,branch:'S',parentBranch:'S',secret:true,name:'เทพแห่งการล่านิรันดร์',icon:'🌌🏹',color:'#9900ff',
      lore:'ไม่มีเป้าหมายใดหนีพ้น แม้แต่ดวงดาวที่กำลังจะดับ',
+     conditions:{evoQuest:'archer_4S'},
      bonuses:{atkMult:2.1,critBonus:0.35,pierce:0.6,multiShot:3},
      rewardWeapon:{name:'ธนูพิฆาตนิรันดร์',icon:'🌌',slot:'weapon',rarity:'mythic',atk:125,requiredClass:'archer'}},
     // ── branch C (kills 35-60) — นักธนูเพลิง ──
@@ -640,6 +650,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ธนูเพลิงมาร',icon:'🔥',slot:'weapon',rarity:'epic',atk:57,requiredClass:'archer'}},
     {tier:4,branch:'C',parentBranch:'C',name:'เทพธนูเพลิงประลัย',icon:'☄️🏹',color:'#ff3300',
      lore:'ฝนลูกธนูเพลิงตกลงมาราวกับวันสิ้นโลก',
+     conditions:{evoQuest:'archer_4C'},
      bonuses:{atkMult:1.85,critBonus:0.26,pierce:0.4,multiShot:2},
      rewardWeapon:{name:'ธนูเพลิงประลัย',icon:'☄️',slot:'weapon',rarity:'legend',atk:100,requiredClass:'archer'}},
     // ── branch D (kills 60-90) — พรานเงา ──
@@ -649,6 +660,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ธนูพรานเงา',icon:'🌑',slot:'weapon',rarity:'epic',atk:61,requiredClass:'archer'}},
     {tier:4,branch:'D',parentBranch:'D',name:'เทพพรานแห่งความมืด',icon:'🌒🏹',color:'#6644aa',
      lore:'ความมืดคือลูกธนู เงาคือคันศร เป้าหมายคือทุกสิ่ง',
+     conditions:{evoQuest:'archer_4D'},
      bonuses:{atkMult:1.95,critBonus:0.3,pierce:0.5,multiShot:2},
      rewardWeapon:{name:'ธนูเทพมืด',icon:'🌒',slot:'weapon',rarity:'legend',atk:106,requiredClass:'archer'}}
   ],
@@ -656,7 +668,7 @@ const CLASS_EVOLUTIONS = {
     {tier:1,name:'อัศวินศักดิ์สิทธิ์',icon:'✨',color:'#4488ff'},
     {tier:2,name:'พาลาดินแสงสว่าง',icon:'🌟✨',color:'#5599ff',
      lore:'ศรัทธาแกร่งพอที่จะหักดาบศัตรู พาลาดินเดินบนเส้นทางแห่งแสง',
-     conditions:{level:20,hp:300},
+     conditions:{level:15,hp:300},
      bonuses:{regenMult:1.2,hpMult:1.2},
      rewardWeapon:{name:'ดาบศักดิ์สิทธิ์',icon:'✨',slot:'weapon',rarity:'uncommon',atk:16,requiredClass:'paladin'}},
     {tier:3,branch:'A',name:'นักบุญนักรบ',icon:'🌈✨',color:'#3366ee',
@@ -671,12 +683,12 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ดาบพิฆาตมาร',icon:'⚡',slot:'weapon',rarity:'epic',atk:50,requiredClass:'paladin'}},
     {tier:4,branch:'A',parentBranch:'A',name:'เทพแห่งแสง',icon:'☀️',color:'#2244dd',
      lore:'แสงจากอีกโลก ผ่านร่างของนักรบมนุษย์',
-     conditions:{level:80,hpHealed:5000,evoQuest:'paladin_4A'},
+     conditions:{level:60,hpHealed:5000,evoQuest:'paladin_4A'},
      bonuses:{regenMult:1.5,hpMult:1.6,damageReduction:0.1},
      rewardWeapon:{name:'ดาบเทพแห่งแสง',icon:'☀️',slot:'weapon',rarity:'legend',atk:65,requiredClass:'paladin'}},
     {tier:4,branch:'B',parentBranch:'B',name:'ราชันพิฆาต',icon:'👑⚡',color:'#ff8800',
      lore:'ราชาแห่งการพิฆาต ทุกก้าวคือความตายของศัตรู',
-     conditions:{level:80,bossKills:15,evoQuest:'paladin_4B'},
+     conditions:{level:60,bossKills:15,evoQuest:'paladin_4B'},
      bonuses:{atkMult:1.6,critBonus:0.12,hpMult:1.2},
      rewardWeapon:{name:'ดาบราชันพิฆาต',icon:'👑',slot:'weapon',rarity:'legend',atk:95,requiredClass:'paladin'}},
     // ── SECRET branch (S) — ปลดล็อกจาก Infinity Trial เท่านั้น ──
@@ -686,6 +698,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ดาบอมตะศักดิ์สิทธิ์',icon:'⚜️',slot:'weapon',rarity:'legend',atk:60,def:20,requiredClass:'paladin'}},
     {tier:4,branch:'S',parentBranch:'S',secret:true,name:'เทพผู้คุ้มครองนิรันดร์',icon:'🕊️☀️',color:'#ffdd88',
      lore:'แสงของเขาไม่เคยดับ แม้ในความมืดมิดที่สุดของจักรวาล',
+     conditions:{evoQuest:'paladin_4S'},
      bonuses:{hpMult:2.2,defMult:1.9,regenMult:1.8,damageReduction:0.25,reviveOnce:true},
      rewardWeapon:{name:'ดาบเทพผู้คุ้มครอง',icon:'🕊️',slot:'weapon',rarity:'mythic',atk:100,def:40,requiredClass:'paladin'}},
     // ── branch C (kills 35-60) — อัศวินครูเสด ──
@@ -695,6 +708,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ดาบครูเสด',icon:'⚔️',slot:'weapon',rarity:'epic',atk:55,requiredClass:'paladin'}},
     {tier:4,branch:'C',parentBranch:'C',name:'จอมพลครูเสดศักดิ์สิทธิ์',icon:'🛡☀️',color:'#ffaa22',
      lore:'นำกองทัพแสงพิชิตความมืด ดาบไม่เคยพ่าย',
+     conditions:{evoQuest:'paladin_4C'},
      bonuses:{hpMult:1.5,atkMult:1.6,defMult:1.3,critBonus:0.2,regenMult:1.2},
      rewardWeapon:{name:'ดาบจอมพลครูเสด',icon:'🛡',slot:'weapon',rarity:'legend',atk:95,requiredClass:'paladin'}},
     // ── branch D (kills 60-90) — เทพแห่งการพิพากษา ──
@@ -704,6 +718,7 @@ const CLASS_EVOLUTIONS = {
      rewardWeapon:{name:'ดาบผู้พิพากษา',icon:'⚖️',slot:'weapon',rarity:'epic',atk:59,requiredClass:'paladin'}},
     {tier:4,branch:'D',parentBranch:'D',name:'เทพแห่งการพิพากษา',icon:'👁☀️',color:'#ffbb33',
      lore:'คำตัดสินสุดท้ายของจักรวาลอยู่ในมือของเขา',
+     conditions:{evoQuest:'paladin_4D'},
      bonuses:{hpMult:1.7,atkMult:1.65,defMult:1.5,critBonus:0.22,regenMult:1.4,damageReduction:0.1},
      rewardWeapon:{name:'ดาบพิพากษาสวรรค์',icon:'👁',slot:'weapon',rarity:'legend',atk:104,requiredClass:'paladin'}}
   ]
@@ -768,6 +783,22 @@ const EVO_QUESTS = {
   paladin_3B:{name:'อัศวินพิฆาต',     desc:'bossKills 5 ตัว และ kills 70 ตัว',   conditions:{bossKills:5, kills:70}},
   paladin_4A:{name:'เทพผู้พิทักษ์',   desc:'ฟื้น HP รวม 5000 และ streak 10 วัน', conditions:{hpHealed:5000, streak:10}},
   paladin_4B:{name:'ราชันล่ามาร',     desc:'bossKills 15 ตัว และ epicTasks 5 ชิ้น', conditions:{bossKills:15, epicTasks:5}},
+  // ── Tier 4 quests for branches C / D / S (เควสประจำอาชีพสายโหด) ──
+  warrior_4C:{name:'ปีศาจสงครามเลือด', desc:'kills 120 ตัว และ bossKills 8 ตัว',   conditions:{kills:120, bossKills:8}},
+  warrior_4D:{name:'จอมจักรพรรดิสงคราม',desc:'bossKills 12 ตัว และทำงาน 50 ชิ้น',  conditions:{bossKills:12, tasks:50}},
+  warrior_4S:{name:'อสูรสงครามนิรันดร์',desc:'kills 200 ตัว และ bossKills 15 ตัว',  conditions:{kills:200, bossKills:15}},
+  mage_4C:{name:'อัคนีประลัยกัลป์',    desc:'kills 130 ตัว และ epicTasks 8 ชิ้น',  conditions:{kills:130, epicTasks:8}},
+  mage_4D:{name:'ผู้บงการกาลเวลา',     desc:'ทำงาน 60 ชิ้น และ kills 100 ตัว',     conditions:{tasks:60, kills:100}},
+  mage_4S:{name:'ผู้กลืนกินจักรวาล',   desc:'kills 200 ตัว และ epicTasks 15 ชิ้น', conditions:{kills:200, epicTasks:15}},
+  rogue_4C:{name:'ราชาพิษมรณะ',        desc:'Crit 130 ครั้ง และ kills 130 ตัว',    conditions:{critCount:130, kills:130}},
+  rogue_4D:{name:'เทพสังหารสายฟ้า',    desc:'Crit 150 ครั้ง และสะสมทอง 6000',     conditions:{critCount:150, gold:6000}},
+  rogue_4S:{name:'จักรพรรดิเงา',       desc:'Crit 200 ครั้ง และ kills 200 ตัว',    conditions:{critCount:200, kills:200}},
+  archer_4C:{name:'เทพธนูเพลิงประลัย', desc:'kills 130 ตัว และ crit 80 ครั้ง',     conditions:{kills:130, critCount:80}},
+  archer_4D:{name:'เทพพรานแห่งความมืด', desc:'kills 140 ตัว และ streak 20 วัน',    conditions:{kills:140, streak:20}},
+  archer_4S:{name:'เทพแห่งการล่านิรันดร์',desc:'kills 200 ตัว และ crit 120 ครั้ง', conditions:{kills:200, critCount:120}},
+  paladin_4C:{name:'จอมพลครูเสด',      desc:'bossKills 10 ตัว และฟื้น HP 4000',    conditions:{bossKills:10, hpHealed:4000}},
+  paladin_4D:{name:'เทพแห่งการพิพากษา', desc:'bossKills 12 ตัว และทำงาน 50 ชิ้น',  conditions:{bossKills:12, tasks:50}},
+  paladin_4S:{name:'เทพผู้คุ้มครองนิรันดร์',desc:'ฟื้น HP 8000 และ bossKills 15 ตัว',conditions:{hpHealed:8000, bossKills:15}},
 };
 
 // ============================================================
@@ -864,6 +895,69 @@ const CLASS_SETS = {
     {icon:'👢',name:'รองเท้าแสงนิรันดร์',atk:10,def:12},
     {icon:'✨',name:'หอกเจาะนิรันดร์EX',atk:28,def:8}
    ]}
+};
+
+// ============================================================
+// T4 DUNGEON — ดันเจี้ยนหาของเฉพาะอาชีพ (gate ก่อนวิวัฒนาการ Tier 4)
+// ------------------------------------------------------------
+//  • เข้าได้เฉพาะตอน Tier 3 ของอาชีพตัวเอง
+//  • สู้กับ "ตัวละคร T4 ของอาชีพตัวเอง" (เงา/ภาพสะท้อนแห่งอนาคต)
+//  • แต่ละชิ้นดรอป ~2.5% ต่อการสังหาร 1 ตัว — มี 6 ชิ้น
+//  • เก็บครบ 6 + ทำเควสประจำอาชีพเสร็จ → ปลดล็อกวิวัฒนาการ Tier 4
+//  หมายเหตุ slot: "อาวุธรอง" ใช้ช่อง pants (ระบบ equip มี 6 ช่องพอดี)
+// ============================================================
+const T4_DUNGEON = {
+  dropChance: 0.025,   // 2.5% ต่อชิ้น ต่อการสังหาร
+  pieceCount: 6,
+  // ลำดับชิ้น (ตรงกับ index ใน gear): หมวก เกราะ มือ เท้า อาวุธหลัก อาวุธรอง
+  pieceSlots: ['helmet','armor','gloves','boots','weapon','pants'],
+  pieceLabels:['หมวก','เกราะ','ถุงมือ','รองเท้า','อาวุธหลัก','อาวุธรอง'],
+  // จำนวนตัวที่ต้องสู้ต่อเวฟ + การสเกล
+  mobHpMult: 1.15,     // ตัว T4 ในดันแกร่งกว่ามอนปกติ tier เดียวกันนิดหน่อย
+  mobAtkMult:1.1,
+  // ของ 6 ชิ้น/อาชีพ — rarity mythic, stat สูงสุดในเกม
+  gear: {
+    warrior:[
+      {icon:'🪖',name:'หมวกอสูรสงคราม',     slot:'helmet',atk:24,def:18,hp:120},
+      {icon:'⚔',name:'เกราะอสูรนิรันดร์',   slot:'armor', atk:22,def:26,hp:160},
+      {icon:'🧤',name:'กำปั้นทำลายล้าง',     slot:'gloves',atk:30,def:8, hp:80},
+      {icon:'👢',name:'สนับแข้งจอมพล',       slot:'boots', atk:16,def:16,hp:100},
+      {icon:'🗡',name:'มหาดาบสังหารเทพ',     slot:'weapon',atk:48,def:6, hp:60},
+      {icon:'🛡',name:'โล่อสูรพิทักษ์',      slot:'pants', atk:14,def:22,hp:140}
+    ],
+    mage:[
+      {icon:'🎩',name:'มงกุฎผู้กลืนจักรวาล', slot:'helmet',atk:28,def:6, hp:70,effect:'EXP+20%'},
+      {icon:'🥋',name:'อาภรณ์มิติว่างเปล่า', slot:'armor', atk:26,def:12,hp:100},
+      {icon:'🧤',name:'ถุงมือทำลายดวงดาว',   slot:'gloves',atk:34,def:4, hp:60},
+      {icon:'👢',name:'รองเท้าเหินมิติ',     slot:'boots', atk:22,def:8, hp:80},
+      {icon:'🌌',name:'คทากลืนจักรวาล',      slot:'weapon',atk:52,def:2, hp:40},
+      {icon:'📖',name:'คัมภีร์ต้องห้าม',     slot:'pants', atk:24,def:6, hp:90,effect:'EXP+15%'}
+    ],
+    rogue:[
+      {icon:'🪖',name:'หน้ากากจักรพรรดิเงา', slot:'helmet',atk:26,def:8, hp:80,effect:'crit+12%'},
+      {icon:'🥋',name:'ชุดเงาแห่งความตาย',   slot:'armor', atk:24,def:14,hp:110},
+      {icon:'🧤',name:'ถุงมือเรียกวิญญาณ',   slot:'gloves',atk:32,def:4, hp:70},
+      {icon:'👢',name:'รองเท้าไร้เงา',       slot:'boots', atk:20,def:8, hp:80,effect:'crit+8%'},
+      {icon:'💀',name:'คทาจักรพรรดิเงา',     slot:'weapon',atk:50,def:2, hp:50},
+      {icon:'🗡',name:'กริชคู่สังหาร',       slot:'pants', atk:30,def:4, hp:60,effect:'crit+10%'}
+    ],
+    archer:[
+      {icon:'🪖',name:'หมวกเทพล่านิรันดร์',  slot:'helmet',atk:25,def:10,hp:90},
+      {icon:'🥋',name:'เกราะนักล่าวิญญาณ',   slot:'armor', atk:23,def:14,hp:110},
+      {icon:'🧤',name:'ปลอกแขนแม่นนิรันดร์', slot:'gloves',atk:33,def:5, hp:65,effect:'crit+10%'},
+      {icon:'👢',name:'รองเท้าลมกรด',        slot:'boots', atk:21,def:8, hp:80},
+      {icon:'🌌',name:'ธนูพิฆาตนิรันดร์',    slot:'weapon',atk:51,def:2, hp:45},
+      {icon:'🏹',name:'หน้าไม้วิญญาณ',       slot:'pants', atk:28,def:5, hp:70,effect:'crit+8%'}
+    ],
+    paladin:[
+      {icon:'🪖',name:'มงกุฎเทพผู้คุ้มครอง', slot:'helmet',atk:16,def:24,hp:160,effect:'ฟื้น HP+15/เทิร์น'},
+      {icon:'⚔',name:'เกราะคุ้มครองนิรันดร์',slot:'armor', atk:14,def:32,hp:220},
+      {icon:'🧤',name:'ถุงมือศรัทธาบริสุทธิ์',slot:'gloves',atk:20,def:14,hp:120},
+      {icon:'👢',name:'รองเท้าผู้พิทักษ์',   slot:'boots', atk:12,def:20,hp:140},
+      {icon:'🕊️',name:'ดาบเทพผู้คุ้มครอง',  slot:'weapon',atk:40,def:12,hp:100},
+      {icon:'🛡',name:'โล่แสงนิรันดร์',      slot:'pants', atk:10,def:28,hp:180,effect:'ฟื้น HP+10/เทิร์น'}
+    ]
+  }
 };
 
 // ============================================================

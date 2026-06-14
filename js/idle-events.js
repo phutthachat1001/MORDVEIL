@@ -151,7 +151,7 @@ function _decorateSpecial(type, mob) {
     if (type === 'raider' && mob.classId) {
       const spr = wrap.querySelector('.idle-mob-sprite');
       if (spr) spr.innerHTML =
-        `<img src="assets/sprites/${mob.classId}_t${Math.min(4,mob.classTier||1)}.png" onerror="this.outerHTML='🧑'">`;
+        `<img src="assets/sprites/${mob.classId}_T${Math.min(4,mob.classTier||1)}.png" onerror="this.outerHTML='🧑'">`;
     }
   }
   let banner = document.getElementById('idle-special-banner');

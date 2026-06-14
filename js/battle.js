@@ -232,28 +232,39 @@ function getMonsterStats(zone, tier, isBoss) {
 
 // ---------- Pixel art sprites ----------
 
-// PNG sprite path helper — returns path if file is expected to exist
-function _pngSpritePath(classId, cosmeticTier) {
-  const tier = Math.min(cosmeticTier || 1, 4); // PNG tiers go up to t4
-  return `assets/sprites/${classId}_t${tier}.png`;
+// PNG sprite path helper — file naming: {class}_T{tier}[-{branch}].png
+// e.g. warrior_T1.png, warrior_T2.png, warrior_T3-D.png, rogue_T4-S.png
+// T1/T2 have no branch; T3/T4 use the chosen branch (A/B/C/D/S).
+function _pngSpritePath(classId, tier, branch) {
+  const t = Math.min(tier || 1, 4); // PNG tiers go up to T4
+  const suffix = (t >= 3 && branch) ? `-${branch}` : '';
+  return `assets/sprites/${classId}_T${t}${suffix}.png`;
 }
 
 // ผู้เล่น pixel art ตามคลาส — tries PNG first, falls back to SVG
-function getPlayerSprite(classId, classTier, cosmeticTierOverride) {
+function getPlayerSprite(classId, classTier, cosmeticTierOverride, classBranch) {
   const cosm = cosmeticTierOverride || (typeof G !== 'undefined' ? G.cosmeticTier : 1) || 1;
   // use classTier for PNG selection if cosmetic is still at base (tier 1)
   const pngTier = cosm > 1 ? cosm : (classTier || 1);
-  const pngPath = _pngSpritePath(classId, pngTier);
-  const tierFilter = {
-    2: 'brightness(1.15) saturate(1.4)',
-    3: 'brightness(1.2) saturate(1.6) drop-shadow(0 0 3px #4488ff)',
-    4: 'brightness(1.5) drop-shadow(0 0 8px gold) hue-rotate(40deg) saturate(1.4)',
+  const branch = (classBranch !== undefined) ? classBranch
+               : (typeof G !== 'undefined' ? G.classBranch : null);
+  const pngPath = _pngSpritePath(classId, pngTier, branch);
+  // Each tier/branch now has its own dedicated artwork, so no colour filter is
+  // applied — only a subtle glow for the higher tiers.
+  const tierGlow = {
+    3: 'filter:drop-shadow(0 0 3px #4488ff);',
+    4: 'filter:drop-shadow(0 0 8px gold);',
   };
-  const filt = tierFilter[Math.min(pngTier, 4)] ? `filter:${tierFilter[Math.min(pngTier,4)]};` : '';
+  const filt = tierGlow[Math.min(pngTier, 4)] || '';
+  // Fallback chain: branch sprite → base-tier sprite → SVG sprite.
+  const baseTierPath = _pngSpritePath(classId, pngTier, null);
+  const onErr = baseTierPath !== pngPath
+    ? `this.onerror=function(){this.parentElement.outerHTML=_getSVGSprite('${classId}',${classTier||1})};this.src='${baseTierPath}'`
+    : `this.parentElement.outerHTML=_getSVGSprite('${classId}',${classTier||1})`;
   return `<div class="png-sprite-wrap" style="display:inline-block;background:transparent;${filt}" data-class="${classId}" data-tier="${pngTier}">` +
     `<img src="${pngPath}" width="80" height="80" ` +
     `style="image-rendering:pixelated;display:block;background:transparent;" ` +
-    `onerror="this.parentElement.outerHTML=_getSVGSprite('${classId}',${classTier||1})">` +
+    `onerror="${onErr}">` +
     `</div>`;
 }
 

@@ -57,6 +57,9 @@ let G = {
   epicTasksDone: 0,
   totalHpHealed: 0,
   collectedSetPieces: {},
+  // T4 Dungeon — ของดรอปเฉพาะอาชีพ (gate ก่อนวิวัฒนาการ Tier 4)
+  // โครงสร้าง: { warrior:[true,false,...6], ... } true = เก็บชิ้นนั้นได้แล้ว
+  t4GearCollected: {},
   // Random Event System
   eventLog: [],
   lastWorkEventTime: 0,
