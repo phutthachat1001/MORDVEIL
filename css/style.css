@@ -3408,3 +3408,6 @@ body.preload{visibility:hidden}
   background:rgba(255,255,255,.05);border:1px solid #555;border-radius:14px;
   padding:.12rem .5rem;font-size:.8rem;
 }
+
+/* quest ready-to-turn-in highlight */
+.rpq-card-ready{ border-color:#4caf50 !important; box-shadow:0 0 12px rgba(76,175,80,.4); animation:pulse 1.6s infinite; }

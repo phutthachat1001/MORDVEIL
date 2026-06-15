@@ -425,26 +425,20 @@ function rpgAcceptQuest(id) {
   st.active = true; st.progress = 0;
 
   // ── retroactive credit: count progress already earned BEFORE accepting ──
+  // (this can make the quest immediately READY to turn in — not auto-finished)
   if (q.type === 'explore') {
-    // visited if it's the current zone OR the zone has any cleared progress
     const reached = G.currentZone === q.targetZone || ((G.zoneProgress||{})[q.targetZone]||0) > 0;
-    if (reached) { st.progress = q.required || 1; _rpgCheckComplete(q, st); return; }
+    if (reached) { st.progress = q.required || 1; _rpgCheckComplete(q, st); }
   } else if (q.type === 'kill') {
-    // if the target monster tier in that zone was already defeated, credit it
     const beaten = (G.defeatedMonsters||{})[`${q.targetZone}_${q.targetTier}`];
-    if (beaten) {
-      // give a head-start (counts as having killed it once)
-      st.progress = Math.min(q.required || 1, 1);
-      _rpgCheckComplete(q, st);
-      if (st.done) return;
-    }
+    if (beaten) { st.progress = Math.min(q.required || 1, 1); _rpgCheckComplete(q, st); }
   } else if (q.type === 'collect' && q.collectType === 'gold') {
-    if (G.gold >= (q.required||0)) { st.progress = G.gold; _rpgCheckComplete(q, st); return; }
+    if (G.gold >= (q.required||0)) { st.progress = G.gold; _rpgCheckComplete(q, st); }
   }
 
   saveGame();
   renderRpgQuestPanel();
-  logBattle(`<span class="log-sys">📜 รับเควส: <b>${q.name}</b> — ${q.desc}</span>`);
+  if (!st.ready) logBattle(`<span class="log-sys">📜 รับเควส: <b>${q.name}</b> — ${q.desc}</span>`);
 }
 
 function rpgAbandonQuest(id) {
@@ -624,15 +618,47 @@ function rpgOnNpcTalk(npcId) {
 // COMPLETE LOGIC
 // ──────────────────────────────────────────────────────────────
 
+// Objective reached → mark READY TO TURN IN (no auto-reward). The player must
+// press "ส่งเควส" in the quest menu to claim. Keeps the quest active+ready.
 function _rpgCheckComplete(q, st) {
   if ((st.progress||0) < (q.required||1)) return;
-  st.done = true; st.active = false;
+  if (st.done || st.ready) return;
+  st.ready = true;          // shows a "ส่งเควส" button in the panel
+  logBattle(`<span class="log-sys">✅ เป้าหมายเควสสำเร็จ: <b>${q.name}</b> — ไปกดส่งเควสที่เมนูเควส!</span>`);
+  if (typeof playSound === 'function') playSound('exp');
+  if (typeof updateNavBadges === 'function') updateNavBadges();
+}
+
+// Player presses "ส่งเควส" — grant reward + finish (and unlock chain next).
+function rpgTurnInQuest(id) {
+  const q = RPG_QUESTS.find(x => x.id === id);
+  if (!q) return;
+  const st = _rpgState(id);
+  if (st.done || !st.ready) return;
+  if ((st.progress||0) < (q.required||1)) return;  // safety
+  st.done = true; st.active = false; st.ready = false;
   _rpgCompleteQuest(q);
-  // chain: auto-unlock next quest for accept
+  // chain story: auto-start the next chapter (kill/explore types continue the
+  // story without an NPC trip; pure NPC-talk chapters still wait for the talk).
   if (q.chainNext) {
+    const nq = RPG_QUESTS.find(x => x.id === q.chainNext);
     const nextSt = _rpgState(q.chainNext);
-    nextSt.active = false; // will show as available
+    if (nq && !nq.trigger && G.level >= (nq.minLevel || 1)) {
+      nextSt.active = true; nextSt.progress = 0;
+      // retroactive credit for the new chapter too
+      if (nq.type === 'explore') {
+        const reached = G.currentZone === nq.targetZone || ((G.zoneProgress||{})[nq.targetZone]||0) > 0;
+        if (reached) { nextSt.progress = nq.required||1; _rpgCheckComplete(nq, nextSt); }
+      } else if (nq.type === 'kill') {
+        if ((G.defeatedMonsters||{})[`${nq.targetZone}_${nq.targetTier}`]) { nextSt.progress = Math.min(nq.required||1,1); _rpgCheckComplete(nq, nextSt); }
+      }
+    } else {
+      nextSt.active = false;
+    }
   }
+  saveGame();
+  if (typeof updateNavBadges === 'function') updateNavBadges();
+  renderRpgQuestPanel();
 }
 
 function _rpgCompleteQuest(q) {
@@ -821,17 +847,20 @@ function renderRpgQuestPanel() {
       const pct = Math.min(100, Math.floor(((st.progress||0)/req)*100));
       const zc  = zoneColors[q.zone] || '#aaa';
       const zoneName = q.zone > 0 ? (ZONES.find(z=>z.id===q.zone)?.name||'') : 'ทุกที่';
-      html += `<div class="rpq-card rpq-card-active">
+      const turnInBtn = st.ready
+        ? `<button class="rpq-btn-accept" style="border-color:#4caf50;color:#7dff7d;background:linear-gradient(135deg,#0f2e0f,#1a3a1a)" onclick="rpgTurnInQuest('${q.id}')">📨 ส่งเควส (รับรางวัล)</button>`
+        : `<button class="rpq-btn-abandon" onclick="rpgAbandonQuest('${q.id}')">✕ ยกเลิก</button>`;
+      html += `<div class="rpq-card rpq-card-active${st.ready?' rpq-card-ready':''}">
         <div class="rpq-card-top">
           <span class="rpq-name">${typeIcon[q.type]||'📜'} ${q.name}</span>
           <span class="rpq-zone" style="color:${zc}">${zoneName}</span>
         </div>
         <div class="rpq-desc">${q.desc}</div>
         <div class="rpq-progress-wrap"><div class="rpq-progress-bar" style="width:${pct}%"></div></div>
-        <div class="rpq-progress-text">${st.progress||0}/${req} (${pct}%)</div>
+        <div class="rpq-progress-text">${st.ready?'<b style="color:#7dff7d">✅ พร้อมส่ง!</b>':`${st.progress||0}/${req} (${pct}%)`}</div>
         <div class="rpq-reward">🏆 +${(q.reward.exp||0).toLocaleString()} EXP &nbsp;💰 +${q.reward.gold||0}${q.reward.chest?` 🎁 ไอเทม${chestLabel[q.reward.chest]}`:''}
         </div>
-        <button class="rpq-btn-abandon" onclick="rpgAbandonQuest('${q.id}')">✕ ยกเลิก</button>
+        ${turnInBtn}
       </div>`;
     });
   }
@@ -857,16 +886,19 @@ function renderRpgQuestPanel() {
     const pct = Math.min(100, Math.floor(((st.progress||0)/req)*100));
     const zc  = zoneColors[q.zone] || '#aaa';
     const zoneName = q.zone > 0 ? (ZONES.find(z=>z.id===q.zone)?.name||'') : 'ทุกที่';
-    html += `<div class="rpq-card rpq-card-active" style="border-color:#a88">
+    const storyTurnIn = st.ready
+      ? `<button class="rpq-btn-accept" style="border-color:#4caf50;color:#7dff7d;background:linear-gradient(135deg,#0f2e0f,#1a3a1a)" onclick="rpgTurnInQuest('${q.id}')">📨 ส่งเควส (รับรางวัล)</button>`
+      : `<button class="rpq-btn-abandon" onclick="rpgAbandonQuest('${q.id}')">✕ ยกเลิก</button>`;
+    html += `<div class="rpq-card rpq-card-active${st.ready?' rpq-card-ready':''}" style="border-color:#a88">
       <div class="rpq-card-top">
         <span class="rpq-name" style="color:#daa">📖 ${q.name}</span>
         <span class="rpq-zone" style="color:${zc}">${zoneName}</span>
       </div>
       <div class="rpq-desc">${q.desc}</div>
       <div class="rpq-progress-wrap"><div class="rpq-progress-bar" style="width:${pct}%;background:linear-gradient(90deg,#a55,#daa)"></div></div>
-      <div class="rpq-progress-text">${st.progress||0}/${req} (${pct}%)</div>
+      <div class="rpq-progress-text">${st.ready?'<b style="color:#7dff7d">✅ พร้อมส่ง!</b>':`${st.progress||0}/${req} (${pct}%)`}</div>
       <div class="rpq-reward" style="color:#daa">🏆 +${(q.reward.exp||0).toLocaleString()} EXP 💰+${q.reward.gold||0}</div>
-      <button class="rpq-btn-abandon" onclick="rpgAbandonQuest('${q.id}')">✕ ยกเลิก</button>
+      ${storyTurnIn}
     </div>`;
   });
 
@@ -874,10 +906,8 @@ function renderRpgQuestPanel() {
   if (nextStory) {
     const zc = zoneColors[nextStory.zone] || '#aaa';
     const zoneName = nextStory.zone > 0 ? (ZONES.find(z=>z.id===nextStory.zone)?.name||'') : 'ทุกที่';
-    const needsNpc = !!nextStory.trigger; // ต้องไปพูด NPC ก่อน
-    const actionHtml = needsNpc
-      ? `<div style="font-size:.75rem;color:#fa8;margin-top:.3rem">💬 ไปพูดกับ <b>Aldric</b> ที่ Hub เพื่อเริ่มเควสนี้</div>`
-      : `<button class="rpq-btn-accept" style="border-color:#a88;color:#daa;background:linear-gradient(135deg,#2a0a0a,#1a0505)" onclick="rpgAcceptQuest('${nextStory.id}')">รับเควส</button>`;
+    // story quests are always started by talking to the NPC at the Hub
+    const actionHtml = `<div style="font-size:.75rem;color:#fa8;margin-top:.3rem">💬 ไปพูดกับ <b>นักวิชาการ (Aldric)</b> ที่หมู่บ้านเพื่อเริ่มเควสนี้</div>`;
     html += `<div class="rpq-card" style="border-color:#a88;background:linear-gradient(135deg,#1a0a0a,#0e0505)">
       <div class="rpq-card-top">
         <span class="rpq-name" style="color:#daa">📖 ${nextStory.name}</span>
@@ -899,6 +929,11 @@ function renderRpgQuestPanel() {
     const showOther = otherQ;              // แสดงทุก non-kill quests (collect/explore/skilltree)
     const hiddenKill = killQ.length - showKill.length;
 
+    // quest menu is VIEW-ONLY now: kill quests are auto-accepted by entering
+    // their zone; other quests are taken by talking to the matching NPC.
+    const _howToGet = (q) => q.type === 'kill'
+      ? '⚔ เข้าด่านโซนนี้เพื่อรับอัตโนมัติ'
+      : '💬 ไปคุยกับ NPC ที่หมู่บ้านเพื่อรับ';
     const renderQCard = (q) => {
       const zc = zoneColors[q.zone] || '#aaa';
       const zoneName = q.zone > 0 ? (ZONES.find(z=>z.id===q.zone)?.name||'') : 'ทุกที่';
@@ -910,7 +945,7 @@ function renderRpgQuestPanel() {
         <div class="rpq-desc">${q.desc}</div>
         <div class="rpq-reward">🏆 +${(q.reward.exp||0).toLocaleString()} EXP 💰+${q.reward.gold||0}${q.reward.chest?` 🎁 ไอเทม${chestLabel[q.reward.chest]}`:''}
         </div>
-        <button class="rpq-btn-accept" onclick="rpgAcceptQuest('${q.id}')">รับเควส</button>
+        <div style="font-size:.72rem;color:#88aadd;margin-top:.3rem">${_howToGet(q)}</div>
       </div>`;
     };
 
