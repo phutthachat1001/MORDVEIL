@@ -12,7 +12,7 @@ function updateDailyQuestProgress(track) {
       if (q.progress >= q.target) {
         q.done = true;
         const count = q.chestCount || 1;
-        for (let i = 0; i < count; i++) G.chests[q.chestType] = (G.chests[q.chestType] || 0) + 1;
+        if(typeof grantChestReward==="function")grantChestReward(q.chestType,count);
         logBattle(`<span class="log-exp">🎯 ภารกิจวันสำเร็จ: ${q.desc}! ได้ ${q.reward}!</span>`);
       }
     }

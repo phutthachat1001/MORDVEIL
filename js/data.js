@@ -336,6 +336,84 @@ const SLOT_META = {
   boots:  {label:'รองเท้า', icon:'👢'},
 };
 
+// ============================================================
+// CRAFTING MATERIALS — วัตถุดิบที่มอนดรอป (เก็บใน G.materials[id])
+// แต่ละโซนดรอปวัตถุดิบของตัวเอง (ไล่ rarity ตามโซน)
+// ============================================================
+const MATERIALS = {
+  // zone 1 — ป่ากอบลิน
+  goblin_hide:   { id:'goblin_hide',   name:'หนังกอบลิน',    icon:'🟫', zone:1, rarity:'common' },
+  goblin_fang:   { id:'goblin_fang',   name:'เขี้ยวกอบลิน',  icon:'🦷', zone:1, rarity:'uncommon' },
+  // zone 2 — หุบเขาซอมบี้
+  rotten_flesh:  { id:'rotten_flesh',  name:'เนื้อเน่า',      icon:'🥩', zone:2, rarity:'common' },
+  bone_shard:    { id:'bone_shard',    name:'เศษกระดูก',      icon:'🦴', zone:2, rarity:'uncommon' },
+  // zone 3 — ถ้ำมังกร
+  dragon_scale:  { id:'dragon_scale',  name:'เกล็ดมังกร',    icon:'🐲', zone:3, rarity:'rare' },
+  fire_essence:  { id:'fire_essence',  name:'แก่นเพลิง',      icon:'🔥', zone:3, rarity:'rare' },
+  // zone 4 — ซากอสูร
+  demon_horn:    { id:'demon_horn',    name:'เขาอสูร',        icon:'😈', zone:4, rarity:'epic' },
+  cursed_metal:  { id:'cursed_metal',  name:'เหล็กต้องสาป',  icon:'⛓', zone:4, rarity:'epic' },
+  // zone 5 — ปราสาทมืด
+  shadow_cloth:  { id:'shadow_cloth',  name:'ผ้าเงามืด',      icon:'🕸', zone:5, rarity:'epic' },
+  dark_crystal:  { id:'dark_crystal',  name:'คริสตัลมืด',    icon:'🔮', zone:5, rarity:'legend' },
+  // zone 6 — อาณาจักรโกลาหล
+  chaos_core:    { id:'chaos_core',    name:'แก่นโกลาหล',    icon:'🌀', zone:6, rarity:'legend' },
+  cosmic_dust:   { id:'cosmic_dust',   name:'ผงจักรวาล',      icon:'✨', zone:6, rarity:'legend' },
+};
+
+// วัตถุดิบที่ดรอปได้ในแต่ละโซน (ไล่ตามที่ผู้เล่นอยากได้: โซนสูง = วัตถุดิบดีขึ้น)
+const ZONE_MATERIALS = {
+  1: ['goblin_hide','goblin_fang'],
+  2: ['rotten_flesh','bone_shard'],
+  3: ['dragon_scale','fire_essence'],
+  4: ['demon_horn','cursed_metal'],
+  5: ['shadow_cloth','dark_crystal'],
+  6: ['chaos_core','cosmic_dust'],
+};
+
+// ============================================================
+// CRAFTABLE SETS — ชุดคราฟ (6 ชิ้น/เซ็ต) + โบนัสเซ็ต
+// แต่ละชิ้นใช้วัตถุดิบ + ทอง คราฟได้ที่ NPC ช่างตีเหล็ก
+// ============================================================
+const CRAFT_SETS = {
+  goblin_set: {
+    id:'goblin_set', name:'ชุดนักล่ากอบลิน', tier:1, rarity:'uncommon',
+    setBonus:{ need:4, atk:8, def:8, hp:60, label:'ครบ 4 ชิ้น: +8 ATK +8 DEF +60 HP' },
+    pieces: [
+      { slot:'weapon', name:'ดาบเขี้ยวกอบลิน', icon:'🗡', atk:14, def:0,  mats:{goblin_fang:5, goblin_hide:8}, gold:200 },
+      { slot:'helmet', name:'หมวกหนังกอบลิน', icon:'🪖', atk:2,  def:6,  mats:{goblin_hide:6}, gold:120 },
+      { slot:'armor',  name:'เกราะหนังกอบลิน',icon:'⚔', atk:3,  def:8,  mats:{goblin_hide:10}, gold:180 },
+      { slot:'gloves', name:'ถุงมือกอบลิน',   icon:'🧤', atk:4,  def:3,  mats:{goblin_hide:5, goblin_fang:2}, gold:120 },
+      { slot:'pants',  name:'กางเกงกอบลิน',   icon:'👖', atk:2,  def:6,  mats:{goblin_hide:7}, gold:150 },
+      { slot:'boots',  name:'รองเท้ากอบลิน',  icon:'👢', atk:2,  def:5,  mats:{goblin_hide:5}, gold:120 },
+    ],
+  },
+  undead_set: {
+    id:'undead_set', name:'ชุดอัศวินอมตะ', tier:2, rarity:'rare',
+    setBonus:{ need:4, atk:18, def:16, hp:140, label:'ครบ 4 ชิ้น: +18 ATK +16 DEF +140 HP' },
+    pieces: [
+      { slot:'weapon', name:'ดาบกระดูกมรณะ', icon:'🗡', atk:30, def:0,  mats:{bone_shard:8, rotten_flesh:10}, gold:600 },
+      { slot:'helmet', name:'หมวกกะโหลก',     icon:'🪖', atk:5,  def:14, mats:{bone_shard:6}, gold:400 },
+      { slot:'armor',  name:'เกราะกระดูก',    icon:'⚔', atk:6,  def:18, mats:{bone_shard:12, rotten_flesh:8}, gold:550 },
+      { slot:'gloves', name:'ถุงมืออมตะ',     icon:'🧤', atk:9,  def:7,  mats:{bone_shard:5}, gold:380 },
+      { slot:'pants',  name:'กางเกงกระดูก',   icon:'👖', atk:5,  def:13, mats:{bone_shard:7, rotten_flesh:6}, gold:420 },
+      { slot:'boots',  name:'รองเท้าอมตะ',    icon:'👢', atk:5,  def:11, mats:{bone_shard:6}, gold:380 },
+    ],
+  },
+  dragon_set: {
+    id:'dragon_set', name:'ชุดเกล็ดมังกร', tier:3, rarity:'epic',
+    setBonus:{ need:4, atk:35, def:30, hp:280, crit:0.08, label:'ครบ 4 ชิ้น: +35 ATK +30 DEF +280 HP +8% Crit' },
+    pieces: [
+      { slot:'weapon', name:'ดาบเขี้ยวมังกรไฟ', icon:'🐲', atk:58, def:0,  mats:{dragon_scale:10, fire_essence:8}, gold:1800 },
+      { slot:'helmet', name:'หมวกเกล็ดมังกร',   icon:'🪖', atk:10, def:26, mats:{dragon_scale:8}, gold:1200 },
+      { slot:'armor',  name:'เกราะเกล็ดมังกร',  icon:'⚔', atk:12, def:34, mats:{dragon_scale:14, fire_essence:6}, gold:1600 },
+      { slot:'gloves', name:'ถุงมือมังกรเพลิง', icon:'🧤', atk:18, def:12, mats:{dragon_scale:7, fire_essence:5}, gold:1100 },
+      { slot:'pants',  name:'กางเกงเกล็ดมังกร', icon:'👖', atk:10, def:24, mats:{dragon_scale:9}, gold:1300 },
+      { slot:'boots',  name:'รองเท้ามังกร',     icon:'👢', atk:10, def:20, mats:{dragon_scale:7, fire_essence:4}, gold:1100 },
+    ],
+  },
+};
+
 // ราคาซื้อ/ขาย ตาม rarity
 // ขาย ≈ 5-8% ของราคาซื้อ — กันเงินเฟ้อจากการฟาร์มของมาขาย
 // อยากได้ของร้านต้องเก็บเงินจริงจัง (ทำให้เกมท้าทาย+มีเป้าหมาย)

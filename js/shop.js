@@ -35,6 +35,26 @@ function getEquippedStatBonus() {
       if (healM) bonus.healPerTurn += parseInt(healM[1]);
     }
   });
+
+  // ── Craft-set bonus: equipping ≥N pieces of the same craft set grants extras ──
+  if (typeof CRAFT_SETS !== 'undefined') {
+    const counts = {};
+    SLOT_SLOTS.forEach(slot => {
+      const uid = G.equippedSlots[slot];
+      const item = uid && G.inventory.find(i => i.uid === uid);
+      if (item && item.craftSet) counts[item.craftSet] = (counts[item.craftSet] || 0) + 1;
+    });
+    Object.entries(counts).forEach(([setId, n]) => {
+      const set = CRAFT_SETS[setId];
+      if (set && set.setBonus && n >= set.setBonus.need) {
+        const b = set.setBonus;
+        if (b.atk)  bonus.atk  += b.atk;
+        if (b.def)  bonus.def  += b.def;
+        if (b.hp)   bonus.hp   += b.hp;
+        if (b.crit) bonus.crit += b.crit * 100; // crit stored as 0-1, bonus.crit is %
+      }
+    });
+  }
   return bonus;
 }
 

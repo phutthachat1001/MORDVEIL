@@ -28,6 +28,7 @@ function showClassSelect() {
 
 function continueGame() {
   loadGame();
+  if (typeof _convertLegacyChests === 'function') _convertLegacyChests(); // chest system removed
   if (G.classId) {
     fadeToGame(() => {
       document.getElementById('screen-intro').classList.remove('active');

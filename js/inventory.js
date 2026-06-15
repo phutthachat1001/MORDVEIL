@@ -29,6 +29,31 @@ function _randomReelItem() {
 
 let _gachaSpinning = false;
 
+// ── Chest system REMOVED → instant item grant ──────────────────
+// Rewards that used to give "chests" now grant gear directly. Each chest tier
+// maps to a drop rarity; grantChestReward rolls an item of that rarity now.
+const _CHEST_RARITY = { common:'common', uncommon:'uncommon', rare:'rare', boss:'epic' };
+
+function grantChestReward(type, n = 1) {
+  const rarity = _CHEST_RARITY[type] || 'common';
+  for (let i = 0; i < n; i++) {
+    if (typeof _dropDirectItem === 'function') _dropDirectItem(rarity);
+  }
+  if (typeof renderInventory === 'function') renderInventory();
+  if (typeof updateNavBadges === 'function') updateNavBadges();
+}
+
+// Legacy: convert any chests still sitting in a save into instant items.
+function _convertLegacyChests() {
+  if (!G.chests) return;
+  let total = 0;
+  ['common','uncommon','rare','boss'].forEach(t => {
+    const n = G.chests[t] || 0;
+    if (n > 0) { grantChestReward(t, n); G.chests[t] = 0; total += n; }
+  });
+  if (total > 0) logBattle(`<span class="log-exp">📦 แปลงหีบเก่า ${total} ใบเป็นไอเทมแล้ว (ระบบหีบถูกยกเลิก)</span>`);
+}
+
 function openChest(type) {
   // hide the drop-rate tooltip immediately (on touch there's no mouseleave,
   // so it would otherwise stay stuck on screen after tapping the chest)
@@ -273,20 +298,34 @@ function sellLowestRarity() {
   updateTopBar(); saveGame(); renderInventory();
 }
 
+// ---------- crafting materials strip (shown in the bag) ----------
+function _renderMaterialsStrip() {
+  const el = document.getElementById('inv-materials');
+  if (!el || typeof MATERIALS === 'undefined') return;
+  const owned = Object.entries(G.materials || {}).filter(([, n]) => n > 0);
+  if (!owned.length) { el.innerHTML = ''; return; }
+  const chips = owned.map(([id, n]) => {
+    const m = MATERIALS[id]; if (!m) return '';
+    const col = RARITIES[m.rarity] ? RARITIES[m.rarity].color : '#aaa';
+    return `<span class="inv-mat-chip" title="${m.name} (โซน ${m.zone})" style="border-color:${col}">
+      ${m.icon} <b style="color:${col}">${n}</b></span>`;
+  }).join('');
+  el.innerHTML = `<div class="inv-mat-title">🧪 วัตถุดิบคราฟ (เก็บไว้คราฟชุดที่ช่างตีเหล็ก)</div>
+    <div class="inv-mat-row">${chips}</div>`;
+}
+
 // ---------- inventory render ----------
 
 function renderInventory() {
   const COLS = 4, ROWS = 8, TOTAL = COLS * ROWS; // 32 slots
+  _renderMaterialsStrip();
 
   // build chest entries
   const chestLabels = { common:'ธรรมดา', uncommon:'พิเศษ', rare:'หายาก', boss:'บอส' };
   const chestIcons  = { common:'📦', uncommon:'🎁', rare:'💎', boss:'👑' };
   const chestColors = { common:'var(--common)', uncommon:'var(--uncommon)', rare:'var(--rare)', boss:'var(--legend)' };
+  // chest system removed — never render chest slots
   let chestSlots = [];
-  ['common','uncommon','rare','boss'].forEach(t => {
-    const count = G.chests[t] || 0;
-    for (let i = 0; i < count; i++) chestSlots.push({ _chest: t });
-  });
 
   // build item entries (apply filters)
   let items = [...G.inventory];

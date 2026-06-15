@@ -185,9 +185,9 @@ function idleOnMobKilled(mob) {
   const gold = mob.bounty || 0;
   G.gold += gold;
   if (mob.special === 'boss') {
-    G.chests.boss = (G.chests.boss || 0) + 1;
-    logBattle(`<span class="log-exp">👑 ล้มบอสลับสำเร็จ! +${gold} ทอง + หีบบอส 1 ใบ! 🎉</span>`);
-    if (typeof evLog === 'function') evLog('👑','ล้มบอสลับ!',`+${gold} ทอง + หีบบอส`);
+    if (typeof grantChestReward === 'function') grantChestReward('boss', 1);
+    logBattle(`<span class="log-exp">👑 ล้มบอสลับสำเร็จ! +${gold} ทอง + ไอเทมหายาก! 🎉</span>`);
+    if (typeof evLog === 'function') evLog('👑','ล้มบอสลับ!',`+${gold} ทอง + ไอเทม`);
     if (typeof playSound === 'function') playSound('chest');
     _idleBigLootBeam('👑 +หีบบอส!');
   } else if (mob.special === 'raider') {
@@ -280,11 +280,11 @@ function idleSpecialTick() {
 // สะสม idleKills ถึงเป้า → รับรางวัลก้อน (หีบ/ทอง) ช่วยตอนติดด่าน
 // ============================================================
 const IDLE_MILESTONES = [
-  { kills:50,   reward:()=>{ G.chests.uncommon=(G.chests.uncommon||0)+1; return '🎁 หีบพิเศษ ×1'; } },
-  { kills:150,  reward:()=>{ G.chests.rare=(G.chests.rare||0)+1; return '🎁 หีบหายาก ×1'; } },
-  { kills:350,  reward:()=>{ G.chests.rare=(G.chests.rare||0)+2; return '🎁 หีบหายาก ×2'; } },
-  { kills:700,  reward:()=>{ G.chests.boss=(G.chests.boss||0)+1; return '🏆 หีบบอส ×1'; } },
-  { kills:1500, reward:()=>{ G.chests.boss=(G.chests.boss||0)+2; return '🏆 หีบบอส ×2'; } },
+  { kills:50,   reward:()=>{ grantChestReward('uncommon',1); return '🎁 ไอเทมพิเศษ ×1'; } },
+  { kills:150,  reward:()=>{ grantChestReward('rare',1); return '🎁 ไอเทมหายาก ×1'; } },
+  { kills:350,  reward:()=>{ grantChestReward('rare',2); return '🎁 ไอเทมหายาก ×2'; } },
+  { kills:700,  reward:()=>{ grantChestReward('boss',1); return '🏆 ไอเทมมหากาพย์ ×1'; } },
+  { kills:1500, reward:()=>{ grantChestReward('boss',2); return '🏆 ไอเทมมหากาพย์ ×2'; } },
 ];
 
 function checkIdleMilestone() {

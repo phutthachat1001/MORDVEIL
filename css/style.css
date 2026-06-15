@@ -3399,3 +3399,12 @@ body.preload{visibility:hidden}
   font-family:'Sarabun',sans-serif;transition:transform .12s, box-shadow .2s;
 }
 .offline-claim:hover{transform:translateY(-1px);box-shadow:0 0 20px #5588dd88}
+
+/* ── Crafting materials strip in the bag ── */
+.inv-mat-title{ font-size:.72rem;color:#9fc; margin:.2rem 0 .35rem; }
+.inv-mat-row{ display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.6rem; }
+.inv-mat-chip{
+  display:inline-flex;align-items:center;gap:.2rem;
+  background:rgba(255,255,255,.05);border:1px solid #555;border-radius:14px;
+  padding:.12rem .5rem;font-size:.8rem;
+}

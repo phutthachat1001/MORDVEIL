@@ -2445,13 +2445,15 @@ function playerAttack() {
 // boss always 1 tier higher than normal
 function _dropRarityForZone(zone, isBoss, tier = 3) {
   // weighted table: [rarity, weight]
+  // each zone drops a clean 3-rarity window that climbs with the zone:
+  // z1 common/uncommon/rare → z2 uncommon/rare/epic → ... → z6 legend/ancient/mythic-ish
   const tables = {
-    1: [['common',70],['uncommon',28],['rare',2]],
-    2: [['common',30],['uncommon',55],['rare',15]],
-    3: [['uncommon',40],['rare',45],['epic',15]],
-    4: [['uncommon',15],['rare',50],['epic',33],['legend',2]],
-    5: [['rare',30],['epic',52],['legend',18]],
-    6: [['rare',10],['epic',45],['legend',38],['ancient',7]],
+    1: [['common',65],['uncommon',30],['rare',5]],
+    2: [['uncommon',60],['rare',32],['epic',8]],
+    3: [['rare',58],['epic',34],['legend',8]],
+    4: [['rare',35],['epic',50],['legend',15]],
+    5: [['epic',55],['legend',38],['ancient',7]],
+    6: [['legend',60],['ancient',40]],
   };
   let table = tables[Math.min(6, Math.max(1, zone))];
   // high-tier monsters (5-6) in the zone: shift toward rarer
@@ -2511,6 +2513,27 @@ function _dropDirectItem(rarity) {
   if (['rare','epic','legend','ancient'].includes(effRarity)) G.gotRareWeapon = true;
   if (effRarity === 'legend' || effRarity === 'ancient') G.gotLegendWeapon = true;
   renderInventory();
+}
+
+// ---------- Crafting material drop ----------
+// Monsters also drop zone-specific materials used to craft sets.
+function _dropMaterial(zone, isBoss, tier = 1) {
+  if (typeof ZONE_MATERIALS === 'undefined') return;
+  const pool = ZONE_MATERIALS[Math.min(6, Math.max(1, zone))] || [];
+  if (!pool.length) return;
+  // base ~28% per kill, scales with tier; boss always drops a bundle
+  const baseRate = 0.28 + (tier - 1) * 0.03;
+  if (!isBoss && Math.random() > baseRate) return;
+  const matId = pool[Math.floor(Math.random() * pool.length)];
+  const qty = isBoss ? (2 + Math.floor(Math.random() * 3)) : 1; // boss 2-4
+  if (!G.materials) G.materials = {};
+  G.materials[matId] = (G.materials[matId] || 0) + qty;
+  const m = MATERIALS[matId];
+  if (m) {
+    const col = RARITIES[m.rarity] ? RARITIES[m.rarity].color : '#aaa';
+    logBattle(`<span class="log-exp" style="color:${col}">${m.icon} ดรอปวัตถุดิบ: ${m.name} ×${qty}</span>`);
+  }
+  if (typeof updateNavBadges === 'function') updateNavBadges();
 }
 
 // ---------- Attack speed (ms per hit) ----------
@@ -2791,6 +2814,8 @@ function monsterDie() {
       _dropDirectItem(rarity);
     }
   }
+  // crafting materials drop (separate from gear)
+  _dropMaterial(G.currentZone, monster.isBoss, monster.tier || 1);
 
   // Gold: boss = atk × 3 (baseline); normal = 35% of that ≈ atk × 1.05
   let goldGain = Math.floor(stats.atk * 1.5 * rewardMult); // ลดจาก ×3 กันเงินเฟ้อ
@@ -3095,9 +3120,8 @@ function _checkKillMilestones() {
         G.gold += ms.amount;
         setTimeout(() => _showMilestonePopup(ms, `💰 +${ms.amount} ทอง`), 1000);
       } else if (ms.reward === 'chest') {
-        G.chests[ms.type] = (G.chests[ms.type] || 0) + 1;
-        const chestLabel = ms.type==='boss'?'บอส':ms.type==='rare'?'หายาก':ms.type==='uncommon'?'พิเศษ':'ธรรมดา';
-        setTimeout(() => _showMilestonePopup(ms, `📦 หีบ${chestLabel}`), 1000);
+        if (typeof grantChestReward === 'function') grantChestReward(ms.type, 1);
+        setTimeout(() => _showMilestonePopup(ms, `🎁 ไอเทม ${ms.type}`), 1000);
       }
     }
   });

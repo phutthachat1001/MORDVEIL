@@ -96,13 +96,14 @@ const HUB_NPCS = [
     floatDur: '2.8s', floatDel: '0.3s',
     greeting: () => {
       const c = Object.values(G.equippedSlots||{}).filter(Boolean).length;
-      if (c===0) return 'เฮ้! แกไม่มีอุปกรณ์เลยสักชิ้น ข้าช่วยอะไรไม่ได้ถ้าแกไม่มีของมาให้ตรวจ!';
-      if (c < 3)  return `แกใส่อุปกรณ์แค่ ${c}/6 ชิ้น ยังไม่พอนะ ไปเปิดหีบเพิ่มสิ!`;
-      return `โอ้ อุปกรณ์ ${c}/6 ชิ้น ไม่เลว! มาให้ข้าตรวจดูซิ`;
+      if (c===0) return 'เฮ้! แกไม่มีอุปกรณ์เลยสักชิ้น เก็บวัตถุดิบจากมอนมา ข้าจะตีชุดให้!';
+      if (c < 3)  return `แกใส่อุปกรณ์แค่ ${c}/6 ชิ้น ยังไม่พอนะ เก็บวัตถุดิบมาคราฟชุดเพิ่มสิ!`;
+      return `โอ้ อุปกรณ์ ${c}/6 ชิ้น ไม่เลว! อยากตีชุดใหม่ไหม ข้ามีสูตรเด็ด`;
     },
     actions: () => {
       const c = Object.values(G.equippedSlots||{}).filter(Boolean).length;
       const acts = [
+        { label:'⚒ คราฟชุด (ใช้วัตถุดิบ)', style:'gold',  onclick:()=>hubOpenCrafting() },
         { label:`🔍 ตรวจสอบอุปกรณ์ (${c}/6)`, style:'blue',  onclick:()=>hubCheckGear()    },
       ];
       if (G.gameMode === 'fullrpg') {
@@ -1324,7 +1325,7 @@ function claimHubQuest(questId) {
   if (quest.reward.exp)   giveExp(quest.reward.exp);
   if (quest.reward.chest) {
     const ct = quest.reward.chest;
-    G.chests[ct] = (G.chests[ct]||0) + (questId === 'hq_kill_50' ? 2 : 1);
+    if (typeof grantChestReward === 'function') grantChestReward(ct, questId === 'hq_kill_50' ? 2 : 1);
   }
   logBattle(`<span class="log-exp">📜 ภารกิจ "${quest.title}" เสร็จสิ้น! ${quest.rewardText}</span>`);
   saveGame(); updateTopBar(); renderInventory(); checkAchievements();
@@ -1350,6 +1351,101 @@ function hubCheckGear() {
     </div>`;
   }).join('');
   document.getElementById('hub-panel').style.display = 'flex';
+}
+
+// ---------- CRAFTING (blacksmith) ----------
+
+function _matCount(id) { return (G.materials && G.materials[id]) || 0; }
+
+// does the player already own a crafted piece (by name)?
+function _ownsCraftPiece(name) {
+  return (G.inventory || []).some(i => i.name === name);
+}
+
+function hubOpenCrafting(setId) {
+  const panel = document.getElementById('hub-panel');
+  const body  = document.getElementById('hub-panel-body');
+  document.getElementById('hub-panel-title').textContent = '⚒ คราฟชุด';
+  if (!panel || !body) return;
+  panel.style.display = 'flex';
+
+  const sets = Object.values(CRAFT_SETS);
+  // set selector tabs
+  let html = `<div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:.6rem">`;
+  sets.forEach(s => {
+    const owned = s.pieces.filter(p => _ownsCraftPiece(p.name)).length;
+    const active = (setId || sets[0].id) === s.id;
+    const col = RARITIES[s.rarity]?.color || '#aaa';
+    html += `<button onclick="hubOpenCrafting('${s.id}')" style="flex:1;min-width:90px;padding:.35rem;border-radius:8px;cursor:pointer;font-size:.72rem;font-weight:700;
+      background:${active?'rgba(255,200,60,.18)':'rgba(255,255,255,.05)'};border:1px solid ${active?'#ffcc44':'#333'};color:${col}">
+      ${s.name}<br><span style="font-size:.62rem;color:#999">${owned}/6</span></button>`;
+  });
+  html += `</div>`;
+
+  const set = sets.find(s => s.id === (setId || sets[0].id)) || sets[0];
+  const col = RARITIES[set.rarity]?.color || '#aaa';
+  // set bonus line
+  const ownedCount = set.pieces.filter(p => _ownsCraftPiece(p.name)).length;
+  html += `<div style="background:rgba(255,200,60,.08);border:1px solid #5a4a2a;border-radius:8px;padding:.4rem .6rem;margin-bottom:.6rem;font-size:.72rem;color:#ffcc88">
+    🎖 เซ็ตโบนัส (${ownedCount}/${set.setBonus.need}): ${set.setBonus.label}</div>`;
+
+  // each piece: stats, material cost, craft button
+  set.pieces.forEach(p => {
+    const owned = _ownsCraftPiece(p.name);
+    const matRows = Object.entries(p.mats).map(([mid, need]) => {
+      const have = _matCount(mid); const m = MATERIALS[mid] || {};
+      const ok = have >= need;
+      return `<span style="color:${ok?'#88dd88':'#dd6666'};font-size:.66rem">${m.icon||'•'}${have}/${need}</span>`;
+    }).join(' ');
+    const goldOk = G.gold >= p.gold;
+    const canCraft = !owned && goldOk && Object.entries(p.mats).every(([mid,need]) => _matCount(mid) >= need);
+    const btn = owned
+      ? `<span style="color:#88dd88;font-size:.72rem;font-weight:700">✅ มีแล้ว</span>`
+      : `<button onclick="hubCraftPiece('${set.id}','${p.slot}')" ${canCraft?'':'disabled'}
+          style="padding:.3rem .7rem;border-radius:6px;font-size:.72rem;font-weight:700;cursor:${canCraft?'pointer':'not-allowed'};
+          background:${canCraft?'linear-gradient(135deg,#3a2a0a,#5a3a10)':'#222'};border:1px solid ${canCraft?'#ffcc44':'#444'};color:${canCraft?'#ffdd66':'#666'}">⚒ คราฟ</button>`;
+    html += `<div class="hub-gear-row" style="flex-direction:column;align-items:stretch;gap:.25rem">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="color:${col};font-size:.8rem">${p.icon} ${p.name}</span>
+        <span style="color:#7a9a70;font-size:.68rem">⚔${p.atk} 🛡${p.def}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span>${matRows} <span style="color:${goldOk?'#ffd700':'#dd6666'};font-size:.66rem">💰${p.gold}</span></span>
+        ${btn}
+      </div>
+    </div>`;
+  });
+  body.innerHTML = html;
+}
+
+function hubCraftPiece(setId, slot) {
+  const set = CRAFT_SETS[setId];
+  if (!set) return;
+  const p = set.pieces.find(x => x.slot === slot);
+  if (!p || _ownsCraftPiece(p.name)) return;
+  // verify cost
+  if (G.gold < p.gold) { logBattle('<span class="log-sys">⚠ ทองไม่พอ</span>'); return; }
+  for (const [mid, need] of Object.entries(p.mats)) {
+    if (_matCount(mid) < need) { logBattle('<span class="log-sys">⚠ วัตถุดิบไม่พอ</span>'); return; }
+  }
+  if ((G.inventory||[]).length >= 50) { logBattle('<span class="log-sys">⚠ กระเป๋าเต็ม</span>'); return; }
+  // pay
+  G.gold -= p.gold;
+  for (const [mid, need] of Object.entries(p.mats)) G.materials[mid] -= need;
+  // create item (tagged with craftSet so set bonus can be computed)
+  const item = {
+    id: `craft_${setId}_${slot}`, name: p.name, icon: p.icon,
+    slot: p.slot, rarity: set.rarity, atk: p.atk, def: p.def,
+    craftSet: setId, requiredClass: null, uid: Date.now() + Math.random(),
+  };
+  if (!G.inventory) G.inventory = [];
+  G.inventory.push(item);
+  const col = RARITIES[set.rarity]?.color || '#aaa';
+  logBattle(`<span class="log-exp" style="color:${col}">⚒ คราฟสำเร็จ: ${p.icon} ${p.name}!</span>`);
+  if (typeof playSound === 'function') playSound('chest');
+  saveGame(); updateTopBar(); renderInventory();
+  hubOpenCrafting(setId); // refresh in place
+  _hubNpcSay(`ตีเสร็จแล้ว! ${p.name} เป็นของแกแล้ว ⚒`);
 }
 
 // ---------- sage ----------

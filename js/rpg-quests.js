@@ -591,7 +591,7 @@ function _rpgCompleteQuest(q) {
   const r = q.reward;
   if (r.exp)   giveExp(r.exp);
   if (r.gold)  { G.gold += r.gold; if (typeof rpgOnGoldGain === 'function') {} } // avoid loop
-  if (r.chest) G.chests[r.chest] = (G.chests[r.chest]||0) + 1;
+  if (r.chest && typeof grantChestReward==="function") grantChestReward(r.chest,1);
   const chestLabel = { common:'ธรรมดา', uncommon:'พิเศษ', rare:'หายาก', boss:'บอส' };
   const icon = q.type === 'chain' ? '📖' : q.type === 'explore' ? '🗺' : q.type === 'collect' ? '💎' : q.type === 'skilltree' ? '🌳' : '🏆';
   logBattle(`<span class="log-exp">${icon} เควสสำเร็จ! <b>${q.name}</b> — +${(r.exp||0).toLocaleString()} EXP 💰+${r.gold||0}${r.chest ? ` 📦 หีบ${chestLabel[r.chest]}` : ''}</span>`);
@@ -685,7 +685,7 @@ function _rpgDailyCheck(q) {
   const r = q.reward;
   if (r.exp)   giveExp(r.exp);
   if (r.gold)  G.gold += r.gold;
-  if (r.chest) G.chests[r.chest] = (G.chests[r.chest]||0) + 1;
+  if (r.chest && typeof grantChestReward==="function") grantChestReward(r.chest,1);
   const chestLabel = { common:'ธรรมดา', uncommon:'พิเศษ', rare:'หายาก', boss:'บอส' };
   logBattle(`<span class="log-exp">⭐ ภารกิจวันนี้สำเร็จ! <b>${q.name}</b> — +${(r.exp||0).toLocaleString()} EXP 💰+${r.gold||0}${r.chest ? ` 📦 หีบ${chestLabel[r.chest]}` : ''}</span>`);
   if (typeof playSound === 'function') playSound('exp');
@@ -694,6 +694,14 @@ function _rpgDailyCheck(q) {
 // ──────────────────────────────────────────────────────────────
 // NPC QUEST PANEL (เปิดจาก Hub)
 // ──────────────────────────────────────────────────────────────
+
+// accept a quest from the NPC panel WITHOUT closing it — refresh in place so
+// the player can keep accepting the next quest (no more "bounce back to talk").
+function rpgAcceptQuestFromNpc(id, npcId) {
+  rpgAcceptQuest(id);
+  // re-render the same NPC quest list so the accepted quest updates inline
+  if (typeof rpgShowNpcQuests === 'function') rpgShowNpcQuests(npcId);
+}
 
 function rpgShowNpcQuests(npcId) {
   if (G.gameMode !== 'fullrpg') return;
@@ -722,7 +730,7 @@ function rpgShowNpcQuests(npcId) {
     const statusCls = st.done ? 'rpq-npc-done' : st.active ? 'rpq-npc-active' : locked ? 'rpq-npc-locked' : '';
     const statusLabel = st.done ? '✅ เสร็จแล้ว' : st.active ? `⏳ กำลังทำ (${st.progress||0}/${q.required||1})` : locked ? `🔒 LV${q.minLevel}` : '';
     const btnHtml = (!st.done && !st.active && !locked)
-      ? `<button class="rpq-btn-accept" onclick="rpgAcceptQuest('${q.id}');closeHubPanel()">รับเควส</button>` : '';
+      ? `<button class="rpq-btn-accept" onclick="rpgAcceptQuestFromNpc('${q.id}','${npcId}')">รับเควส</button>` : '';
     html += `<div class="rpq-npc-card ${statusCls}">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-family:'Chakra Petch',sans-serif;font-size:.85rem;color:var(--text)">${typeIcon[q.type]||'📜'} ${q.name}</span>

@@ -71,7 +71,7 @@ function completeTask(id) {
     else if (task.diff === 'hard'   && roll < .80) chestType = Math.random() < .3 ? 'uncommon' : 'rare';
     else if (task.diff === 'epic')                 chestType = Math.random() < .5 ? 'rare' : Math.random() < .5 ? 'boss' : 'uncommon';
   }
-  if (chestType) G.chests[chestType] = (G.chests[chestType] || 0) + 1;
+  if (chestType && typeof grantChestReward === 'function') grantChestReward(chestType, 1);
 
   // gold
   let goldGain = Math.floor(exp * 0.3); // ลดจาก 0.5 กันเงินเฟ้อ
@@ -89,7 +89,7 @@ function completeTask(id) {
   if (G.todayCount >= 3) updateDailyQuestProgress('todayCount');
 
   giveExp(exp);
-  logBattle(`<span class="log-exp">✅ "${task.name}" เสร็จแล้ว! +${exp} EXP 💰+${goldGain}${chestType ? ` 📦 หีบ${chestType==='rare'?'หายาก':chestType==='uncommon'?'พิเศษ':'ธรรมดา'}` : ''}</span>`);
+  logBattle(`<span class="log-exp">✅ "${task.name}" เสร็จแล้ว! +${exp} EXP 💰+${goldGain}${chestType ? ` 🎁 ไอเทม${chestType==='rare'?'หายาก':chestType==='uncommon'?'พิเศษ':'ธรรมดา'}` : ''}</span>`);
   playSound('exp');
   checkAchievements();
   saveGame();

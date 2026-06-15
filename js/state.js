@@ -25,6 +25,7 @@ let G = {
   bossKills: 0,
   idleKills: 0,    // IDLE-farm kills (separate, no achievement credit)
   claimedIdleMilestones: [],  // IDLE farm milestone rewards already given
+  materials: {},   // crafting materials: { materialId: count }
   totalExpGained: 0,
   streak: 0,
   maxStreak: 0,

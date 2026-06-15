@@ -189,12 +189,11 @@ function checkHourlyChest() {
 
   G.hourlyChestClaimed = hourKey;
   const type = Math.random() < 0.15 ? 'uncommon' : 'common';
-  G.chests[type] = (G.chests[type] || 0) + 1;
-  renderInventory();
+  if (typeof grantChestReward === 'function') grantChestReward(type, 1);
   saveGame();
 
-  evLog('🎁', 'กล่องของขวัญรายชั่วโมง', `ได้หีบ${type === 'uncommon' ? 'พิเศษ' : 'ธรรมดา'} ฟรี 1 ใบ!`);
-  logBattle(`<span class="log-exp">🎁 รางวัลรายชั่วโมง! หีบ${type === 'uncommon' ? 'พิเศษ' : 'ธรรมดา'} +1</span>`);
+  evLog('🎁', 'ของขวัญรายชั่วโมง', `ได้ไอเทม${type === 'uncommon' ? 'พิเศษ' : 'ธรรมดา'} ฟรี 1 ชิ้น!`);
+  logBattle(`<span class="log-exp">🎁 รางวัลรายชั่วโมง! ไอเทม${type === 'uncommon' ? 'พิเศษ' : 'ธรรมดา'} +1</span>`);
   playSound('chest');
 
   // badge บนกระเป๋า
@@ -218,7 +217,7 @@ const STREAK_MILESTONES = [
   },
   { streak:7,  triggered:false,
     fn: () => {
-      G.chests.boss = (G.chests.boss || 0) + 1;
+      if(typeof grantChestReward==="function")grantChestReward("boss",1);
       renderInventory(); saveGame();
       evLog('💫','สัปดาห์แห่งตำนาน!','ได้หีบบอส 1 ใบฟรี!');
       showEventPopup({ icon:'💫', title:'สัปดาห์แห่งตำนาน!', color:EV_COLORS.gold,
@@ -569,21 +568,21 @@ function applyMonsterEventMods(stats) {
 // เรียกใน monsterDie() หลังมอนตาย
 function applyMonsterEventRewards(stats) {
   if (stats._ferociousReward) {
-    G.chests.rare = (G.chests.rare || 0) + 1;
+    if(typeof grantChestReward==="function")grantChestReward("rare",1);
     renderInventory();
     logBattle('<span class="log-exp">⚡ ชนะความท้าทาย! EXP×3 + หีบ rare!</span>');
     evLog('⚡','ชนะท้าทาย!','EXP×3 + หีบ rare');
     return 3; // EXP multiplier
   }
   if (stats._legendaryReward) {
-    G.chests.boss = (G.chests.boss || 0) + 1;
+    if(typeof grantChestReward==="function")grantChestReward("boss",1);
     renderInventory();
     logBattle('<span class="log-exp">💀 มอนหายากตาย! หีบบอส Legendary รับประกัน!</span>');
     evLog('💀','ชนะมอนหายาก!','ได้หีบบอส');
     return 2;
   }
   if (stats._surpriseBossReward) {
-    G.chests.boss = (G.chests.boss || 0) + 1;
+    if(typeof grantChestReward==="function")grantChestReward("boss",1);
     renderInventory();
     logBattle('<span class="log-exp">👑 บอสเซอร์ไพรส์ตาย! หีบบอสพิเศษ!</span>');
     evLog('👑','ชนะบอสเซอร์ไพรส์!','ได้หีบบอสพิเศษ');

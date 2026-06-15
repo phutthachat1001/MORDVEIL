@@ -431,6 +431,17 @@ function _idleMobDie(idx, mob) {
       _floatAboveIdleMob(idx, `<span style="color:${col}">${dropped.icon||'⚔'} ${dropped.name}</span>`, 'idle-drop-float');
     }
   }
+  // crafting materials from IDLE farming (lower rate than manual)
+  if (typeof ZONE_MATERIALS !== 'undefined' && (mob.special || Math.random() < 0.20)) {
+    const pool = ZONE_MATERIALS[Math.min(6, Math.max(1, mob.zone || 1))] || [];
+    if (pool.length) {
+      const matId = pool[Math.floor(Math.random() * pool.length)];
+      if (!G.materials) G.materials = {};
+      G.materials[matId] = (G.materials[matId] || 0) + 1;
+      const m = MATERIALS[matId];
+      if (m) _floatAboveIdleMob(idx, `${m.icon} ${m.name}`, 'idle-drop-float');
+    }
+  }
 
   // play the death animation on the existing sprite, then re-render so the
   // floating popups stay visible during the fade-out.
