@@ -3213,6 +3213,29 @@ body.preload{visibility:hidden}
 .btn-mute{ transition:opacity .15s; }
 .btn-mute.muted{ opacity:.55; filter:grayscale(.6); }
 
+/* ════════════════════════════════════════════════════════════
+   SKILL LOADOUT — เลือกสกิล active (สูงสุด 3)
+   ════════════════════════════════════════════════════════════ */
+#skill-loadout-overlay .sl-modal{ max-width:420px; width:94%; text-align:left; }
+.sl-title{ font-size:1.15rem; font-weight:800; color:#ccaaff; text-align:center; margin-bottom:.3rem; }
+.sl-hint{ font-size:.74rem; color:#9988bb; text-align:center; margin-bottom:.8rem; line-height:1.4; }
+.sl-list{ display:flex; flex-direction:column; gap:.45rem; max-height:60vh; overflow-y:auto; margin-bottom:.8rem; }
+.sl-row{
+  display:flex; align-items:center; gap:.6rem; padding:.5rem .6rem;
+  background:rgba(255,255,255,.04); border:1px solid #333; border-radius:10px; cursor:pointer;
+  transition:all .15s;
+}
+.sl-row:hover{ border-color:#6a4aaa; }
+.sl-row.on{ background:rgba(140,100,220,.15); border-color:#8866cc; box-shadow:0 0 8px rgba(140,100,220,.3); }
+.sl-icon{ font-size:1.7rem; line-height:1; flex-shrink:0; }
+.sl-info{ flex:1; min-width:0; }
+.sl-name{ font-size:.86rem; font-weight:700; color:#eee; }
+.sl-tier{ font-size:.62rem; color:#aa88dd; background:rgba(140,100,220,.2); padding:0 .35rem; border-radius:6px; }
+.sl-desc{ font-size:.7rem; color:#aaa; line-height:1.3; margin-top:1px; }
+.sl-tags{ font-size:.64rem; color:#88aadd; margin-top:2px; }
+.sl-toggle{ font-size:.72rem; font-weight:700; flex-shrink:0; color:#ccaaff; }
+.sl-row.on .sl-toggle{ color:#88ff88; }
+
 /* ════════════════ BOSS SPLASH — ฉากเปิดตัวบอส ════════════════ */
 #boss-splash{
   position:fixed;inset:0;z-index:800;pointer-events:none;

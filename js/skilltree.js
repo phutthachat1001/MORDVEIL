@@ -65,7 +65,7 @@ function _applyNodeUnlock(nodeId) {
     if (!G.unlockedSkills.includes(node.skill.id)) {
       G.unlockedSkills.push(node.skill.id);
       if (!G.equippedSkills) G.equippedSkills = [];
-      if (G.equippedSkills.length < 4) G.equippedSkills.push(node.skill.id);
+      if (G.equippedSkills.length < 3) G.equippedSkills.push(node.skill.id);
       logBattle(`<span class="log-exp">✨ สกิลใหม่: ${node.icon||'⚡'} ${node.skill.name} — ${node.skill.desc}</span>`);
     }
   }
@@ -225,11 +225,98 @@ function renderSkillTree() {
     <button onclick="openSkillTreeFull()" style="width:100%;padding:.55rem;border-radius:10px;cursor:pointer;font-weight:700;font-size:.85rem;
       background:linear-gradient(135deg,#2a2a4a,#3a3a6a);border:1px solid ${avail>0?'#ffcc44':'#445'};color:${avail>0?'#ffdd66':'#aabbdd'};${pulse}">
       🌳 เปิด Skill Tree${avail > 0 ? ` &nbsp;<span style="background:#ffcc44;color:#221100;border-radius:10px;padding:0 .5rem">${avail} จุด</span>` : ''}
+    </button>
+    <button onclick="openSkillLoadout()" style="width:100%;margin-top:.4rem;padding:.5rem;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem;
+      background:linear-gradient(135deg,#2a1a3a,#3a2a5a);border:1px solid #8866cc;color:#ccaaff">
+      ⚔ จัดสกิล (${(G.equippedSkills||[]).length}/${MAX_ACTIVE_SKILLS})
     </button>`;
 
-  // keep full overlay in sync if open
+  // keep overlays in sync if open
   const ov = document.getElementById('skilltree-overlay');
   if (ov && ov.classList.contains('active')) _renderSkillTreeFull();
+  const lo = document.getElementById('skill-loadout-overlay');
+  if (lo && lo.classList.contains('active')) _renderSkillLoadout();
+}
+
+// ── Active-skill loadout: pick up to 3 unlocked skills to use in IDLE + battle ──
+const MAX_ACTIVE_SKILLS = 3;
+
+function openSkillLoadout() {
+  let ov = document.getElementById('skill-loadout-overlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'skill-loadout-overlay';
+    ov.className = 'overlay';
+    ov.onclick = (e) => { if (e.target === ov) closeSkillLoadout(); };
+    document.body.appendChild(ov);
+  }
+  _renderSkillLoadout();
+  ov.classList.add('active');
+}
+
+function closeSkillLoadout() {
+  const ov = document.getElementById('skill-loadout-overlay');
+  if (ov) ov.classList.remove('active');
+}
+
+function _allUnlockedSkillDefs() {
+  const tree = SKILL_TREES[G.classId] || [];
+  const out = [];
+  (G.unlockedSkills || []).forEach(sid => {
+    const node = tree.find(n => n.type === 'skill' && n.skill && n.skill.id === sid);
+    if (node) out.push({ id: sid, name: node.skill.name, desc: node.skill.desc, icon: node.icon || '⚡', tier: node.skill.tier || 1 });
+    else out.push({ id: sid, name: sid, desc: '', icon: '⚡', tier: 1 });
+  });
+  return out;
+}
+
+// toggle a skill on/off in the active loadout (max 3)
+function toggleActiveSkill(sid) {
+  if (!G.equippedSkills) G.equippedSkills = [];
+  const i = G.equippedSkills.indexOf(sid);
+  if (i >= 0) {
+    G.equippedSkills.splice(i, 1);
+  } else {
+    if (G.equippedSkills.length >= MAX_ACTIVE_SKILLS) {
+      logBattle(`<span class="log-sys">⚠ ใช้สกิลได้สูงสุด ${MAX_ACTIVE_SKILLS} อัน — ปิดอันอื่นก่อน</span>`);
+      return;
+    }
+    G.equippedSkills.push(sid);
+  }
+  saveGame();
+  _renderSkillLoadout();
+  renderSkillTree();
+}
+
+function _renderSkillLoadout() {
+  const ov = document.getElementById('skill-loadout-overlay');
+  if (!ov) return;
+  const all = _allUnlockedSkillDefs();
+  const equipped = G.equippedSkills || [];
+  const tierName = { 1:'พื้นฐาน', 2:'พัฒนา', 3:'สาขา', 4:'ขั้นสูง' };
+
+  const rows = all.length ? all.map(s => {
+    const on = equipped.includes(s.id);
+    const idleOk = (typeof _IDLE_SKILL_DMG !== 'undefined') && _IDLE_SKILL_DMG[s.id];
+    return `
+      <div class="sl-row${on ? ' on' : ''}" onclick="toggleActiveSkill('${s.id}')">
+        <span class="sl-icon">${s.icon}</span>
+        <div class="sl-info">
+          <div class="sl-name">${s.name} <span class="sl-tier">T${s.tier}</span></div>
+          <div class="sl-desc">${s.desc || ''}</div>
+          <div class="sl-tags">${idleOk ? '🌙 ออโต้ใน IDLE' : '⚔ ใช้ในด่าน'}</div>
+        </div>
+        <span class="sl-toggle">${on ? '✅ ใช้อยู่' : '➕ เลือก'}</span>
+      </div>`;
+  }).join('') : '<div style="color:#888;text-align:center;padding:1rem;font-size:.85rem">ยังไม่มีสกิล — ปลดล็อกจาก Skill Tree ก่อน</div>';
+
+  ov.innerHTML = `
+    <div class="modal sl-modal" onclick="event.stopPropagation()">
+      <div class="sl-title">⚔ จัดสกิลที่ใช้ <span style="color:#ccaaff">(${equipped.length}/${MAX_ACTIVE_SKILLS})</span></div>
+      <div class="sl-hint">เลือกได้สูงสุด ${MAX_ACTIVE_SKILLS} สกิล — ใช้ทั้งโหมด IDLE และด่าน · แตะเพื่อเปิด/ปิด</div>
+      <div class="sl-list">${rows}</div>
+      <button class="btn-close-modal" onclick="closeSkillLoadout()">ปิด</button>
+    </div>`;
 }
 
 function openSkillTreeFull() {
@@ -282,7 +369,7 @@ function _renderSkillTreeFull() {
     <div style="color:#aaa;font-size:.75rem">ใช้ไป ${spent}/${earned} &nbsp;|&nbsp; ทุก 5 LV = +1 point</div>
     <div style="color:#88ccff;font-size:.75rem">⚡ ความเร็ว: ${curInterval}วิ/ตี (-${speedPct}%${equipSpeedPct ? ` +${equipSpeedPct}% จากของ` : ''})</div>
     <div style="color:#ffcc44;font-size:.75rem">💎 Drop: +${Math.round((G.dropBonusFromTree||0)*100)}%</div>
-    ${G.classBranch ? `<div style="color:#ffaa44;font-size:.75rem">🔱 สาย: ${G.classBranch==='A'?'ซ้าย':'ขวา'}</div>` : ''}
+    ${G.classBranch ? `<div style="color:#ffaa44;font-size:.75rem">🔱 สาย: ${({A:'บุก',B:'ตั้งรับ',C:'พิฆาต',D:'จอมทัพ',S:'★ ลับ'})[G.classBranch]||G.classBranch}</div>` : ''}
   </div>`;
 
   for (let row = 0; row <= maxRow; row++) {

@@ -35,6 +35,8 @@ const _IDLE_SKILL_DMG = {
   fireball:      { mult: 2.6, hits: 1, label: '🔥 ไฟบรรลัย' },
   shadow_strike: { mult: 2.8, hits: 1, label: '🌑 เงาสังหาร' },
 };
+// merge in the C/D/S branch skills defined in data.js (Infinity Trial branches)
+if (typeof INFINITY_IDLE_SKILLS !== 'undefined') Object.assign(_IDLE_SKILL_DMG, INFINITY_IDLE_SKILLS);
 let _idleDead       = false;    // hero is dead, waiting to respawn
 let _idleRespawnAt  = 0;        // timestamp when hero respawns
 

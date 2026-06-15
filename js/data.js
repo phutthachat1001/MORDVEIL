@@ -1233,3 +1233,92 @@ const SKILL_TREES = {
     {id:'p_drop2', name:'+10% Drop', icon:'💎', type:'stat', row:6,col:5, requires:'p_drop1', stat:{dropBonus:0.10}},
   ],
 };
+
+// IDLE auto-cast table for the new C/D/S branch skills (merged into
+// _IDLE_SKILL_DMG by idle.js so they auto-cast in the IDLE farm).
+const INFINITY_IDLE_SKILLS = {};
+
+// ============================================================
+// SKILL TREE — สาขาใหม่ C/D/S (ปลดล็อกจาก Infinity Trial)
+// สร้างอัตโนมัติให้ครบทุกคลาส: row 3 (stat, skill, stat) + row 4 (stat, skill, stat)
+// requires อิงจาก node row-2 ของแต่ละคลาส (เหมือนสาย A/B เดิม)
+// ============================================================
+(function buildSecretBranchNodes() {
+  // [classId, prefix, [row2-stat-req, row2-skill-req, row2-stat-req2]]
+  const CLS = {
+    warrior: { p:'w', req:['w_hp2','w_slam','w_atk3'] },
+    mage:    { p:'m', req:['m_atk2','m_burst','m_exp3'] },
+    rogue:   { p:'r', req:['r_crit2','r_stab','r_atk3'] },
+    archer:  { p:'a', req:['a_atk3','a_arrow','a_crit1'] },
+    paladin: { p:'p', req:['p_regen1','p_heal','p_def3'] },
+  };
+  // per class+branch: T3 skill + T4 skill (id,name,desc,icon, idle mult/hits)
+  const SK = {
+    warrior:{
+      C:[['berserk_rage','คลั่งสงคราม','โจมตี ×3 + ดูดเลือด 10%','🪓',3,1],['blood_massacre','สังหารหมู่','โจมตี ×5 ดูดเลือด 20% เผา 3 ตา','🔥',2.2,1]],
+      D:[['marshal_strike','ดาบแม่ทัพ','โจมตี ×2.6 ทะลุ DEF','🎖',2.6,1],['imperial_smash','ทุบจักรพรรดิ','โจมตี ×4 กว้าง สตัน 1 ตา','👑',3.2,1]],
+      S:[['blood_demon_slash','ฟันเลือดอสูร','โจมตี ×3 ดูดเลือด 15%','🩸',2.8,1],['eternal_war','สงครามนิรันดร์','โจมตี ×6 ดูดเลือด 25%','👹',3.5,1]],
+    },
+    mage:{
+      C:[['wrath_flame','เพลิงพิโรธ','โจมตี ×2.8 เผา 4 ตา','🔥',2.8,1],['apocalypse_flame','อัคนีประลัย','อุกกาบาต ×5 เผาทั้งจอ','☄️',3.4,1]],
+      D:[['time_bolt','คาถากาลเวลา','โจมตี ×2.4 เกิดซ้ำ 2 ครั้ง','⏳',2.4,2],['time_collapse','กาลเวลาล่มสลาย','โจมตี ×4 หยุดเวลาศัตรู','🌌',3.3,1]],
+      S:[['void_burst','ระเบิดมิติ','โจมตี ×3 ดูดพลัง','🕳️',3.0,1],['cosmos_devour','กลืนจักรวาล','โจมตี ×6 ทะลุทุกอย่าง','🌀',3.6,1]],
+    },
+    rogue:{
+      C:[['venom_strike','พิษอสรพิษ','โจมตี ×2.4 พิษ 4 ตา','🐍',2.4,1],['death_venom','พิษมรณะ','โจมตี ×4 พิษหนัก ลด DEF','☠️',3.2,1]],
+      D:[['thunder_dagger','กริชสายฟ้า','โจมตี ×2.6 ฟ้าผ่า 2 ครั้ง','⚡',2.6,2],['thunder_god','เทพสายฟ้า','โจมตี ×4 ฟ้าผ่าทั้งจอ','🌩',3.3,1]],
+      S:[['timeless_strike','ฟันไร้กาลเวลา','โจมตี ×3 โจมตีซ้ำ','⏳',3.0,2],['shadow_emperor','จักรพรรดิเงา','โจมตี ×6 crit สูง','☠️',3.6,1]],
+    },
+    archer:{
+      C:[['flame_arrow','ธนูเพลิง','โจมตี ×2.6 เผา','🔥',2.6,1],['meteor_arrow','ธนูอุกกาบาต','ฝนธนูเพลิง ×5','☄️',3.3,1]],
+      D:[['shadow_arrow','ธนูเงา','โจมตี ×2.8 ทะลุ','🌑',2.8,1],['dark_volley','ห่าธนูมืด','ยิงพร้อม ×4','🌒',3.2,2]],
+      S:[['soul_arrow','ธนูวิญญาณ','โจมตี ×3 ทะลุเกราะ','👁️',3.0,2],['eternal_hunt','ล่านิรันดร์','ยิงดาว ×6 ทะลุ','🌌',3.6,3]],
+    },
+    paladin:{
+      C:[['crusade_strike','ฟันครูเสด','โจมตี ×2.4 + เกราะ','⚔️',2.4,1],['holy_crusade','ครูเสดศักดิ์สิทธิ์','โจมตี ×4 + ฟื้น HP','🛡',3.2,1]],
+      D:[['judgment','พิพากษา','โจมตี ×2.6 ตามบาป','⚖️',2.6,1],['final_verdict','คำตัดสินสุดท้าย','โจมตี ×4 ลงทัณฑ์','👁',3.3,1]],
+      S:[['undying_smite','ทัณฑ์อมตะ','โจมตี ×3 + เกราะหนา','⚜️',3.0,1],['eternal_light','แสงนิรันดร์','โจมตี ×6 + ฟื้นเต็ม','🕊️',3.6,1]],
+    },
+  };
+  const STAT3 = { // row-3 stat values per class (mirror A/B power)
+    warrior:{a:{atk:14},b:{hp:70}}, mage:{a:{atk:14},b:{expBonus:0.1}},
+    rogue:{a:{crit:0.06},b:{atk:12}}, archer:{a:{atk:14},b:{crit:0.06}},
+    paladin:{a:{hp:70},b:{def:10}},
+  };
+  const STAT4 = {
+    warrior:{a:{atk:20},b:{hp:110}}, mage:{a:{atk:22},b:{expBonus:0.12}},
+    rogue:{a:{crit:0.1},b:{atk:18}}, archer:{a:{atk:22},b:{crit:0.1}},
+    paladin:{a:{hp:110},b:{def:15}},
+  };
+  const BR_ICON = { C:'🔥', D:'⚡', S:'★' };
+
+  Object.keys(CLS).forEach(clsId => {
+    const { p, req } = CLS[clsId];
+    const tree = SKILL_TREES[clsId];
+    if (!tree) return;
+    ['C','D','S'].forEach(br => {
+      const sk3 = SK[clsId][br][0], sk4 = SK[clsId][br][1];
+      const s3 = STAT3[clsId], s4 = STAT4[clsId];
+      // row 3 (saขา): stat | skill | stat
+      tree.push({ id:`${p}_${br}_s3a`, name:_statName(s3.a), icon:'⚔', type:'stat', row:3, col:1, requires:req[0], branch:br, stat:s3.a });
+      tree.push({ id:`${p}_${br}_sk3`, name:sk3[1], icon:sk3[3], type:'skill', row:3, col:2, requires:req[1], branch:br,
+        skill:{ id:sk3[0], name:sk3[1], desc:sk3[2], cooldown:7, tier:3 } });
+      tree.push({ id:`${p}_${br}_s3b`, name:_statName(s3.b), icon:'❤', type:'stat', row:3, col:3, requires:req[2], branch:br, stat:s3.b });
+      // row 4: stat | skill | stat
+      tree.push({ id:`${p}_${br}_s4a`, name:_statName(s4.a), icon:BR_ICON[br], type:'stat', row:4, col:1, requires:`${p}_${br}_sk3`, branch:br, stat:s4.a });
+      tree.push({ id:`${p}_${br}_sk4`, name:sk4[1], icon:sk4[3], type:'skill', row:4, col:2, requires:`${p}_${br}_sk3`, branch:br,
+        skill:{ id:sk4[0], name:sk4[1], desc:sk4[2], cooldown:10, tier:4 } });
+      tree.push({ id:`${p}_${br}_s4b`, name:_statName(s4.b), icon:'❤', type:'stat', row:4, col:3, requires:`${p}_${br}_s3b`, branch:br, stat:s4.b });
+      // register the new skills for IDLE auto-cast
+      INFINITY_IDLE_SKILLS[sk3[0]] = { mult:sk3[4], hits:sk3[5], label:`${sk3[3]} ${sk3[1]}` };
+      INFINITY_IDLE_SKILLS[sk4[0]] = { mult:sk4[4], hits:sk4[5], label:`${sk4[3]} ${sk4[1]}` };
+    });
+  });
+  function _statName(s){
+    if(!s) return '';
+    if(s.hp) return `+${s.hp} HP`; if(s.atk) return `+${s.atk} ATK`;
+    if(s.def) return `+${s.def} DEF`; if(s.crit) return `+${Math.round(s.crit*100)}% Crit`;
+    if(s.expBonus) return `+${Math.round(s.expBonus*100)}% EXP`;
+    return '+stat';
+  }
+})();
