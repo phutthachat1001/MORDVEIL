@@ -62,8 +62,10 @@ function refreshSkillPoints() {
     const c = Math.max(1, node.cost || 1);   // cost-aware spend
     if (_isIdleNode(node)) spentIdle += c; else spentMain += c;
   });
-  G.skillTreePoints = Math.max(0, earned - spentMain); // main pool
-  G.idleTreePoints  = Math.max(0, earned - spentIdle); // IDLE pool
+  // main pool also includes bonus skill points earned from Infinity Trials
+  const trialBonus = G.trialSkillPoints || 0;
+  G.skillTreePoints = Math.max(0, earned + trialBonus - spentMain); // main pool
+  G.idleTreePoints  = Math.max(0, earned - spentIdle);              // IDLE pool
 }
 
 // ── node helpers ──

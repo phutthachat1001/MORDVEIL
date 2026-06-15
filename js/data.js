@@ -829,6 +829,18 @@ const INFINITY_TRIAL = {
   secret: { label:'TIER ลับ', rank:'SS', minWave:10, base:0, perKill:0.45, minKillsToRoll:30 },
   // floor ขั้นต่ำของแต่ละ weight (กันติดลบ)
   minWeight: 1,
+
+  // ── รางวัลตาม kills (นอกจาก % คลาส) — ตีเยอะยิ่งคุ้ม, ออกแบบให้สมดุล ──
+  // แต้มสกิล: ทุก killsPerSkillPoint kills = +1 แต้ม (เข้า main pool)
+  // ค่าสถานะถาวร: ATK/HP/DEF เพิ่มตาม kills (× ต่อ kill) ปัดเศษ
+  killRewards: {
+    killsPerSkillPoint: 20,   // ตี 20 ตัว = +1 แต้มสกิล
+    maxSkillPoints: 6,        // เพดานแต้มจาก trial เดียว (กัน farm เกิน)
+    atkPerKill: 0.6,          // +0.6 ATK ต่อ kill
+    hpPerKill: 3,             // +3 HP ต่อ kill
+    defPerKill: 0.2,          // +0.2 DEF ต่อ kill
+    maxKillsForStats: 150,    // นับ stat สูงสุดที่ 150 kills (กันเฟ้อ)
+  },
 };
 
 // ============================================================

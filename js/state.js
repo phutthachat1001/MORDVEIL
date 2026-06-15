@@ -87,6 +87,7 @@ let G = {
   // Skill Tree
   skillTreePoints: 0,
   idleTreePoints: 0,       // separate point pool for the IDLE section (row 5+)
+  trialSkillPoints: 0,     // bonus main-pool skill points earned from Infinity Trials
   skillTreeSpent: {},      // nodeId -> true
   classBranch: null,       // 'A','B','S' — decided by the Infinity Trial at tier 3
   // Persistent combat traits granted by evolutions (esp. secret tiers)

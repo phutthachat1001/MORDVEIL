@@ -146,6 +146,7 @@ function loadGame() {
       if (!G.unlockedSkills)    G.unlockedSkills    = [];
       if (G.skillTreePoints   === undefined) G.skillTreePoints   = 0;
       if (G.idleTreePoints    === undefined) G.idleTreePoints    = 0;
+      if (G.trialSkillPoints  === undefined) G.trialSkillPoints  = 0;
       if (G.classBranch       === undefined) G.classBranch       = null;
       if (G.totalDmgTaken     === undefined) G.totalDmgTaken     = 0;
       if (G.critBonusFromTree  === undefined) G.critBonusFromTree  = 0;

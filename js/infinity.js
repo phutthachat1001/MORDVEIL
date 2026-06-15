@@ -306,6 +306,18 @@ function _renderTrialResult(result) {
     return `<span style="opacity:${hit?1:.5};font-weight:${hit?800:400}">${info.rank} ${ch[b]}%</span>`;
   }).join(' · ');
 
+  // preview the kills-based rewards the player will receive
+  const R = INFINITY_TRIAL.killRewards || {};
+  const k = Math.min(result.kills, R.maxKillsForStats || result.kills);
+  const rwParts = [];
+  if (R.atkPerKill && Math.floor(k*R.atkPerKill)) rwParts.push(`+${Math.floor(k*R.atkPerKill)} ATK`);
+  if (R.hpPerKill  && Math.floor(k*R.hpPerKill))  rwParts.push(`+${Math.floor(k*R.hpPerKill)} HP`);
+  if (R.defPerKill && Math.floor(k*R.defPerKill)) rwParts.push(`+${Math.floor(k*R.defPerKill)} DEF`);
+  const pts = Math.min(R.maxSkillPoints||0, Math.floor(result.kills/(R.killsPerSkillPoint||999)));
+  if (pts) rwParts.push(`+${pts} แต้มสกิล`);
+  const rwRow = rwParts.length
+    ? `<div class="trial-result-hint" style="color:#7dff7d;font-size:.74rem">🏅 โบนัสจาก ${result.kills} kills: ${rwParts.join(' · ')}</div>` : '';
+
   stage.innerHTML = `
     <div class="trial-result${secret ? ' secret' : ''}">
       <div class="trial-result-dead">💀 การทดสอบสิ้นสุด</div>
@@ -317,6 +329,7 @@ function _renderTrialResult(result) {
       <div class="trial-result-name" style="color:${evo.color}">${evo.name}</div>
       <div class="trial-result-lore">${evo.lore || ''}</div>
       <div class="trial-result-bonus">${typeof formatBonuses === 'function' ? formatBonuses(evo.bonuses) : ''}</div>
+      ${rwRow}
       <div class="trial-result-hint" style="font-size:.7rem">🎲 โอกาส run นี้: ${chRow}</div>
       <button class="btn-trial-start" onclick="confirmTrialEvolution('${result.branch}')">✨ รับวิวัฒนาการ</button>
     </div>`;
@@ -326,10 +339,49 @@ function _renderTrialResult(result) {
 function confirmTrialEvolution(branch) {
   const path = CLASS_EVOLUTIONS[G.classId] || [];
   const evo  = path.find(e => e.tier === 3 && e.branch === branch);
+  const kills = _trialKills;   // capture before closing resets state
   closeInfinityTrial();
   if (!evo) return;
   G.classBranch = branch;
   evolveClass(evo);   // forced — skips condition gate
+  _grantTrialKillRewards(kills);
+}
+
+// Grant kills-based rewards on top of the class % — more kills = more reward.
+function _grantTrialKillRewards(kills) {
+  const R = INFINITY_TRIAL.killRewards;
+  if (!R || !kills) return;
+
+  // permanent stats (capped so huge runs don't inflate)
+  const k = Math.min(kills, R.maxKillsForStats);
+  const atk = Math.floor(k * R.atkPerKill);
+  const hp  = Math.floor(k * R.hpPerKill);
+  const def = Math.floor(k * R.defPerKill);
+  if (atk) G.baseAtk += atk;
+  if (hp)  { G.maxHp += hp; G.hp = G.maxHp; }
+  if (def) G.baseDef += def;
+
+  // bonus skill points (into the main pool, capped per run)
+  const pts = Math.min(R.maxSkillPoints, Math.floor(kills / R.killsPerSkillPoint));
+  if (pts > 0) {
+    // award by crediting earned-points: store as a persistent bonus the
+    // skill-tree refresh adds on top of level-based points
+    G.trialSkillPoints = (G.trialSkillPoints || 0) + pts;
+    if (typeof refreshSkillPoints === 'function') refreshSkillPoints();
+  }
+
+  if (typeof logBattle === 'function') {
+    const parts = [];
+    if (atk) parts.push(`+${atk} ATK`);
+    if (hp)  parts.push(`+${hp} HP`);
+    if (def) parts.push(`+${def} DEF`);
+    if (pts) parts.push(`+${pts} แต้มสกิล`);
+    if (parts.length)
+      logBattle(`<span class="log-exp">🏅 โบนัสจากการทดสอบ (ตี ${kills} ตัว): ${parts.join(' · ')}</span>`);
+  }
+  if (typeof updateTopBar === 'function') updateTopBar();
+  if (typeof renderAll === 'function') renderAll();
+  if (typeof saveGame === 'function') saveGame();
 }
 
 // ---------- rendering ----------
