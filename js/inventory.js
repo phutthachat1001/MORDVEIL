@@ -30,6 +30,9 @@ function _randomReelItem() {
 let _gachaSpinning = false;
 
 function openChest(type) {
+  // hide the drop-rate tooltip immediately (on touch there's no mouseleave,
+  // so it would otherwise stay stuck on screen after tapping the chest)
+  if (typeof _forceHideDropTooltip === 'function') _forceHideDropTooltip();
   if (!(G.chests[type] > 0)) return;
   if (_gachaSpinning) return;
   if (G.inventory.length >= 50) {
@@ -208,6 +211,23 @@ function hideDropTooltip() {
     const tt = document.getElementById('drop-tooltip');
     if (tt) tt.style.display = 'none';
   }, 120);
+}
+
+// hide instantly (used on touch / tap where mouseleave never fires)
+function _forceHideDropTooltip() {
+  clearTimeout(_dtHideTimer);
+  const tt = document.getElementById('drop-tooltip');
+  if (tt) tt.style.display = 'none';
+}
+
+// on touch devices, dismiss the tooltip when tapping anywhere else / scrolling
+if (typeof document !== 'undefined') {
+  document.addEventListener('touchstart', (e) => {
+    const tt = document.getElementById('drop-tooltip');
+    if (!tt || tt.style.display === 'none') return;
+    if (!e.target.closest('.inv-cell-chest')) _forceHideDropTooltip();
+  }, { passive: true });
+  document.addEventListener('scroll', () => _forceHideDropTooltip(), { passive: true, capture: true });
 }
 
 function _chestDropLines(type) {

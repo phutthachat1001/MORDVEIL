@@ -29,7 +29,13 @@ function giveExp(amount) {
   }
   updateTopBar();
   checkAchievements();
-  if (leveled) { renderZoneTabs(); updateCharPanel(); }
+  if (leveled) {
+    renderZoneTabs();
+    updateCharPanel();
+    // refresh evolution + skill-tree UI in realtime (no reload needed)
+    if (typeof renderEvolutionButton === 'function') renderEvolutionButton();
+    if (typeof renderSkillTree === 'function') renderSkillTree();
+  }
   saveGame();
 }
 
