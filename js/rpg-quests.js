@@ -493,20 +493,20 @@ function rpgOnExplore(zoneId) {
   rpgAutoAcceptZoneQuests(zoneId);
 }
 
-// Auto-accept available (non-chain) quests for a zone the moment the player
-// enters it — so the new quest system + the red quest badge light up without
-// having to visit an NPC. Retroactive credit in rpgAcceptQuest still applies.
+// Auto-accept ONLY plain KILL quests for the zone the player enters — so
+// fighting in a zone lights up the quest system + red badge without an NPC trip.
+// Collect / explore / NPC-talk / story quests are NOT auto-accepted — those are
+// taken manually (visit the NPC). Retroactive credit in rpgAcceptQuest applies.
 function rpgAutoAcceptZoneQuests(zoneId) {
   if (G.gameMode !== 'fullrpg') return;
-  // accept a few non-chain quests for THIS zone, lowest-tier first, capped so
-  // the active list doesn't get flooded with every kill quest at once.
   const MAX_ACTIVE_AUTO = 3;
   const curActive = rpgGetActiveQuests().filter(q => !q.chainFrom && !q.chainNext && q.type !== 'chain').length;
   let slots = Math.max(0, MAX_ACTIVE_AUTO - curActive);
   if (slots <= 0) return;
 
   const candidates = RPG_QUESTS
-    .filter(q => !(q.type === 'chain' || q.chainFrom || q.chainNext))
+    .filter(q => q.type === 'kill')                       // kill quests only
+    .filter(q => !(q.chainFrom || q.chainNext))           // exclude story chain
     .filter(q => (q.targetZone || q.zone) === zoneId)
     .filter(q => G.level >= q.minLevel)
     .filter(q => { const st = _rpgState(q.id); return !st.active && !st.done; })
