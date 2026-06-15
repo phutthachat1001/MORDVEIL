@@ -311,18 +311,22 @@ body.preload{visibility:hidden}
 }
 .hit-flash{animation:hit-flash .35s ease-out!important}
 
-/* Attack effect image overlay on enemy card */
+/* Attack effect image overlay on enemy card.
+   Punchy 4-beat motion: lunge in → overshoot impact → snap back → linger+fade,
+   with a glow pulse so the still PNG reads as a dynamic hit. */
 @keyframes attack-fx-anim{
-  0%  {opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(-15deg)}
-  20% {opacity:1;transform:translate(-50%,-50%) scale(1.15) rotate(5deg)}
-  65% {opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)}
-  100%{opacity:0;transform:translate(-50%,-50%) scale(1.2) rotate(8deg)}
+  0%  {opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-22deg);filter:brightness(1.6) drop-shadow(0 0 0 transparent)}
+  18% {opacity:1;transform:translate(-50%,-50%) scale(1.28) rotate(6deg);filter:brightness(1.5) drop-shadow(0 0 14px rgba(120,180,255,.85))}
+  34% {opacity:1;transform:translate(-50%,-50%) scale(.92) rotate(-3deg);filter:brightness(1) drop-shadow(0 0 8px rgba(120,180,255,.5))}
+  55% {opacity:1;transform:translate(-50%,-50%) scale(1.06) rotate(2deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.3) rotate(7deg);filter:brightness(.9)}
 }
 @keyframes attack-fx-crit{
-  0%  {opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-20deg)}
-  15% {opacity:1;transform:translate(-50%,-50%) scale(1.4) rotate(8deg)}
-  50% {opacity:1;transform:translate(-50%,-50%) scale(1.1) rotate(-3deg)}
-  100%{opacity:0;transform:translate(-50%,-50%) scale(1.35) rotate(10deg)}
+  0%  {opacity:0;transform:translate(-50%,-50%) scale(.25) rotate(-30deg);filter:brightness(2) drop-shadow(0 0 0 transparent)}
+  14% {opacity:1;transform:translate(-50%,-50%) scale(1.6) rotate(10deg);filter:brightness(1.8) drop-shadow(0 0 22px rgba(255,200,40,1))}
+  30% {opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(-5deg);filter:brightness(1.2) drop-shadow(0 0 16px rgba(255,180,0,.9))}
+  55% {opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(4deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.5) rotate(12deg);filter:brightness(1)}
 }
 .attack-fx-img{
   position:absolute;
@@ -332,12 +336,29 @@ body.preload{visibility:hidden}
   object-fit:contain;
   image-rendering:pixelated;
   z-index:20;
-  animation:attack-fx-anim .55s ease-out forwards;
+  animation:attack-fx-anim .6s cubic-bezier(.2,.8,.3,1) forwards;
 }
 .attack-fx-img.crit{
-  width:170px;height:170px;
-  animation:attack-fx-crit .55s ease-out forwards;
-  filter:drop-shadow(0 0 12px rgba(255,180,0,.9));
+  width:185px;height:185px;
+  animation:attack-fx-crit .65s cubic-bezier(.2,.85,.25,1) forwards;
+}
+
+/* impact shockwave ring — spawned on hit for extra punch */
+@keyframes fx-shockwave{
+  0%  {opacity:.9;transform:translate(-50%,-50%) scale(.2)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(2.4)}
+}
+.fx-shockwave{
+  position:absolute;top:40%;left:50%;width:120px;height:120px;
+  border-radius:50%;pointer-events:none;z-index:19;
+  border:3px solid rgba(150,200,255,.8);
+  box-shadow:0 0 18px rgba(120,180,255,.6),inset 0 0 18px rgba(120,180,255,.4);
+  animation:fx-shockwave .5s ease-out forwards;
+}
+.fx-shockwave.crit{
+  width:150px;height:150px;
+  border-color:rgba(255,210,60,.95);
+  box-shadow:0 0 26px rgba(255,190,0,.8),inset 0 0 22px rgba(255,190,0,.5);
 }
 
 /* ── Multi-enemy cards ── */
@@ -1970,7 +1991,13 @@ body.preload{visibility:hidden}
    so it faces RIGHT toward the hero. */
 .idle-mob-sprite { font-size: 3.6rem; line-height: 1; transition: transform .15s; transform: scaleX(-1); }
 .idle-mob-sprite img { width: 88px; height: 88px; object-fit: contain; image-rendering: pixelated; }
-.idle-mob.hit .idle-mob-sprite { transform: scaleX(-1) scale(.88) translateX(-4px); filter: brightness(2.2) sepia(1) hue-rotate(-30deg); }
+.idle-mob.hit .idle-mob-sprite { animation: idleMobHit .22s ease-out; }
+@keyframes idleMobHit {
+  0%   { transform: scaleX(-1) scale(1); filter: brightness(1); }
+  30%  { transform: scaleX(-1) scale(.84) translateX(6px) rotate(4deg); filter: brightness(2.6) sepia(1) hue-rotate(-30deg); }
+  60%  { transform: scaleX(-1) scale(1.06) translateX(-3px); filter: brightness(1.4); }
+  100% { transform: scaleX(-1) scale(1); filter: brightness(1); }
+}
 .idle-mob.dead .idle-mob-sprite { animation: idleMobDie .5s forwards; }
 @keyframes idleMobDie {
   to { opacity: 0; transform: scaleX(-1) scale(.3) rotate(20deg); }
@@ -1986,12 +2013,14 @@ body.preload{visibility:hidden}
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  animation: idleFxPop .4s ease-out forwards;
+  width: 80px; height: 80px;
+  animation: idleFxPop .46s cubic-bezier(.2,.8,.3,1) forwards;
 }
 @keyframes idleFxPop {
-  0%   { opacity: 0; transform: translate(-50%,-50%) scale(.5) rotate(-15deg); }
-  35%  { opacity: 1; transform: translate(-50%,-50%) scale(1.15) rotate(0deg); }
-  100% { opacity: 0; transform: translate(-50%,-50%) scale(1) rotate(10deg); }
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(.35) rotate(-20deg); filter: brightness(1.7); }
+  20%  { opacity: 1; transform: translate(-50%,-50%) scale(1.35) rotate(6deg);  filter: brightness(1.5) drop-shadow(0 0 10px rgba(150,200,255,.8)); }
+  40%  { opacity: 1; transform: translate(-50%,-50%) scale(.95) rotate(-2deg);  filter: brightness(1); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.25) rotate(9deg); }
 }
 .idle-mob-name { font-size: .62rem; color: #cdd; margin-top: .25rem; white-space: nowrap; text-shadow: 0 1px 2px #000; }
 

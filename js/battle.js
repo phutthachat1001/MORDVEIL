@@ -2532,13 +2532,20 @@ function _showAttackEffect(container, isCrit) {
     ? getAttackFxUrl()
     : './assets/effects/rogue_T1.png';
 
+  container.style.position = 'relative';
+
+  // shockwave ring (behind the fx) for extra impact
+  const ring = document.createElement('div');
+  ring.className = 'fx-shockwave' + (isCrit ? ' crit' : '');
+  container.appendChild(ring);
+  setTimeout(() => ring.remove(), 500);
+
   const img = document.createElement('img');
   img.src = src;
   img.className = 'attack-fx-img' + (isCrit ? ' crit' : '');
   img.draggable = false;
-  container.style.position = 'relative';
   container.appendChild(img);
-  setTimeout(() => img.remove(), 600);
+  setTimeout(() => img.remove(), 650);
 }
 
 // ---------- Monster attack ----------
