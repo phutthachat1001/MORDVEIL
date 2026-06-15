@@ -1,4 +1,4 @@
-const CACHE = 'mordveil-v46';
+const CACHE = 'mordveil-v47';
 const ASSETS = [
   './Play.html',
   './css/style.css',
@@ -29,11 +29,18 @@ const ASSETS = [
   './js/offline.js',
   './assets/button/playnext.png',
   './assets/button/newgame.png',
-  './assets/effects/slash.png',
-  './assets/effects/explosion.png',
-  './assets/effects/dark.png',
-  './assets/effects/arrow.png',
-  './assets/effects/holy.png',
+  './assets/effects/rogue_T1.png',
+  './assets/effects/rogue_T2.png',
+  './assets/effects/rogue_T3-A.png',
+  './assets/effects/rogue_T3-B.png',
+  './assets/effects/rogue_T3-C.png',
+  './assets/effects/rogue_T3-D.png',
+  './assets/effects/rogue_T3-S.png',
+  './assets/effects/rogue_T4-A.png',
+  './assets/effects/rogue_T4-B.png',
+  './assets/effects/rogue_T4-C.png',
+  './assets/effects/rogue_T4-D.png',
+  './assets/effects/rogue_T4-S.png',
 ];
 
 self.addEventListener('install', e => {

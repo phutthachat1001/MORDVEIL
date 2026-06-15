@@ -2490,17 +2490,13 @@ function getAttackInterval() {
 }
 
 function _showAttackEffect(container, isCrit) {
-  const CLASS_FX = {
-    warrior: 'slash',
-    mage:    'explosion',
-    rogue:   'dark',
-    archer:  'arrow',
-    paladin: 'holy',
-  };
-  const fx = CLASS_FX[G.classId] || 'slash';
+  // use the shared tier/branch-aware resolver (rogue has per-tier art)
+  const src = (typeof getAttackFxUrl === 'function')
+    ? getAttackFxUrl()
+    : './assets/effects/rogue_T1.png';
 
   const img = document.createElement('img');
-  img.src = `./assets/effects/${fx}.png`;
+  img.src = src;
   img.className = 'attack-fx-img' + (isCrit ? ' crit' : '');
   img.draggable = false;
   container.style.position = 'relative';

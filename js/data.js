@@ -1322,3 +1322,21 @@ const INFINITY_IDLE_SKILLS = {};
     return '+stat';
   }
 })();
+
+// ── FIX: IDLE entry nodes (row 5) were gated behind main-tree stat nodes
+// (e.g. r_spd1 required r_atk1). A player who spent points on skills could
+// "have points but cant upgrade IDLE". Free up each IDLE entry node so it
+// only chains within the IDLE rows (row >= 5), making them unlockable anytime.
+(function freeIdleEntryNodes() {
+  Object.keys(SKILL_TREES).forEach(clsId => {
+    const tree = SKILL_TREES[clsId];
+    const byId = Object.fromEntries(tree.map(n => [n.id, n]));
+    tree.forEach(n => {
+      if (n.row >= 5 && n.requires) {
+        const req = byId[n.requires];
+        // if it depends on a node OUTSIDE the IDLE section, drop the gate
+        if (!req || req.row < 5) n.requires = null;
+      }
+    });
+  });
+})();

@@ -233,6 +233,10 @@ function switchMobileTab(tab) {
     return;
   }
 
+  // any bottom-nav tap leaves the full-screen Hub (acts as "back to map/game")
+  const hub = document.getElementById('hub-screen');
+  if (hub && hub.style.display === 'block' && typeof closeHub === 'function') closeHub();
+
   _mobileActiveTab = tab;
 
   // IDLE tab → full-screen farm view (a body class drives the CSS overlay).

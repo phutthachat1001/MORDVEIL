@@ -251,17 +251,26 @@ function _floatAboveIdleMob(idx, html, cls) {
   setTimeout(() => el.remove(), 1700);
 }
 
-// class-based slash/hit effect over the targeted mob
-const _IDLE_FX = { warrior:'slash', mage:'explosion', rogue:'dark', archer:'arrow', paladin:'holy' };
+// Resolve the attack-effect image URL for the current class/tier/branch.
+// Rogue has per-tier/per-branch art (rogue_T1, rogue_T3-A ... rogue_T4-S).
+// Other classes fall back to rogue's tier art until their own art exists.
+function getAttackFxUrl() {
+  const tier = Math.min(4, Math.max(1, G.classTier || 1));
+  const branch = G.classBranch;
+  const fxClass = (G.classId === 'rogue') ? 'rogue' : 'rogue'; // TODO: per-class art
+  // T1/T2 have no branch; T3/T4 use the chosen branch (A/B/C/D/S)
+  const suffix = (tier >= 3 && branch) ? `-${branch}` : '';
+  return `./assets/effects/${fxClass}_T${tier}${suffix}.png`;
+}
+
 function _showIdleFx(idx) {
   const stage = document.getElementById('idle-stage');
   if (!stage) return;
   const wrap = stage.querySelector(`.idle-mob[data-idx="${idx}"] .idle-mob-sprite`);
   if (!wrap) return;
-  const fx = _IDLE_FX[G.classId] || 'slash';
   const el = document.createElement('div');
   el.className = 'idle-fx';
-  el.style.backgroundImage = `url('./assets/effects/${fx}.png')`;
+  el.style.backgroundImage = `url('${getAttackFxUrl()}')`;
   wrap.parentElement.appendChild(el);
   setTimeout(() => el.remove(), 400);
 }

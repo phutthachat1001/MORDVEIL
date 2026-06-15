@@ -992,7 +992,7 @@ body.preload{visibility:hidden}
 
 /* ── close button ── */
 .hub-close-btn{
-  position:absolute;top:1rem;right:1.2rem;z-index:25;
+  position:absolute;top:calc(1rem + env(safe-area-inset-top, 0px));right:1.2rem;z-index:25;
   background:rgba(0,0,0,.6);border:1px solid #3a5428;
   color:#7a9a60;padding:.4rem 1rem;border-radius:6px;
   cursor:pointer;font-size:.85rem;font-family:'Sarabun',sans-serif;

@@ -192,7 +192,11 @@ function openHub() {
   closeHubDialogue();
   closeHubPanel();
   const s = document.getElementById('hub-screen');
-  if (window.innerWidth <= 700) s.style.bottom = '58px';
+  if (window.innerWidth <= 700) {
+    // sit above the bottom nav (incl. iOS home-indicator inset)
+    const nav = document.getElementById('mobile-nav');
+    s.style.bottom = (nav ? nav.offsetHeight : 58) + 'px';
+  }
   s.style.display = 'block';
   s.style.opacity = '0';
   s.style.transition = 'opacity .5s';
@@ -1134,7 +1138,7 @@ function renderHubScene() {
   // visible horizontal range ≈ px 504–894 of original 1280px video
   // NPC positions calculated as % of screen width to match building locations in video
   // Building A (left) center ≈ screen 15–20%, Building B (right) center ≈ screen 58–65%
-  const mobilePos  = ['12%','27%','48%','63%','80%'];
+  const mobilePos  = ['10%','30%','50%','70%','90%'];
   const bottomPx   = mob ? 35 : 80;
   // name tag inline style — smaller on mobile
   const nameStyle  = mob
