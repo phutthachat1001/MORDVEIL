@@ -2850,7 +2850,7 @@ function monsterDie() {
   const monEl = document.getElementById('pixel-monster');
   if (monEl) monEl.classList.add('die-anim');
 
-  logBattle(`<span class="log-exp">🏆 ${monster.name} ตาย! +${expGain} EXP 💰+${goldGain}${dropChest ? ` 📦 หีบบอส` : ''} [Kill #${G.sessionKills}]</span>`);
+  logBattle(`<span class="log-exp">🏆 ${monster.name} ตาย! +${expGain} EXP 💰+${goldGain} [Kill #${G.sessionKills}]</span>`);
 
   giveExp(expGain);
   checkAchievements();

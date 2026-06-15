@@ -276,16 +276,24 @@ function npcQuestOnKill(monsterName, zone) {
   });
 }
 
-// Hook into zone navigation — show NPC when entering a zone from map
+// Hook into zone navigation — show NPC when entering a zone from map.
+// Shows ONCE per zone ever (persisted). Won't re-show if already seen, if the
+// quest is already active, or if it's already done.
 function npcCheckZoneEntry(zone) {
+  // fullrpg mode has its own complete quest system (rpg-quests) — don't stack
+  // the zone-NPC quests on top of it (that caused "duplicate" quests).
+  if (G.gameMode === 'fullrpg') return;
   if (!G.npcQuestProgress) G.npcQuestProgress = {};
   const npc = ZONE_NPCS[zone];
   if (!npc) return;
-  // Show once per zone unless quest done
   const q = npc.quest;
   const seenKey = `npc_enc_shown_z${zone}`;
-  if (G.npcQuestProgress[seenKey]) return;
+  // already shown, already accepted, or already finished → never show again
+  const accepted = G._npcQuestDefs && G._npcQuestDefs[q.id];
+  const progressed = (G.npcQuestProgress[q.id] || 0) > 0;
+  if (G.npcQuestProgress[seenKey] || accepted || progressed) return;
   G.npcQuestProgress[seenKey] = true;
+  saveGame();   // persist immediately so a reload doesn't re-trigger it
   // Delay slightly so the monster list renders first
   setTimeout(() => openNpcEncounter(zone, null), 400);
 }

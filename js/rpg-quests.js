@@ -594,7 +594,7 @@ function _rpgCompleteQuest(q) {
   if (r.chest && typeof grantChestReward==="function") grantChestReward(r.chest,1);
   const chestLabel = { common:'ธรรมดา', uncommon:'พิเศษ', rare:'หายาก', boss:'บอส' };
   const icon = q.type === 'chain' ? '📖' : q.type === 'explore' ? '🗺' : q.type === 'collect' ? '💎' : q.type === 'skilltree' ? '🌳' : '🏆';
-  logBattle(`<span class="log-exp">${icon} เควสสำเร็จ! <b>${q.name}</b> — +${(r.exp||0).toLocaleString()} EXP 💰+${r.gold||0}${r.chest ? ` 📦 หีบ${chestLabel[r.chest]}` : ''}</span>`);
+  logBattle(`<span class="log-exp">${icon} เควสสำเร็จ! <b>${q.name}</b> — +${(r.exp||0).toLocaleString()} EXP 💰+${r.gold||0}${r.chest ? ` 🎁 ไอเทม${chestLabel[r.chest]}` : ''}</span>`);
   if (q.lore) logBattle(`<span class="log-sys" style="color:#a88;font-style:italic">📜 ${q.lore}</span>`);
   if (typeof playSound === 'function') playSound('exp');
   if (typeof checkAchievements === 'function') checkAchievements();
@@ -687,7 +687,7 @@ function _rpgDailyCheck(q) {
   if (r.gold)  G.gold += r.gold;
   if (r.chest && typeof grantChestReward==="function") grantChestReward(r.chest,1);
   const chestLabel = { common:'ธรรมดา', uncommon:'พิเศษ', rare:'หายาก', boss:'บอส' };
-  logBattle(`<span class="log-exp">⭐ ภารกิจวันนี้สำเร็จ! <b>${q.name}</b> — +${(r.exp||0).toLocaleString()} EXP 💰+${r.gold||0}${r.chest ? ` 📦 หีบ${chestLabel[r.chest]}` : ''}</span>`);
+  logBattle(`<span class="log-exp">⭐ ภารกิจวันนี้สำเร็จ! <b>${q.name}</b> — +${(r.exp||0).toLocaleString()} EXP 💰+${r.gold||0}${r.chest ? ` 🎁 ไอเทม${chestLabel[r.chest]}` : ''}</span>`);
   if (typeof playSound === 'function') playSound('exp');
 }
 
@@ -737,7 +737,7 @@ function rpgShowNpcQuests(npcId) {
         <span style="font-size:.72rem;color:#888">${statusLabel}</span>
       </div>
       <div style="font-size:.78rem;color:var(--text2);margin:.2rem 0">${q.desc}</div>
-      <div style="font-size:.75rem;color:var(--gold)">🏆 +${(q.reward.exp||0).toLocaleString()} EXP 💰+${q.reward.gold||0}${q.reward.chest ? ` 📦 หีบ${chestLabel[q.reward.chest]}` : ''}</div>
+      <div style="font-size:.75rem;color:var(--gold)">🏆 +${(q.reward.exp||0).toLocaleString()} EXP 💰+${q.reward.gold||0}${q.reward.chest ? ` 🎁 ไอเทม${chestLabel[q.reward.chest]}` : ''}</div>
       ${q.lore ? `<div style="font-size:.7rem;color:#a88;font-style:italic;margin-top:.2rem">📜 ${q.lore}</div>` : ''}
       ${btnHtml}
     </div>`;
@@ -781,7 +781,7 @@ function renderRpgQuestPanel() {
         <div class="rpq-desc">${q.desc}</div>
         <div class="rpq-progress-wrap"><div class="rpq-progress-bar" style="width:${pct}%"></div></div>
         <div class="rpq-progress-text">${st.progress||0}/${req} (${pct}%)</div>
-        <div class="rpq-reward">🏆 +${(q.reward.exp||0).toLocaleString()} EXP &nbsp;💰 +${q.reward.gold||0}${q.reward.chest?` 📦 หีบ${chestLabel[q.reward.chest]}`:''}
+        <div class="rpq-reward">🏆 +${(q.reward.exp||0).toLocaleString()} EXP &nbsp;💰 +${q.reward.gold||0}${q.reward.chest?` 🎁 ไอเทม${chestLabel[q.reward.chest]}`:''}
         </div>
         <button class="rpq-btn-abandon" onclick="rpgAbandonQuest('${q.id}')">✕ ยกเลิก</button>
       </div>`;
@@ -860,7 +860,7 @@ function renderRpgQuestPanel() {
           <span class="rpq-zone" style="color:${zc}">${zoneName}</span>
         </div>
         <div class="rpq-desc">${q.desc}</div>
-        <div class="rpq-reward">🏆 +${(q.reward.exp||0).toLocaleString()} EXP 💰+${q.reward.gold||0}${q.reward.chest?` 📦 หีบ${chestLabel[q.reward.chest]}`:''}
+        <div class="rpq-reward">🏆 +${(q.reward.exp||0).toLocaleString()} EXP 💰+${q.reward.gold||0}${q.reward.chest?` 🎁 ไอเทม${chestLabel[q.reward.chest]}`:''}
         </div>
         <button class="rpq-btn-accept" onclick="rpgAcceptQuest('${q.id}')">รับเควส</button>
       </div>`;
@@ -916,7 +916,7 @@ function renderRpgDailyPanel() {
       <div style="font-size:.77rem;color:var(--text2);margin:.2rem 0">${q.desc}</div>
       ${!q.done?`<div class="rpq-progress-wrap"><div class="rpq-progress-bar" style="width:${pct}%;background:linear-gradient(90deg,#fa0,#ff0)"></div></div>
       <div class="rpq-progress-text">${q.progress||0}/${q.required} (${pct}%)</div>`:''}
-      <div class="rpq-reward" style="color:${q.done?'#7dff7d':'var(--gold)'}">🏆 +${(q.reward.exp||0).toLocaleString()} EXP 💰+${q.reward.gold||0}${q.reward.chest?` 📦 หีบ${chestLabel[q.reward.chest]}`:''}</div>
+      <div class="rpq-reward" style="color:${q.done?'#7dff7d':'var(--gold)'}">🏆 +${(q.reward.exp||0).toLocaleString()} EXP 💰+${q.reward.gold||0}${q.reward.chest?` 🎁 ไอเทม${chestLabel[q.reward.chest]}`:''}</div>
     </div>`;
   });
   panel.innerHTML = html;
