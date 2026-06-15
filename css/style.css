@@ -441,6 +441,14 @@ body.preload{visibility:hidden}
   image-rendering:pixelated;
 }
 
+/* Bigger battle sprites — the inline 80px sizing was too small to enjoy.
+   Scale player + monster up a lot in the fight scene (desktop baseline;
+   mobile overrides further down in the @media block). */
+#pixel-player svg, #pixel-player img,
+#pixel-monster svg, #pixel-monster img{
+  width:170px !important; height:170px !important;
+}
+
 /* Player info panel */
 #battle-player-info{
   width:100%;border-radius:10px;padding:.32rem .6rem .28rem;text-align:center;
@@ -1735,8 +1743,8 @@ body.preload{visibility:hidden}
   /* ── RPG Battle Scene on mobile ── */
   #rpg-battle-scene { flex:1;min-height:0 }
   #battle-fighters {
-    height: 65%;
-    min-height: 240px;
+    height: 70%;
+    min-height: 310px;
     padding: 0 3% 14px;
   }
   /* both sides equal width on mobile */
@@ -1744,13 +1752,13 @@ body.preload{visibility:hidden}
   #battle-player-side { width: 47% }
 
   #pixel-monster svg,
-  #pixel-monster img { width: 110px !important; height: 110px !important; }
+  #pixel-monster img { width: 175px !important; height: 175px !important; }
   #pixel-player  svg,
-  #pixel-player  img { width: 110px !important; height: 110px !important; }
+  #pixel-player  img { width: 175px !important; height: 175px !important; }
 
   /* enemy cards on mobile */
   #enemy-cards-wrap .enemy-card-sprite svg,
-  #enemy-cards-wrap .enemy-card-sprite img{width:100px!important;height:100px!important}
+  #enemy-cards-wrap .enemy-card-sprite img{width:150px!important;height:150px!important}
   #enemy-cards-wrap.enemy-count-2 .enemy-card-sprite svg,
   #enemy-cards-wrap.enemy-count-2 .enemy-card-sprite img{width:80px!important;height:80px!important}
   #enemy-cards-wrap.enemy-count-3 .enemy-card-sprite svg,
