@@ -19,7 +19,40 @@ function _isIdleNodeId(nodeId) {
   return _isIdleNode(tree.find(n => n.id === nodeId));
 }
 
+// Recompute the DERIVED skill-tree bonuses (speed/crit/exp/gold/regen/streak/
+// drop) from the currently-unlocked nodes + current data values. This makes
+// data-side rebalances (e.g. new speed %) apply to existing saves instead of
+// being stuck at the value that was added when the node was first unlocked.
+// NOTE: hp/atk/def are applied to base stats directly and are NOT recomputed
+// here (that would double-count with level-ups).
+function recalcTreeBonuses() {
+  const tree = SKILL_TREES[G.classId] || [];
+  let speed=0, crit=0, exp=0, gold=0, regen=0, streak=0, drop=0;
+  Object.keys(G.skillTreeSpent || {}).forEach(id => {
+    const node = tree.find(n => n.id === id);
+    if (!node || node.type !== 'stat' || !node.stat) return;
+    const s = node.stat;
+    if (s.speedBonus)  speed  += s.speedBonus;
+    if (s.crit)        crit   += s.crit;
+    if (s.expBonus)    exp    += s.expBonus;
+    if (s.goldBonus)   gold   += s.goldBonus;
+    if (s.regenBonus)  regen  += s.regenBonus;
+    if (s.streakBonus) streak += s.streakBonus;
+    if (s.dropBonus)   drop   += s.dropBonus;
+  });
+  G.attackSpeedBonus    = Math.min(0.9, speed);
+  G.critBonusFromTree   = crit;
+  G.expBonusFromTree    = exp;
+  G.goldBonusFromTree   = gold;
+  G.regenBonusFromTree  = regen;
+  G.streakBonusFromTree = streak;
+  G.dropBonusFromTree   = drop;
+}
+
 function refreshSkillPoints() {
+  // keep derived bonuses in sync with current data values (applies rebalances
+  // to existing saves the moment the tree is touched/rendered)
+  recalcTreeBonuses();
   const earned = getSkillPointsEarned(G.level);
   const tree = SKILL_TREES[G.classId] || [];
   let spentMain = 0, spentIdle = 0;
@@ -79,16 +112,13 @@ function _applyNodeUnlock(nodeId) {
 
   if (node.type === 'stat' && node.stat) {
     const s = node.stat;
-    if (s.hp)           { G.maxHp += s.hp; G.hp = Math.min(G.hp + s.hp, G.maxHp); }
-    if (s.atk)          G.baseAtk += s.atk;
-    if (s.def)          G.baseDef += s.def;
-    if (s.crit)         G.critBonusFromTree  = (G.critBonusFromTree  || 0) + s.crit;
-    if (s.expBonus)     G.expBonusFromTree   = (G.expBonusFromTree   || 0) + s.expBonus;
-    if (s.goldBonus)    G.goldBonusFromTree  = (G.goldBonusFromTree  || 0) + s.goldBonus;
-    if (s.regenBonus)   G.regenBonusFromTree = (G.regenBonusFromTree || 0) + s.regenBonus;
-    if (s.streakBonus)  G.streakBonusFromTree= (G.streakBonusFromTree|| 0) + s.streakBonus;
-    if (s.speedBonus)   { G.attackSpeedBonus = Math.min(0.9, (G.attackSpeedBonus || 0) + s.speedBonus); if (typeof restartAutoWithNewSpeed === 'function') restartAutoWithNewSpeed(); }
-    if (s.dropBonus)    G.dropBonusFromTree  = (G.dropBonusFromTree  || 0) + s.dropBonus;
+    // hp/atk/def go straight into base stats (one-time)
+    if (s.hp)  { G.maxHp += s.hp; G.hp = Math.min(G.hp + s.hp, G.maxHp); }
+    if (s.atk) G.baseAtk += s.atk;
+    if (s.def) G.baseDef += s.def;
+    // derived bonuses are recomputed from all unlocked nodes (data-driven)
+    recalcTreeBonuses();
+    if (s.speedBonus && typeof restartAutoWithNewSpeed === 'function') restartAutoWithNewSpeed();
     logBattle(`<span class="log-exp">🌳 Skill Tree: ได้รับ ${node.name}!</span>`);
   }
 
