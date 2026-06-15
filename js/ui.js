@@ -193,7 +193,25 @@ function updateNavBadges() {
   // QUEST badge
   let questN = 0;
   if (G.gameMode === 'fullrpg') {
-    questN = (typeof rpgGetAvailableQuests === 'function') ? rpgGetAvailableQuests().length : 0;
+    // badge = the next story quest ready to accept (1) + active quests whose
+    // objective is already met (ready to turn in). Zone kill/explore quests are
+    // auto-accepted, so we don't flood the badge with every available quest.
+    let story = 0, ready = 0;
+    if (typeof RPG_QUESTS !== 'undefined' && typeof _rpgState === 'function') {
+      const hasNextStory = RPG_QUESTS.some(q => {
+        const isChain = q.type === 'chain' || q.chainFrom || q.chainNext;
+        if (!isChain) return false;
+        const st = _rpgState(q.id);
+        return !st.done && !st.active && G.level >= q.minLevel &&
+               (!q.chainFrom || _rpgState(q.chainFrom).done);
+      });
+      story = hasNextStory ? 1 : 0;
+      RPG_QUESTS.forEach(q => {
+        const st = _rpgState(q.id);
+        if (st.active && !st.done && (st.progress||0) >= (q.required||1)) ready++;
+      });
+    }
+    questN = story + ready;
   } else {
     questN = (typeof getHubQuestsPending === 'function') ? getHubQuestsPending().length : 0;
   }

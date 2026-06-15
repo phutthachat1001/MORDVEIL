@@ -423,12 +423,25 @@ function rpgAcceptQuest(id) {
   const st = _rpgState(id);
   if (st.active || st.done) return;
   st.active = true; st.progress = 0;
-  // explore: instant check current zone
-  if (q.type === 'explore' && G.currentZone === q.targetZone) {
-    st.progress = 1;
-    _rpgCheckComplete(q, st);
-    return;
+
+  // ── retroactive credit: count progress already earned BEFORE accepting ──
+  if (q.type === 'explore') {
+    // visited if it's the current zone OR the zone has any cleared progress
+    const reached = G.currentZone === q.targetZone || ((G.zoneProgress||{})[q.targetZone]||0) > 0;
+    if (reached) { st.progress = q.required || 1; _rpgCheckComplete(q, st); return; }
+  } else if (q.type === 'kill') {
+    // if the target monster tier in that zone was already defeated, credit it
+    const beaten = (G.defeatedMonsters||{})[`${q.targetZone}_${q.targetTier}`];
+    if (beaten) {
+      // give a head-start (counts as having killed it once)
+      st.progress = Math.min(q.required || 1, 1);
+      _rpgCheckComplete(q, st);
+      if (st.done) return;
+    }
+  } else if (q.type === 'collect' && q.collectType === 'gold') {
+    if (G.gold >= (q.required||0)) { st.progress = G.gold; _rpgCheckComplete(q, st); return; }
   }
+
   saveGame();
   renderRpgQuestPanel();
   logBattle(`<span class="log-sys">📜 รับเควส: <b>${q.name}</b> — ${q.desc}</span>`);
@@ -476,6 +489,41 @@ function rpgOnExplore(zoneId) {
     }
   });
   if (changed) { saveGame(); renderRpgQuestPanel(); }
+  // auto-accept any newly-available quests for this zone (no NPC trip needed)
+  rpgAutoAcceptZoneQuests(zoneId);
+}
+
+// Auto-accept available (non-chain) quests for a zone the moment the player
+// enters it — so the new quest system + the red quest badge light up without
+// having to visit an NPC. Retroactive credit in rpgAcceptQuest still applies.
+function rpgAutoAcceptZoneQuests(zoneId) {
+  if (G.gameMode !== 'fullrpg') return;
+  // accept a few non-chain quests for THIS zone, lowest-tier first, capped so
+  // the active list doesn't get flooded with every kill quest at once.
+  const MAX_ACTIVE_AUTO = 3;
+  const curActive = rpgGetActiveQuests().filter(q => !q.chainFrom && !q.chainNext && q.type !== 'chain').length;
+  let slots = Math.max(0, MAX_ACTIVE_AUTO - curActive);
+  if (slots <= 0) return;
+
+  const candidates = RPG_QUESTS
+    .filter(q => !(q.type === 'chain' || q.chainFrom || q.chainNext))
+    .filter(q => (q.targetZone || q.zone) === zoneId)
+    .filter(q => G.level >= q.minLevel)
+    .filter(q => { const st = _rpgState(q.id); return !st.active && !st.done; })
+    .sort((a, b) => (a.targetTier || 0) - (b.targetTier || 0));
+
+  let any = false;
+  for (const q of candidates) {
+    if (slots <= 0) break;
+    rpgAcceptQuest(q.id);
+    // only consumes a slot if it didn't instantly complete (retroactive)
+    if (!_rpgState(q.id).done) slots--;
+    any = true;
+  }
+  if (any) {
+    if (typeof updateNavBadges === 'function') updateNavBadges();
+    if (typeof renderRpgQuestPanel === 'function') renderRpgQuestPanel();
+  }
 }
 
 // จาก chest open (เรียกจาก openChest / gacha modal)
