@@ -737,21 +737,20 @@ const INFINITY_TRIAL = {
   baseAtkMult:      0.4,
   attackSpeedMult:  0.42,    // trial ตีเร็วกว่าปกติ (× ของ getAttackInterval, ขั้นต่ำ 420ms)
 
-  // ── kills → branch (5 ชั้น, ยิ่งตีเยอะ ยิ่งได้คลาสโหด) ──
-  // ตรวจจากบนลงล่าง: ใช้ branch แรกที่ kills ถึง minKills
-  // เรียงพลังจากอ่อน→โหด:  B (~20-50) < A (~40-60) < C (~65-90) < D (~90-120)
-  // ค่า score เป็นแนวเทียบ (จาก bonuses) ไว้ดูสมดุล ไม่ได้ใช้ใน logic
-  killTiers: [
-    { branch:'B', minKills:0,  label:'เส้นทางตั้งรับ',  rank:'C' },
-    { branch:'A', minKills:15, label:'เส้นทางบุก',       rank:'B' },
-    { branch:'C', minKills:35, label:'เส้นทางพิฆาต',     rank:'A' },
-    { branch:'D', minKills:60, label:'เส้นทางจอมทัพ',    rank:'S' },
-  ],
-
-  // ── SECRET TIER (branch S) — เหนือทุกชั้น, ต้องเก่งจริง + โชค ──
-  secretMinKills: 90,        // ต้องตีอย่างน้อย 90 ตัวใน run เดียว
-  secretMinWave:  12,        // และไปถึงคลื่นที่ 12+
-  secretChance:   0.5,       // เข้าเงื่อนไขครบ → 50% ได้ Secret (ไม่งั้นตกชั้น D)
+  // ── kills → คลาส แบบ "สุ่มถ่วงน้ำหนัก" (ทุกคลาสมีดีของตัวเอง) ──
+  // แต่ละ branch มีน้ำหนัก = base + perKill × kills (clamp ไม่ติดลบ)
+  // ยิ่งตีเยอะ → น้ำหนัก S/D สูงขึ้น, B/A ต่ำลง → S ออกบ่อยขึ้นแต่ไม่การันตี
+  // label/rank ใช้โชว์ความ "เท่" ของผล (ไม่ใช่ลำดับ fixed อีกต่อไป)
+  branchInfo: {
+    B: { label:'เส้นทางตั้งรับ', rank:'B', base:40, perKill:-0.30 },
+    A: { label:'เส้นทางบุก',      rank:'A', base:35, perKill:-0.10 },
+    C: { label:'เส้นทางพิฆาต',    rank:'A', base:18, perKill: 0.18 },
+    D: { label:'เส้นทางจอมทัพ',   rank:'S', base: 7, perKill: 0.30 },
+  },
+  // SECRET (S) — ต้องผ่านคลื่นลึกถึงจะมีสิทธิ์ลุ้น, น้ำหนักโตตาม kills
+  secret: { label:'TIER ลับ', rank:'SS', minWave:10, base:0, perKill:0.45, minKillsToRoll:30 },
+  // floor ขั้นต่ำของแต่ละ weight (กันติดลบ)
+  minWeight: 1,
 };
 
 // ============================================================

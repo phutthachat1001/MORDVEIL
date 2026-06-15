@@ -303,6 +303,11 @@ function switchMobileTab(tab) {
     // (set above) makes #idle-panel fill the screen for the IDLE tab.
     const bp = document.querySelector('.main-layout .battle-panel');
     if (bp) bp.classList.add('mobile-active');
+    // entering the battle tab while NOT mid-fight → show the world map
+    // (fixes "map sometimes doesn't appear" when coming back from another tab)
+    if (tab === 'battle' && !G.battleInProgress && typeof showBattleMap === 'function') {
+      showBattleMap();
+    }
   } else if (tab === 'char') {
     const cp = document.getElementById('panel-char');
     if (cp) cp.classList.add('mobile-active');

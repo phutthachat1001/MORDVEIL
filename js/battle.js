@@ -223,8 +223,12 @@ function getMonsterStats(zone, tier, isBoss) {
   // tier scaling: 1→1x, 2→1.8x, 3→3x, 4→5x, 5→8x, 6→14x (exponential curve)
   const tierMult = [0, 1, 1.8, 3, 5, 8, 14][tier] || tier;
   const zoneBase = 1 + (zone - 1) * 1.2; // zone 1=1, zone 2=2.2, zone 3=3.4 ... zone 6=7
-  let maxHp = Math.floor(200 * zoneBase * tierMult);
-  let atk   = Math.floor(12 * zoneBase * tierMult);
+  // REAL-TIME rebalance: monsters now attack on their own timer (~1.7s) rather
+  // than once per player turn, so per-hit ATK is lowered (~55%) to keep total
+  // incoming damage fair, and HP is bumped a bit so fights last longer (more
+  // engaging — chip them down instead of one-shotting).
+  let maxHp = Math.floor(200 * zoneBase * tierMult * 1.25);
+  let atk   = Math.floor(12  * zoneBase * tierMult * 0.55);
   // tier 6 (zone boss) — extra tough
   if (isBoss) { maxHp = Math.floor(maxHp * 1.5); atk = Math.floor(atk * 1.4); }
   return { maxHp, atk };
@@ -1610,6 +1614,37 @@ function _startAutoIfNeeded() {
   }, 200);
 }
 
+// ---------- REAL-TIME monster attack loop ----------
+// The monster strikes on its OWN timer, independent of the player. This makes
+// the player's attack-speed/cooldown meaningful: attack slow → take more hits.
+// Monster interval scales with its tier (tougher mobs hit a bit slower but harder).
+let _monsterAtkLoop = null;
+
+function _monsterAtkInterval() {
+  // base ~1.8s; bosses a touch slower (1.8s), trash a touch faster (1.5s)
+  const m = G.currentMonster;
+  if (!m) return 1800;
+  return m.isBoss ? 2000 : 1600;
+}
+
+function startMonsterAutoAttack() {
+  stopMonsterAutoAttack();
+  if (!G.battleInProgress || !G.currentMonster) return;
+  let last = performance.now();
+  _monsterAtkLoop = setInterval(() => {
+    if (!G.battleInProgress || G.hp <= 0 || !G.currentMonster) { stopMonsterAutoAttack(); return; }
+    const now = performance.now();
+    if (now - last >= _monsterAtkInterval()) {
+      last = now;
+      if (typeof monsterAttack === 'function') monsterAttack();
+    }
+  }, 150);
+}
+
+function stopMonsterAutoAttack() {
+  if (_monsterAtkLoop) { clearInterval(_monsterAtkLoop); _monsterAtkLoop = null; }
+}
+
 function restartAutoWithNewSpeed() {
   if (!G._idleMode) return;
   stopAuto();
@@ -1677,6 +1712,9 @@ function showBattleContent(monster, stats) {
   const nm = document.getElementById('mon-name'); if (nm) nm.textContent = monster.name;
   const mt = document.getElementById('mon-type'); if (mt) mt.textContent = monster.isBoss ? 'บอส' : 'ศัตรู';
   const ms = document.getElementById('mon-stats'); if (ms) ms.textContent = `ATK: ${stats.atk}`;
+
+  // REAL-TIME: kick off the monster's independent attack loop for this fight
+  if (typeof startMonsterAutoAttack === 'function') startMonsterAutoAttack();
 }
 
 function _setEnemyInfo(monster, stats) {
@@ -2271,12 +2309,8 @@ function useSkill(id) {
   updateMonsterHpBar();
 
   if (G.currentMonsterHp <= 0) { monsterDie(); return; }
-  if (skipMonsterTurn) {
-    document.getElementById('btn-attack').disabled = false;
-    renderSkillBar();
-  } else {
-    setTimeout(() => monsterAttack(), 600);
-  }
+  // REAL-TIME: using a skill no longer hands a free turn to the monster.
+  renderSkillBar();
 }
 
 // ---------- Player attack ----------
@@ -2398,7 +2432,10 @@ function playerAttack() {
 
   if (G.currentMonsterHp <= 0) { monsterDie(); return; }
   updateBattlePlayerStatus();
-  setTimeout(() => { monsterAttack(); }, 600);
+  // REAL-TIME combat: the player no longer triggers a monster counter-attack.
+  // The monster attacks on its own timer (see _startMonsterAutoAttack), so the
+  // player's attack speed/cooldown actually matters. Just start the cooldown.
+  _startAttackCooldown();
 }
 
 // ---------- Attack effect image ----------
@@ -2618,8 +2655,8 @@ function _singleMonsterAttack(enemyObj) {
   updateBattlePlayerStatus();
   renderSkillBar();
   if (G.hp <= 0) { playerDie(); return; }
-  // Manual fight: attack button stays on cooldown for the speed-stat interval
-  _startAttackCooldown();
+  // NOTE: player attack cooldown is driven by playerAttack() now (real-time),
+  // not reset here — the monster attacks on its own independent timer.
 }
 
 // ---------- Manual attack cooldown (zone monster) ----------
@@ -2677,6 +2714,7 @@ function _clearAttackCooldown() {
 
 function monsterDie() {
   G.battleInProgress = false;
+  if (typeof stopMonsterAutoAttack === 'function') stopMonsterAutoAttack();
   const monster = G.currentMonster;
 
   // Mark this enemy as dead in the multi-enemy array
@@ -2960,6 +2998,7 @@ function stopAuto() {
 
 function playerDie() {
   G.battleInProgress = false;
+  if (typeof stopMonsterAutoAttack === 'function') stopMonsterAutoAttack();
   _clearAttackCooldown();
   G.hp = Math.floor(G.maxHp * .3);
   logBattle(`<span class="log-dmg">💀 คุณพ่ายแพ้! ฟื้น HP 30% — กลับไปเลือกมอน</span>`);
@@ -2973,6 +3012,7 @@ function playerDie() {
 function fleeBattle() {
   // reset ทุกอย่างอย่างสมบูรณ์
   stopAuto();
+  if (typeof stopMonsterAutoAttack === 'function') stopMonsterAutoAttack();
   G.battleInProgress    = false;
   G.currentMonster      = null;
   G.currentMonsterHp    = 0;
