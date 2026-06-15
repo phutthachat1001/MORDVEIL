@@ -1340,3 +1340,33 @@ const INFINITY_IDLE_SKILLS = {};
     });
   });
 })();
+
+// ── BALANCE: scale point cost so strong upgrades slow down progression ──
+// IDLE speed (the biggest power spike — it speeds up BOTH idle and battle)
+// costs more each step: tier 1 = 1pt, tier 2 = 2pt, tier 3 = 3pt, tier 4 = 4pt.
+// Other late IDLE stat nodes (row 6) cost 2pt. Main-tree T4 skills cost 2pt.
+(function scaleNodeCosts() {
+  // re-balance attack-speed: game felt too fast. Normalize every class to the
+  // same gentle curve 4/6/8/10% (was up to 8/10/15/20% on rogue/archer).
+  const SPEED_STEPS = [0.04, 0.06, 0.08, 0.10];
+  Object.keys(SKILL_TREES).forEach(clsId => {
+    const tree = SKILL_TREES[clsId];
+    // order speed nodes by their speedBonus value = the upgrade step
+    const speedNodes = tree
+      .filter(n => n.stat && n.stat.speedBonus)
+      .sort((a, b) => a.stat.speedBonus - b.stat.speedBonus);
+    speedNodes.forEach((n, i) => {
+      n.cost = i + 1;                                  // 1,2,3,4 points per step
+      const v = SPEED_STEPS[i] != null ? SPEED_STEPS[i] : SPEED_STEPS[SPEED_STEPS.length - 1];
+      n.stat.speedBonus = v;                           // re-balanced value
+      n.name = `-${Math.round(v * 100)}% ช้า`;          // keep label in sync
+    });
+
+    tree.forEach(n => {
+      // top-tier IDLE stat nodes (row 6) that aren't speed → cost 2
+      if (n.row >= 6 && !(n.stat && n.stat.speedBonus) && !n.cost) n.cost = 2;
+      // main-tree Tier-4 active skills → cost 2 (powerful)
+      if (n.type === 'skill' && n.row === 4 && !n.cost) n.cost = 2;
+    });
+  });
+})();

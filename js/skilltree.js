@@ -22,9 +22,13 @@ function _isIdleNodeId(nodeId) {
 function refreshSkillPoints() {
   const earned = getSkillPointsEarned(G.level);
   const tree = SKILL_TREES[G.classId] || [];
-  const spentIds = Object.keys(G.skillTreeSpent || {});
-  const spentIdle = spentIds.filter(id => _isIdleNode(tree.find(n => n.id === id))).length;
-  const spentMain = spentIds.length - spentIdle;
+  let spentMain = 0, spentIdle = 0;
+  Object.keys(G.skillTreeSpent || {}).forEach(id => {
+    const node = tree.find(n => n.id === id);
+    if (!node) return;                       // node from another class — ignore
+    const c = Math.max(1, node.cost || 1);   // cost-aware spend
+    if (_isIdleNode(node)) spentIdle += c; else spentMain += c;
+  });
   G.skillTreePoints = Math.max(0, earned - spentMain); // main pool
   G.idleTreePoints  = Math.max(0, earned - spentIdle); // IDLE pool
 }
@@ -48,9 +52,14 @@ function _poolForNode(node) {
   return _isIdleNode(node) ? (G.idleTreePoints || 0) : (G.skillTreePoints || 0);
 }
 
+// point cost of a node (default 1; strong nodes cost more — see data.js cost)
+function nodeCost(node) {
+  return Math.max(1, node && node.cost ? node.cost : 1);
+}
+
 function canUnlockNode(node) {
   if (isNodeUnlocked(node.id)) return false;
-  if (_poolForNode(node) < 1) return false;
+  if (_poolForNode(node) < nodeCost(node)) return false;   // need enough points
   if (node.requires && !isNodeUnlocked(node.requires)) return false;
   if (node.branch && G.classBranch && node.branch !== G.classBranch) return false;
   return true;
@@ -63,9 +72,10 @@ function _applyNodeUnlock(nodeId) {
   if (!node || !canUnlockNode(node)) return false;
 
   G.skillTreeSpent[nodeId] = true;
-  // deduct from the matching pool
-  if (_isIdleNode(node)) G.idleTreePoints  = Math.max(0, (G.idleTreePoints  || 0) - 1);
-  else                   G.skillTreePoints = Math.max(0, (G.skillTreePoints || 0) - 1);
+  // deduct the node's cost from the matching pool
+  const cost = nodeCost(node);
+  if (_isIdleNode(node)) G.idleTreePoints  = Math.max(0, (G.idleTreePoints  || 0) - cost);
+  else                   G.skillTreePoints = Math.max(0, (G.skillTreePoints || 0) - cost);
 
   if (node.type === 'stat' && node.stat) {
     const s = node.stat;
@@ -431,10 +441,13 @@ function _renderSkillTreeFull() {
         : `<div style="font-size:.62rem;color:${textCol};margin-top:2px">${_formatStatShort(node.stat)}</div>`;
       const lockIcon = !unlocked && !canGet ? '<span style="position:absolute;top:2px;left:4px;font-size:.65rem">🔒</span>' : '';
       const checkIcon = unlocked ? '<span style="position:absolute;top:2px;left:4px;font-size:.65rem">✓</span>' : '';
+      const cost = (typeof nodeCost === 'function') ? nodeCost(node) : (node.cost || 1);
+      const costTag = (!unlocked && cost > 1)
+        ? `<span style="position:absolute;bottom:2px;right:4px;font-size:.6rem;font-weight:800;color:#ffcc44">💠${cost}</span>` : '';
       const tip = isSkill ? _skillNodeTip(node).replace(/"/g, '&quot;') : _formatStatShort(node.stat);
       html += `<div onclick="${canGet?`unlockNodeFromFull('${node.id}')`:''}" title="${tip}"
         style="position:relative;min-width:78px;max-width:96px;padding:.5rem .4rem;background:${bgColor};border:1px solid ${border};border-radius:10px;text-align:center;cursor:${cursor};transition:all .2s;flex:0 0 auto">
-        ${branchTag}${lockIcon}${checkIcon}
+        ${branchTag}${lockIcon}${checkIcon}${costTag}
         <div style="font-size:1.5rem">${node.icon}</div>
         <div style="font-size:.7rem;color:${textCol};font-weight:${canGet||unlocked?700:400};line-height:1.2">${node.name}</div>
         ${subText}
