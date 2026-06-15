@@ -2,16 +2,31 @@
 // SKILL TREE SYSTEM
 // ============================================================
 
-// ── skill point ──
-// ให้ 1 point ทุก 5 level
+// ── skill points — TWO separate pools, each earns +1 every 5 levels ──
+//   • main pool  → nodes in row 0-4 (class skill tree)
+//   • IDLE pool  → nodes in row 5+ (IDLE system)
+// ดังนั้น level 5 = ได้ทั้ง main +1 และ IDLE +1 (รวมตลอดเกม level/5 ต่อกอง)
 function getSkillPointsEarned(level) {
   return Math.floor(level / 5);
 }
 
+// is this node part of the IDLE section? (row >= 5)
+function _isIdleNode(node) {
+  return !!node && node.row >= 5;
+}
+function _isIdleNodeId(nodeId) {
+  const tree = SKILL_TREES[G.classId] || [];
+  return _isIdleNode(tree.find(n => n.id === nodeId));
+}
+
 function refreshSkillPoints() {
   const earned = getSkillPointsEarned(G.level);
-  const spent  = Object.keys(G.skillTreeSpent || {}).length;
-  G.skillTreePoints = Math.max(0, earned - spent);
+  const tree = SKILL_TREES[G.classId] || [];
+  const spentIds = Object.keys(G.skillTreeSpent || {});
+  const spentIdle = spentIds.filter(id => _isIdleNode(tree.find(n => n.id === id))).length;
+  const spentMain = spentIds.length - spentIdle;
+  G.skillTreePoints = Math.max(0, earned - spentMain); // main pool
+  G.idleTreePoints  = Math.max(0, earned - spentIdle); // IDLE pool
 }
 
 // ── node helpers ──
@@ -28,9 +43,14 @@ function isNodeUnlocked(nodeId) {
   return !!(G.skillTreeSpent && G.skillTreeSpent[nodeId]);
 }
 
+// how many points are available for THIS node (main vs idle pool)
+function _poolForNode(node) {
+  return _isIdleNode(node) ? (G.idleTreePoints || 0) : (G.skillTreePoints || 0);
+}
+
 function canUnlockNode(node) {
   if (isNodeUnlocked(node.id)) return false;
-  if ((G.skillTreePoints || 0) < 1) return false;
+  if (_poolForNode(node) < 1) return false;
   if (node.requires && !isNodeUnlocked(node.requires)) return false;
   if (node.branch && G.classBranch && node.branch !== G.classBranch) return false;
   return true;
@@ -43,7 +63,9 @@ function _applyNodeUnlock(nodeId) {
   if (!node || !canUnlockNode(node)) return false;
 
   G.skillTreeSpent[nodeId] = true;
-  G.skillTreePoints = Math.max(0, (G.skillTreePoints || 0) - 1);
+  // deduct from the matching pool
+  if (_isIdleNode(node)) G.idleTreePoints  = Math.max(0, (G.idleTreePoints  || 0) - 1);
+  else                   G.skillTreePoints = Math.max(0, (G.skillTreePoints || 0) - 1);
 
   if (node.type === 'stat' && node.stat) {
     const s = node.stat;
@@ -207,9 +229,9 @@ function renderSkillTree() {
   if (!area || !G.classId) return;
   refreshSkillPoints();
 
-  const earned = getSkillPointsEarned(G.level);
-  const spent  = Object.keys(G.skillTreeSpent || {}).length;
-  const avail  = Math.max(0, earned - spent);
+  const availMain = G.skillTreePoints || 0;
+  const availIdle = G.idleTreePoints  || 0;
+  const avail = availMain + availIdle;
 
   const equipBonus  = typeof getEquippedStatBonus === 'function' ? (getEquippedStatBonus().attackSpeed || 0) : 0;
   const totalSpeed  = Math.min(0.9, (G.attackSpeedBonus || 0) + equipBonus);
@@ -217,6 +239,7 @@ function renderSkillTree() {
   const curInterval = typeof getAttackInterval === 'function' ? (getAttackInterval()/1000).toFixed(1) : '3.0';
 
   const pulse = avail > 0 ? 'box-shadow:0 0 12px rgba(255,200,40,.5);animation:pulse 1.5s infinite' : '';
+  const badge = (n,col) => n > 0 ? `<span style="background:${col};color:#221100;border-radius:10px;padding:0 .5rem;margin-left:.3rem">${n}</span>` : '';
   area.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;font-size:.74rem;color:#aaa;margin-bottom:.5rem">
       <span>⚡ ${curInterval}วิ/ตี (-${speedPct}%)</span>
@@ -224,7 +247,7 @@ function renderSkillTree() {
     </div>
     <button onclick="openSkillTreeFull()" style="width:100%;padding:.55rem;border-radius:10px;cursor:pointer;font-weight:700;font-size:.85rem;
       background:linear-gradient(135deg,#2a2a4a,#3a3a6a);border:1px solid ${avail>0?'#ffcc44':'#445'};color:${avail>0?'#ffdd66':'#aabbdd'};${pulse}">
-      🌳 เปิด Skill Tree${avail > 0 ? ` &nbsp;<span style="background:#ffcc44;color:#221100;border-radius:10px;padding:0 .5rem">${avail} จุด</span>` : ''}
+      🌳 เปิด Skill Tree${availMain ? ` 🌳${badge(availMain,'#ffcc44')}` : ''}${availIdle ? ` 🌙${badge(availIdle,'#66ccff')}` : ''}
     </button>
     <button onclick="openSkillLoadout()" style="width:100%;margin-top:.4rem;padding:.5rem;border-radius:10px;cursor:pointer;font-weight:700;font-size:.82rem;
       background:linear-gradient(135deg,#2a1a3a,#3a2a5a);border:1px solid #8866cc;color:#ccaaff">
@@ -344,8 +367,8 @@ function _renderSkillTreeFull() {
   });
   const maxRow = tree.length ? Math.max(...tree.map(n => n.row)) : 0;
   const earned = getSkillPointsEarned(G.level);
-  const spent  = Object.keys(G.skillTreeSpent || {}).length;
-  const avail  = Math.max(0, earned - spent);
+  const availMain = G.skillTreePoints || 0;
+  const availIdle = G.idleTreePoints  || 0;
 
   const ROW_LABELS = {
     0: 'Tier 1 — เริ่มต้น',
@@ -365,8 +388,9 @@ function _renderSkillTreeFull() {
 
   let html = `
   <div style="background:rgba(0,0,0,.35);border:1px solid #333;border-radius:10px;padding:.7rem .9rem;margin-bottom:.7rem;display:flex;flex-wrap:wrap;gap:.8rem;align-items:center">
-    <div style="color:var(--gold);font-size:.95rem;font-weight:700">🌳 Skill Points: <span style="font-size:1.2rem">${avail}</span></div>
-    <div style="color:#aaa;font-size:.75rem">ใช้ไป ${spent}/${earned} &nbsp;|&nbsp; ทุก 5 LV = +1 point</div>
+    <div style="color:var(--gold);font-size:.95rem;font-weight:700">🌳 Main: <span style="font-size:1.2rem">${availMain}</span></div>
+    <div style="color:#66ccff;font-size:.95rem;font-weight:700">🌙 IDLE: <span style="font-size:1.2rem">${availIdle}</span></div>
+    <div style="color:#aaa;font-size:.72rem">ทุก 5 LV = +1 ทั้ง 2 กอง (แยกกัน)</div>
     <div style="color:#88ccff;font-size:.75rem">⚡ ความเร็ว: ${curInterval}วิ/ตี (-${speedPct}%${equipSpeedPct ? ` +${equipSpeedPct}% จากของ` : ''})</div>
     <div style="color:#ffcc44;font-size:.75rem">💎 Drop: +${Math.round((G.dropBonusFromTree||0)*100)}%</div>
     ${G.classBranch ? `<div style="color:#ffaa44;font-size:.75rem">🔱 สาย: ${({A:'บุก',B:'ตั้งรับ',C:'พิฆาต',D:'จอมทัพ',S:'★ ลับ'})[G.classBranch]||G.classBranch}</div>` : ''}

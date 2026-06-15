@@ -31,6 +31,77 @@ function manualSave() {
   }, 1800);
 }
 
+// ── Export / Import save (กันเซฟหายตอนลบ PWA — เก็บโค้ดไว้เองได้) ──
+// localStorage ของ PWA บน iOS อาจถูกล้างตอนถอนแอป → ให้ผู้เล่น export เก็บไว้
+function exportSave() {
+  try {
+    saveGame();
+    const code = btoa(unescape(encodeURIComponent(localStorage.getItem(SAVE_KEY) || '{}')));
+    return code;
+  } catch (e) { return ''; }
+}
+
+function importSave(code) {
+  try {
+    const json = decodeURIComponent(escape(atob((code || '').trim())));
+    const parsed = JSON.parse(json);
+    if (!parsed || typeof parsed !== 'object' || !parsed.classId) return false;
+    localStorage.setItem(SAVE_KEY, json);
+    localStorage.setItem(SAVE_BACKUP, json);
+    return true;
+  } catch (e) { return false; }
+}
+
+// UI: open a small modal to copy/paste the save code
+function openSaveTransfer() {
+  let ov = document.getElementById('save-transfer-overlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'save-transfer-overlay';
+    ov.className = 'overlay';
+    ov.onclick = (e) => { if (e.target === ov) ov.classList.remove('active'); };
+    document.body.appendChild(ov);
+  }
+  const code = exportSave();
+  ov.innerHTML = `
+    <div class="modal" onclick="event.stopPropagation()" style="max-width:420px;width:94%;text-align:left">
+      <div style="font-size:1.1rem;font-weight:800;color:var(--gold);text-align:center;margin-bottom:.3rem">💾 สำรอง / กู้คืนเซฟ</div>
+      <div style="font-size:.74rem;color:#bbb;text-align:center;margin-bottom:.8rem;line-height:1.5">
+        คัดลอกโค้ดนี้เก็บไว้ (โน้ต/แชท) — ถ้าเซฟหายหรือเปลี่ยนเครื่อง วางโค้ดกลับมาเพื่อกู้คืน
+      </div>
+      <textarea id="save-code-box" readonly style="width:100%;height:90px;background:#0d0d18;border:1px solid #445;border-radius:8px;color:#9fe;font-size:.66rem;padding:.5rem;resize:none;word-break:break-all">${code}</textarea>
+      <button onclick="_copySaveCode()" style="width:100%;margin:.5rem 0;padding:.55rem;border-radius:8px;border:none;background:linear-gradient(90deg,#1a7a3a,#2caa55);color:#fff;font-weight:700;cursor:pointer">📋 คัดลอกโค้ด</button>
+      <div style="border-top:1px solid #334;margin:.6rem 0;padding-top:.6rem">
+        <div style="font-size:.78rem;color:#ffaa66;margin-bottom:.4rem">กู้คืนเซฟ — วางโค้ดที่นี่:</div>
+        <textarea id="save-import-box" placeholder="วางโค้ดเซฟที่นี่..." style="width:100%;height:70px;background:#0d0d18;border:1px solid #553;border-radius:8px;color:#fda;font-size:.66rem;padding:.5rem;resize:none;word-break:break-all"></textarea>
+        <button onclick="_doImportSave()" style="width:100%;margin-top:.5rem;padding:.55rem;border-radius:8px;border:1px solid #ff8844;background:#3a1a00;color:#ffaa66;font-weight:700;cursor:pointer">♻ กู้คืนเซฟ (เขียนทับของเดิม)</button>
+      </div>
+      <button class="btn-close-modal" onclick="document.getElementById('save-transfer-overlay').classList.remove('active')">ปิด</button>
+    </div>`;
+  ov.classList.add('active');
+}
+
+function _copySaveCode() {
+  const box = document.getElementById('save-code-box');
+  if (!box) return;
+  box.select();
+  try {
+    navigator.clipboard.writeText(box.value);
+  } catch (e) { document.execCommand('copy'); }
+  logBattle('<span class="log-exp">📋 คัดลอกโค้ดเซฟแล้ว! เก็บไว้ให้ดีนะ</span>');
+}
+
+function _doImportSave() {
+  const box = document.getElementById('save-import-box');
+  if (!box || !box.value.trim()) return;
+  if (importSave(box.value)) {
+    alert('✅ กู้คืนเซฟสำเร็จ! เกมจะโหลดใหม่');
+    window.location.reload();
+  } else {
+    alert('❌ โค้ดไม่ถูกต้อง — ตรวจสอบแล้วลองใหม่');
+  }
+}
+
 function loadGame() {
   let raw = null;
   try {
@@ -74,6 +145,7 @@ function loadGame() {
       if (!G.evoQuestDone)      G.evoQuestDone      = {};
       if (!G.unlockedSkills)    G.unlockedSkills    = [];
       if (G.skillTreePoints   === undefined) G.skillTreePoints   = 0;
+      if (G.idleTreePoints    === undefined) G.idleTreePoints    = 0;
       if (G.classBranch       === undefined) G.classBranch       = null;
       if (G.totalDmgTaken     === undefined) G.totalDmgTaken     = 0;
       if (G.critBonusFromTree  === undefined) G.critBonusFromTree  = 0;

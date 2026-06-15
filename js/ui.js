@@ -183,6 +183,41 @@ function renderAll() {
     renderTasks();
     renderDailyQuests();
   }
+  updateNavBadges();
+}
+
+// ── bottom-nav notification badges (เลขแดงเล็กๆ) ──
+// quest tab: number of quests available to accept right now
+// bag tab: number of new items since the bag was last opened
+function updateNavBadges() {
+  // QUEST badge
+  let questN = 0;
+  if (G.gameMode === 'fullrpg') {
+    questN = (typeof rpgGetAvailableQuests === 'function') ? rpgGetAvailableQuests().length : 0;
+  } else {
+    questN = (typeof getHubQuestsPending === 'function') ? getHubQuestsPending().length : 0;
+  }
+  _setNavBadge('badge-quest', questN);
+
+  // BAG badge — new items since last opened (+ unopened chests)
+  const invCount   = (G.inventory || []).length;
+  const chestCount = Object.values(G.chests || {}).reduce((a, b) => a + b, 0);
+  if (G.seenInvCount === undefined) G.seenInvCount = invCount; // first run baseline
+  const newItems = Math.max(0, invCount - G.seenInvCount);
+  _setNavBadge('badge-bag', newItems + chestCount);
+}
+
+function _setNavBadge(id, n) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (n > 0) { el.textContent = n > 99 ? '99+' : n; el.style.display = ''; }
+  else el.style.display = 'none';
+}
+
+// call when the bag is opened → clears the "new items" badge
+function markBagSeen() {
+  G.seenInvCount = (G.inventory || []).length;
+  updateNavBadges();
 }
 
 // ปรับ layout ตาม gameMode — ซ่อน task panel ใน fullrpg แสดง quest panel แทน

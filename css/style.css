@@ -1509,7 +1509,15 @@ body.preload{visibility:hidden}
   border-right: 1px solid var(--border);
 }
 #mobile-nav .mnav-btn:last-child { border-right: none; }
-#mobile-nav .mnav-btn .mnav-icon { font-size: 1.35rem; line-height: 1; }
+#mobile-nav .mnav-btn .mnav-icon { font-size: 1.35rem; line-height: 1; position: relative; }
+.mnav-badge {
+  position: absolute; top: -6px; right: -10px;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  background: #ff3344; color: #fff; font-size: .62rem; font-weight: 800;
+  border-radius: 9px; line-height: 16px; text-align: center;
+  box-shadow: 0 0 0 1.5px #1a1a2e; animation: badgePop .25s ease-out;
+}
+@keyframes badgePop { from { transform: scale(.4); } to { transform: scale(1); } }
 #mobile-nav .mnav-btn.active { color: var(--gold); background: rgba(255,215,0,.07); }
 #mobile-nav .mnav-btn:active { background: rgba(255,255,255,.06); }
 

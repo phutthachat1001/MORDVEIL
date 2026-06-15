@@ -84,6 +84,7 @@ let G = {
   rpgDaily: null,          // { date, quests:[...] } — fullrpg daily quests
   // Skill Tree
   skillTreePoints: 0,
+  idleTreePoints: 0,       // separate point pool for the IDLE section (row 5+)
   skillTreeSpent: {},      // nodeId -> true
   classBranch: null,       // 'A','B','S' — decided by the Infinity Trial at tier 3
   // Persistent combat traits granted by evolutions (esp. secret tiers)
@@ -93,6 +94,7 @@ let G = {
   hasRevive: false,        // revive once per Infinity Trial run (secret paladin)
   secretClassesFound: [],  // ['warrior_S', ...] secret tiers ever discovered (for Codex)
   tutorialDone: false,     // first-time onboarding shown
+  seenInvCount: undefined, // inventory size last time the bag was opened (for "new" badge)
   unlockedSkills: [],      // skill ids unlocked via skill tree
   equippedSkills: [],      // skill ids currently equipped (max 4)
   critBonusFromTree: 0,
