@@ -28,6 +28,7 @@ function _isIdleNodeId(nodeId) {
 function recalcTreeBonuses() {
   const tree = SKILL_TREES[G.classId] || [];
   let speed=0, crit=0, exp=0, gold=0, regen=0, streak=0, drop=0;
+  let idleExp=0, idleGold=0, offCap=0, offEff=0;
   Object.keys(G.skillTreeSpent || {}).forEach(id => {
     const node = tree.find(n => n.id === id);
     if (!node || node.type !== 'stat' || !node.stat) return;
@@ -39,6 +40,10 @@ function recalcTreeBonuses() {
     if (s.regenBonus)  regen  += s.regenBonus;
     if (s.streakBonus) streak += s.streakBonus;
     if (s.dropBonus)   drop   += s.dropBonus;
+    if (s.idleExpBonus)   idleExp  += s.idleExpBonus;
+    if (s.idleGoldBonus)  idleGold += s.idleGoldBonus;
+    if (s.offlineCapBonus)offCap   += s.offlineCapBonus;
+    if (s.offlineEffBonus)offEff   += s.offlineEffBonus;
   });
   G.attackSpeedBonus    = Math.min(0.9, speed);
   G.critBonusFromTree   = crit;
@@ -47,6 +52,11 @@ function recalcTreeBonuses() {
   G.regenBonusFromTree  = regen;
   G.streakBonusFromTree = streak;
   G.dropBonusFromTree   = drop;
+  // IDLE-tree farm/offline bonuses
+  G.idleExpBonus     = idleExp;
+  G.idleGoldBonus    = idleGold;
+  G.offlineCapBonus  = offCap;   // extra hours
+  G.offlineEffBonus  = offEff;   // extra efficiency fraction
 }
 
 function refreshSkillPoints() {
@@ -420,6 +430,7 @@ function _renderSkillTreeFull() {
     4: 'Tier 4 — ขั้นสูงสุด',
     5: 'IDLE — ความเร็ว & ดรอป',
     6: 'IDLE — พลังขั้นสุด',
+    7: 'IDLE — ฟาร์ม & ออฟไลน์',
   };
 
   const equipBonus  = typeof getEquippedStatBonus === 'function' ? (getEquippedStatBonus().attackSpeed || 0) : 0;
@@ -532,6 +543,10 @@ function _formatStatShort(s) {
   if (s.speedBonus) parts.push(`-${Math.round(s.speedBonus*100)}%ช้า`);
   if (s.dropBonus)  parts.push(`+${Math.round(s.dropBonus*100)}%Drop`);
   if (s.streakBonus)parts.push(`+${Math.round(s.streakBonus*100)}%Str`);
+  if (s.idleExpBonus)   parts.push(`+${Math.round(s.idleExpBonus*100)}%IDLE EXP`);
+  if (s.idleGoldBonus)  parts.push(`+${Math.round(s.idleGoldBonus*100)}%IDLE ทอง`);
+  if (s.offlineCapBonus)parts.push(`+${s.offlineCapBonus}ชม.ออฟไลน์`);
+  if (s.offlineEffBonus)parts.push(`+${Math.round(s.offlineEffBonus*100)}%ออฟไลน์`);
   return parts.join(' ');
 }
 

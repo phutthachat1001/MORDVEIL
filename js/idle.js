@@ -396,13 +396,15 @@ function _idleMobDie(idx, mob) {
   let expGain = Math.floor(full.maxHp * killExpBase * 3 * IDLE_REWARD_MULT);
   const expBoostMult = (typeof getExpBoostMult === 'function') ? getExpBoostMult() : 1;
   const comboMult = (typeof idleComboExpMult === 'function') ? idleComboExpMult() : 1;
-  expGain = Math.max(1, Math.floor(expGain * expBoostMult * comboMult * (1 + (G.expBonusFromTree || 0))));
+  // IDLE-tree adds idleExpBonus on top of the general tree EXP bonus
+  expGain = Math.max(1, Math.floor(expGain * expBoostMult * comboMult * (1 + (G.expBonusFromTree || 0) + (G.idleExpBonus || 0))));
   if (mob.special) expGain = Math.floor(expGain * 3);  // bonus EXP for special kills
 
   let goldGain = Math.max(1, Math.floor(full.atk * 1.2 * IDLE_REWARD_MULT)); // IDLE = ฟรี/อัตโนมัติ ทองต้องน้อยกว่าสู้เอง
   const clsB = (typeof CLASSES !== 'undefined') ? CLASSES.find(c => c.id === G.classId) : null;
   if (clsB && clsB.bonuses && clsB.bonuses.goldMult) goldGain = Math.floor(goldGain * clsB.bonuses.goldMult);
-  if ((G.goldBonusFromTree || 0) > 0) goldGain = Math.floor(goldGain * (1 + G.goldBonusFromTree));
+  const idleGoldMult = 1 + (G.goldBonusFromTree || 0) + (G.idleGoldBonus || 0);
+  goldGain = Math.floor(goldGain * idleGoldMult);
 
   G.gold += goldGain;
   // IDLE kills are tracked separately — they do NOT count toward

@@ -147,6 +147,10 @@ function loadGame() {
       if (G.skillTreePoints   === undefined) G.skillTreePoints   = 0;
       if (G.idleTreePoints    === undefined) G.idleTreePoints    = 0;
       if (G.trialSkillPoints  === undefined) G.trialSkillPoints  = 0;
+      if (G.idleExpBonus      === undefined) G.idleExpBonus      = 0;
+      if (G.idleGoldBonus     === undefined) G.idleGoldBonus     = 0;
+      if (G.offlineCapBonus   === undefined) G.offlineCapBonus   = 0;
+      if (G.offlineEffBonus   === undefined) G.offlineEffBonus   = 0;
       if (G.classBranch       === undefined) G.classBranch       = null;
       if (G.totalDmgTaken     === undefined) G.totalDmgTaken     = 0;
       if (G.critBonusFromTree  === undefined) G.critBonusFromTree  = 0;

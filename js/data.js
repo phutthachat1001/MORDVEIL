@@ -1459,3 +1459,37 @@ const INFINITY_IDLE_SKILLS = {};
     });
   });
 })();
+
+// ============================================================
+// IDLE SKILL TREE — extra row-7 nodes (farm & offline rewards)
+// 8 new nodes per class, each a 3-step scaling chain (cost 1→2→3).
+// Uses the IDLE point pool (row >= 5). Effects read in offline.js / idle.js.
+// ============================================================
+(function buildIdleRewardNodes() {
+  // [statKey, label, icon, perStep value]  — 3 steps each, cost = step (1,2,3)
+  const CHAINS = [
+    ['idleExpBonus',  'IDLE EXP',     '⭐', [0.05, 0.08, 0.12]],
+    ['idleGoldBonus', 'IDLE ทอง',    '💰', [0.05, 0.08, 0.12]],
+    ['offlineCapBonus','เวลาออฟไลน์','⏰', [1, 1, 1]],          // +1 hr per step (max +3hr)
+    ['offlineEffBonus','ออฟไลน์ %',  '🌙', [0.10, 0.10, 0.15]], // +offline efficiency
+  ];
+  const PREFIX = { warrior:'w', mage:'m', rogue:'r', archer:'a', paladin:'p' };
+  Object.keys(PREFIX).forEach(clsId => {
+    const tree = SKILL_TREES[clsId]; if (!tree) return;
+    const p = PREFIX[clsId];
+    CHAINS.forEach((chain, ci) => {
+      const [statKey, label, icon, steps] = chain;
+      let prevId = null;
+      steps.forEach((val, si) => {
+        const id = `${p}_idle7_${statKey}_${si+1}`;
+        const node = {
+          id, name: `${label} +${statKey.includes('Bonus') && val < 1 ? Math.round(val*100)+'%' : val+(statKey==='offlineCapBonus'?' ชม.':'')}`,
+          icon, type:'stat', row:7, col:ci, cost: si+1,
+          requires: prevId, stat: { [statKey]: val },
+        };
+        tree.push(node);
+        prevId = id;
+      });
+    });
+  });
+})();

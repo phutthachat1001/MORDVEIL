@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=60">
+<link rel="stylesheet" href="css/style.css?v=61">
 <script>
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
@@ -680,7 +680,7 @@
     <div class="offline-title">ยินดีต้อนรับกลับ!</div>
     <div class="offline-sub">ฮีโร่ของคุณฟาร์มต่อระหว่างที่คุณไม่อยู่</div>
     <div class="offline-time-row">⏰ หายไป <b id="offline-time"></b>
-      <span id="offline-capped" style="display:none;color:var(--orange);font-size:.75rem">(นับสูงสุด 8 ชม.)</span>
+      <span id="offline-capped" style="display:none;color:var(--orange);font-size:.75rem">(นับสูงสุด 3 ชม.)</span>
     </div>
     <div class="offline-rewards" id="offline-rewards"></div>
     <button class="offline-claim" onclick="claimOfflineRewards()">🎁 รับรางวัล</button>
@@ -854,33 +854,33 @@
 <!-- ===== SCRIPTS (โหลดตามลำดับ dependency) =====
      NOTE: ?v=NN busts the browser/iOS HTTP cache. Bump this number (and the SW
      CACHE version in sw.js) on every deploy so updates show without reinstall. -->
-<script src="js/data.js?v=60"></script>
-<script src="js/state.js?v=60"></script>
-<script src="js/audio.js?v=60"></script>
-<script src="js/save.js?v=60"></script>
-<script src="js/achievements.js?v=60"></script>
-<script src="js/daily.js?v=60"></script>
-<script src="js/evolution.js?v=60"></script>
-<script src="js/infinity.js?v=60"></script>
-<script src="js/t4dungeon.js?v=60"></script>
-<script src="js/skilltree.js?v=60"></script>
-<script src="js/exp.js?v=60"></script>
-<script src="js/shop.js?v=60"></script>
-<script src="js/inventory.js?v=60"></script>
-<script src="js/events.js?v=60"></script>
-<script src="js/cosmetic.js?v=60"></script>
-<script src="js/rpg-quests.js?v=60"></script>
-<script src="js/npc-encounter.js?v=60"></script>
-<script src="js/battle.js?v=60"></script>
-<script src="js/idle.js?v=60"></script>
-<script src="js/offline.js?v=60"></script>
-<script src="js/idle-events.js?v=60"></script>
-<script src="js/codex.js?v=60"></script>
-<script src="js/tasks.js?v=60"></script>
-<script src="js/hub.js?v=60"></script>
-<script src="js/intro.js?v=60"></script>
-<script src="js/tutorial.js?v=60"></script>
-<script src="js/ui.js?v=60"></script>
+<script src="js/data.js?v=61"></script>
+<script src="js/state.js?v=61"></script>
+<script src="js/audio.js?v=61"></script>
+<script src="js/save.js?v=61"></script>
+<script src="js/achievements.js?v=61"></script>
+<script src="js/daily.js?v=61"></script>
+<script src="js/evolution.js?v=61"></script>
+<script src="js/infinity.js?v=61"></script>
+<script src="js/t4dungeon.js?v=61"></script>
+<script src="js/skilltree.js?v=61"></script>
+<script src="js/exp.js?v=61"></script>
+<script src="js/shop.js?v=61"></script>
+<script src="js/inventory.js?v=61"></script>
+<script src="js/events.js?v=61"></script>
+<script src="js/cosmetic.js?v=61"></script>
+<script src="js/rpg-quests.js?v=61"></script>
+<script src="js/npc-encounter.js?v=61"></script>
+<script src="js/battle.js?v=61"></script>
+<script src="js/idle.js?v=61"></script>
+<script src="js/offline.js?v=61"></script>
+<script src="js/idle-events.js?v=61"></script>
+<script src="js/codex.js?v=61"></script>
+<script src="js/tasks.js?v=61"></script>
+<script src="js/hub.js?v=61"></script>
+<script src="js/intro.js?v=61"></script>
+<script src="js/tutorial.js?v=61"></script>
+<script src="js/ui.js?v=61"></script>
 <script>
   // Override window.onload to handle both buttons properly
   window.onload = () => {

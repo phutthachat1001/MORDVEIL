@@ -7,7 +7,7 @@
 // ============================================================
 
 const OFFLINE_MIN_MS = 3 * 60 * 1000;        // need ≥3 minutes away
-const OFFLINE_CAP_MS = 8 * 60 * 60 * 1000;   // earnings cap at 8 hours
+const OFFLINE_CAP_MS = 3 * 60 * 60 * 1000;   // earnings cap at 3 hours
 const OFFLINE_EFF    = 0.6;                  // 60% of live IDLE rate
 
 let _offlinePending = null; // { kills, exp, gold, ms }
@@ -37,15 +37,19 @@ function _calcOfflineRewards(ms) {
   const idleHp = Math.max(1, Math.floor(full.maxHp * IDLE_HP_MULT));
   const hits   = Math.max(1, Math.ceil(idleHp / atk));
   const killMs = hits * getAttackInterval() + 900; // + respawn gap between waves
-  const kills  = Math.floor((ms * OFFLINE_EFF) / killMs);
+  const eff    = Math.min(1, OFFLINE_EFF + (G.offlineEffBonus || 0)); // IDLE-tree boosts efficiency
+  const kills  = Math.floor((ms * eff) / killMs);
   if (kills <= 0) return null;
 
   const killExpBase = G.gameMode === 'fullrpg' ? 0.5 : 0.03;
-  const expPer = Math.max(1, Math.floor(full.maxHp * killExpBase * 3 * IDLE_REWARD_MULT * (1 + (G.expBonusFromTree || 0))));
+  // IDLE-tree EXP/Gold bonuses also apply to offline farming
+  const expMult  = 1 + (G.expBonusFromTree || 0)  + (G.idleExpBonus  || 0);
+  const expPer = Math.max(1, Math.floor(full.maxHp * killExpBase * 3 * IDLE_REWARD_MULT * expMult));
   let goldPer  = Math.max(1, Math.floor(full.atk * 1.2 * IDLE_REWARD_MULT)); // sync with idle.js gold rate
   const cls = (typeof CLASSES !== 'undefined') ? CLASSES.find(c => c.id === G.classId) : null;
   if (cls && cls.bonuses && cls.bonuses.goldMult) goldPer = Math.floor(goldPer * cls.bonuses.goldMult);
-  if ((G.goldBonusFromTree || 0) > 0) goldPer = Math.floor(goldPer * (1 + G.goldBonusFromTree));
+  const goldMult = 1 + (G.goldBonusFromTree || 0) + (G.idleGoldBonus || 0);
+  goldPer = Math.floor(goldPer * goldMult);
 
   return { kills, exp: expPer * kills, gold: goldPer * kills, ms };
 }
@@ -60,17 +64,24 @@ function checkOfflineProgress() {
   const away = Date.now() - lastSeen;
   if (away < OFFLINE_MIN_MS) return;
 
-  const rewards = _calcOfflineRewards(Math.min(away, OFFLINE_CAP_MS));
+  // IDLE-tree can extend the offline cap (base 3hr + offlineCapBonus hours)
+  const cap = OFFLINE_CAP_MS + (G.offlineCapBonus || 0) * 60 * 60 * 1000;
+  const rewards = _calcOfflineRewards(Math.min(away, cap));
   if (!rewards) return;
   _offlinePending = rewards;
-  _showOfflinePopup(rewards, away);
+  _showOfflinePopup(rewards, away, cap);
 }
 
-function _showOfflinePopup(r, awayMs) {
+function _showOfflinePopup(r, awayMs, cap) {
   const ov = document.getElementById('offline-overlay');
   if (!ov) return;
+  cap = cap || OFFLINE_CAP_MS;
   document.getElementById('offline-time').textContent = _fmtOfflineDuration(awayMs);
-  document.getElementById('offline-capped').style.display = awayMs > OFFLINE_CAP_MS ? '' : 'none';
+  const capEl = document.getElementById('offline-capped');
+  if (capEl) {
+    capEl.style.display = awayMs > cap ? '' : 'none';
+    capEl.textContent = `(นับสูงสุด ${Math.round(cap/3600000)} ชม.)`;
+  }
   document.getElementById('offline-rewards').innerHTML = `
     <div class="offline-reward-row"><span>💀 มอนสเตอร์ที่ล่าได้</span><b>${r.kills.toLocaleString()} ตัว</b></div>
     <div class="offline-reward-row"><span>⭐ EXP</span><b style="color:var(--purple)">+${r.exp.toLocaleString()}</b></div>
