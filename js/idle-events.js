@@ -274,3 +274,35 @@ function idleSpecialTick() {
     _renderComboMeter();
   }
 }
+
+// ============================================================
+// IDLE MILESTONES — เป้าหมายระยะสั้นจากการฟาร์ม (ทำให้ติดพัน)
+// สะสม idleKills ถึงเป้า → รับรางวัลก้อน (หีบ/ทอง) ช่วยตอนติดด่าน
+// ============================================================
+const IDLE_MILESTONES = [
+  { kills:50,   reward:()=>{ G.chests.uncommon=(G.chests.uncommon||0)+1; return '🎁 หีบพิเศษ ×1'; } },
+  { kills:150,  reward:()=>{ G.chests.rare=(G.chests.rare||0)+1; return '🎁 หีบหายาก ×1'; } },
+  { kills:350,  reward:()=>{ G.chests.rare=(G.chests.rare||0)+2; return '🎁 หีบหายาก ×2'; } },
+  { kills:700,  reward:()=>{ G.chests.boss=(G.chests.boss||0)+1; return '🏆 หีบบอส ×1'; } },
+  { kills:1500, reward:()=>{ G.chests.boss=(G.chests.boss||0)+2; return '🏆 หีบบอส ×2'; } },
+];
+
+function checkIdleMilestone() {
+  if (!G.claimedIdleMilestones) G.claimedIdleMilestones = [];
+  const k = G.idleKills || 0;
+  for (const m of IDLE_MILESTONES) {
+    if (k >= m.kills && !G.claimedIdleMilestones.includes(m.kills)) {
+      G.claimedIdleMilestones.push(m.kills);
+      const what = m.reward();
+      if (typeof renderInventory === 'function') renderInventory();
+      if (typeof updateTopBar === 'function') updateTopBar();
+      if (typeof logBattle === 'function')
+        logBattle(`<span class="log-exp">🌙 IDLE Milestone! ฟาร์มครบ ${m.kills} ตัว → ${what}</span>`);
+      if (typeof evLog === 'function') evLog('🌙','IDLE Milestone',`${m.kills} ตัว → ${what}`);
+      if (typeof _idleBigLootBeam === 'function') _idleBigLootBeam(what);
+      if (typeof playSound === 'function') playSound('chest');
+      if (typeof saveGame === 'function') saveGame();
+      break; // one milestone per kill
+    }
+  }
+}

@@ -24,6 +24,7 @@ let G = {
   totalKills: 0,   // manual zone-fight kills (drives achievements/evo quests)
   bossKills: 0,
   idleKills: 0,    // IDLE-farm kills (separate, no achievement credit)
+  claimedIdleMilestones: [],  // IDLE farm milestone rewards already given
   totalExpGained: 0,
   streak: 0,
   maxStreak: 0,

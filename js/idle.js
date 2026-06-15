@@ -411,6 +411,7 @@ function _idleMobDie(idx, mob) {
   _idleSessionKills++;
   if (typeof giveExp === 'function') giveExp(expGain);
   if (typeof checkAchievements === 'function') checkAchievements('idle');
+  if (typeof checkIdleMilestone === 'function') checkIdleMilestone();
 
   // track for per-minute rate
   _idleRewardLog.push({ t: performance.now(), exp: expGain, gold: goldGain });
