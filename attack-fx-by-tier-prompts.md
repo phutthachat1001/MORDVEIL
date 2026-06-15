@@ -9,8 +9,29 @@
 
 > `2D game attack effect VFX, single energy slash/burst, painterly splatter style with glowing energy, scattered particles and sparks, vivid saturated colors, dramatic glow, dynamic motion, centered, isolated on a fully transparent background (PNG, no background, no character, no scene, no text, no border), high resolution, RPG hit-effect overlay.`
 
-**กฎไล่ Tier (ให้เอฟเฟกต์ดูแรงขึ้น):**
-- **T1** เอฟเฟกต์เล็ก เรียบ สีเดียว — **T2** ใหญ่ขึ้น มี spark — **T3** เอฟเฟกต์ธาตุชัด glow แรง — **T4** เต็มจอ อลังการ หลายชั้นพลังงาน — **★ Secret** มืด/ต้องห้าม น่าเกรงขามสุด
+### ⭐ INTENSITY TAG (สำคัญ! — ต่อท้ายทุกพรอมพ์ตาม tier)
+
+> **ปัญหาที่เจอ:** บางอันออกมา "มีแต่ควัน/จาง" หรือ Tier 2 ดูอลังกว่า Tier 4
+> **สาเหตุ:** prompt บอกแค่ *เนื้อหา* ไม่ได้บอก *ขนาด/ความเข้ม* → DALL·E เดาเอง ทำให้ไม่ไล่ระดับ
+> **วิธีแก้:** บังคับ scale ด้วย tag นี้ทุกครั้ง (วางต่อจากพรอมพ์ของ tier นั้น)
+
+| Tier | Intensity Tag (วางต่อท้ายพรอมพ์) |
+|---|---|
+| **T1** | `small and simple effect, fills ~30% of frame, single layer, subtle glow, minimal particles.` |
+| **T2** | `medium effect, fills ~45% of frame, bright bold glow, clear sharp shape, moderate sparks.` |
+| **T3** | `large dramatic effect, fills ~65% of frame, intense multi-layered glow, strong elemental energy, lots of particles and embers.` |
+| **T4** | `huge overwhelming effect, fills ~85% of frame, multiple stacked energy layers, blinding glow, shockwave ring, dense particles, screen-filling power.` |
+| **★ Secret** | `colossal god-tier effect, fills the entire frame edge-to-edge, maximum intensity, multiple swirling energy layers, ominous forbidden aura, extreme glow and dense particles, the single most impressive and overwhelming effect of the whole set.` |
+
+**คำที่ควรเลี่ยง** (ทำให้ภาพดูจาง/เล็ก แม้เป็น tier สูง):
+`small · thin · faint · subtle · light · gentle · wispy · dissolving · mostly smoke · simple`
+→ ใน T3-T4 ให้ใช้คำตรงข้ามแทน: `massive · intense · blinding · dense · explosive · radiant · overwhelming`
+
+> 💡 **เคล็ดลับให้สม่ำเสมอ:** เจน T1→T4 ของคลาสเดียวในแชทเดียว แล้วสั่ง
+> *"each tier must look clearly stronger and bigger than the previous one"*
+
+**กฎไล่ Tier (สรุป):**
+- **T1** เล็ก เรียบ — **T2** ใหญ่ขึ้น คมชัด — **T3** ธาตุชัด หลายชั้น glow แรง — **T4** เต็มจอ shockwave — **★ Secret** เต็มกรอบ อลังสุด ต้องห้าม
 - ตั้งชื่อไฟล์ได้ตามใจ เช่น `fx_warrior_t1.png`, `fx_warrior_t3_A.png`
 
 ---
@@ -54,12 +75,12 @@
 - **T1 โจร** — `A small quick green dagger slash, thin sharp arc with light sparks.`
 - **T2 นักฆ่า** — `A fast dual-dagger cross slash, dark green energy X with motion blur and sparks.`
 - **T3/B โจรสลัดเถื่อน** — `A cutlass slash, orange-brown energy arc with gold coin glints and rough sparks.`
-- **T3/A นักฆ่าเงา** — `A shadow crescent slash, deep green-black energy arc dissolving into shadow smoke.`
+- **T3/A นักฆ่าเงา** — `A shadow crescent slash, deep green-black energy arc with a bright glowing edge, sharp blade trail and bursting dark sparks (some shadow smoke around it, but the glowing slash is the focus).`
 - **T3/C นักฆ่าพิษอสรพิษ** — `A toxic venom slash, sickly green acidic arc with dripping poison droplets and bubbling mist.`
 - **T3/D นักฆ่าสายฟ้า** — `A lightning dagger slash, fast yellow-white electric crescent with crackling sparks and speed lines.`
 - **T3/S ★ เนโครแมนเซอร์** — `A necromancer's death-magic burst, a swirling dark purple-and-black soul flame with rising skulls, ghostly purple spirit wisps, bony hands clawing out, and an eerie dark-violet undead glow.`
 - **T4/B จักรพรรดิโจร** — `A golden treasure slash, lavish gold energy arc bursting with coins, gems and gold sparkles.`
-- **T4/A ราชาเงามืด** — `A shadow-king void slash, large dark-green-black crescent of pure shadow with dissolving darkness and faint crown glow.`
+- **T4/A ราชาเงามืด** — `A shadow-king void slash, a massive dark-green-black crescent of pure shadow energy with a brilliant glowing edge, a bright crown motif and explosive dark sparks bursting outward.`
 - **T4/C ราชาพิษมรณะ** — `A deadly venom burst, dark-green toxic explosion with serpents of poison, acid splash and green skull-mist.`
 - **T4/D เทพสังหารสายฟ้า** — `A storm of lightning daggers, massive electric-blue burst with multiple thunderbolts and blinding sparks.`
 - **T4/S ★ จักรพรรดิเงา** — `A shadow-emperor's imperial slash, an enormous purple-and-black crescent of royal shadow energy crowned with a glowing dark crown motif, swirling black shadow tendrils, deep violet sparks and an overwhelming regal purple-black aura, the deadliest shadow effect.`
@@ -72,8 +93,8 @@
 - **T2 นักล่า** — `A sharp arrow strike with a hawk-feather motif, gold-green motion trail and spark burst.`
 - **T3/B นักธนูลม** — `A wind arrow, a cyan crescent of swirling wind currents carrying an arrow, airy slash glow.`
 - **T3/A นักล่าป่า** — `A precise forest arrow, green-gold piercing streak with leaves and vines, sharp impact burst.`
-- **T3/C นักธนูเพลิงมาร** — `A flaming arrow strike, a burning arrow leaving a trail of fire with ember sparks and a small fire burst.`
-- **T3/D พรานเงาไร้เสียง** — `A silent shadow arrow, dark purple arrow streak with shadow mist and dim violet sparks.`
+- **T3/C นักธนูเพลิงมาร** — `A flaming arrow strike, a burning arrow leaving a long blazing fire trail with bright embers and a strong fiery explosion on impact.`
+- **T3/D พรานเงาไร้เสียง** — `A shadow arrow strike, a dark purple arrow streak with a glowing violet edge, swirling shadow energy and bursting bright violet sparks.`
 - **T3/S ★ นักล่าวิญญาณนิรันดร์** — `A spectral soul arrow, a ghostly violet arrow trailing spirit wisps and glowing soul-eyes, eerie purple glow.`
 - **T4/B เทพสายลม** — `A storm of arrows, many cyan wind arrows firing at once within a tornado burst, lightning sparks.`
 - **T4/A จอมล่าแห่งจักรวาล** — `A comet arrow strike, an orange-gold star-arrow with a long cosmic trail and bursting stars.`
