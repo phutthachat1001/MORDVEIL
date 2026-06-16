@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=65">
+<link rel="stylesheet" href="css/style.css?v=66">
 <script>
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
@@ -698,7 +698,9 @@
     <div class="tooltip-stats"  id="tt-stats"></div>
     <div class="tooltip-effect" id="tt-effect"></div>
     <div class="tooltip-class-req" id="tt-class-req" style="font-size:.8rem;margin:.3rem 0"></div>
+    <div id="tt-enhance" style="font-size:.78rem;margin:.3rem 0"></div>
     <div class="tooltip-actions">
+      <button class="btn-tooltip-enhance" id="btn-tt-enhance" onclick="openEnhancePanel(currentTooltipItem)" style="display:none">🔨 ตีบวก</button>
       <button class="btn-tooltip-equip"   onclick="equipItem(currentTooltipItem)">โ” เธชเธงเธกเนเธชเน</button>
       <button class="btn-tooltip-discard" onclick="discardItem(currentTooltipItem)">๐—‘ เธ—เธดเนเธ</button>
       <button class="btn-tooltip-close"   onclick="closeTooltip()">เธเธดเธ”</button>
@@ -854,33 +856,35 @@
 <!-- ===== SCRIPTS (เนเธซเธฅเธ”เธ•เธฒเธกเธฅเธณเธ”เธฑเธ dependency) =====
      NOTE: ?v=NN busts the browser/iOS HTTP cache. Bump this number (and the SW
      CACHE version in sw.js) on every deploy so updates show without reinstall. -->
-<script src="js/data.js?v=65"></script>
-<script src="js/state.js?v=65"></script>
-<script src="js/audio.js?v=65"></script>
-<script src="js/save.js?v=65"></script>
-<script src="js/achievements.js?v=65"></script>
-<script src="js/daily.js?v=65"></script>
-<script src="js/evolution.js?v=65"></script>
-<script src="js/infinity.js?v=65"></script>
-<script src="js/t4dungeon.js?v=65"></script>
-<script src="js/skilltree.js?v=65"></script>
-<script src="js/exp.js?v=65"></script>
-<script src="js/shop.js?v=65"></script>
-<script src="js/inventory.js?v=65"></script>
-<script src="js/events.js?v=65"></script>
-<script src="js/cosmetic.js?v=65"></script>
-<script src="js/rpg-quests.js?v=65"></script>
-<script src="js/npc-encounter.js?v=65"></script>
-<script src="js/battle.js?v=65"></script>
-<script src="js/idle.js?v=65"></script>
-<script src="js/offline.js?v=65"></script>
-<script src="js/idle-events.js?v=65"></script>
-<script src="js/codex.js?v=65"></script>
-<script src="js/tasks.js?v=65"></script>
-<script src="js/hub.js?v=65"></script>
-<script src="js/intro.js?v=65"></script>
-<script src="js/tutorial.js?v=65"></script>
-<script src="js/ui.js?v=65"></script>
+<script src="js/data.js?v=66"></script>
+<script src="js/state.js?v=66"></script>
+<script src="js/audio.js?v=66"></script>
+<script src="js/save.js?v=66"></script>
+<script src="js/achievements.js?v=66"></script>
+<script src="js/daily.js?v=66"></script>
+<script src="js/evolution.js?v=66"></script>
+<script src="js/infinity.js?v=66"></script>
+<script src="js/t4dungeon.js?v=66"></script>
+<script src="js/dungeon.js?v=66"></script>
+<script src="js/enhance.js?v=66"></script>
+<script src="js/skilltree.js?v=66"></script>
+<script src="js/exp.js?v=66"></script>
+<script src="js/shop.js?v=66"></script>
+<script src="js/inventory.js?v=66"></script>
+<script src="js/events.js?v=66"></script>
+<script src="js/cosmetic.js?v=66"></script>
+<script src="js/rpg-quests.js?v=66"></script>
+<script src="js/npc-encounter.js?v=66"></script>
+<script src="js/battle.js?v=66"></script>
+<script src="js/idle.js?v=66"></script>
+<script src="js/offline.js?v=66"></script>
+<script src="js/idle-events.js?v=66"></script>
+<script src="js/codex.js?v=66"></script>
+<script src="js/tasks.js?v=66"></script>
+<script src="js/hub.js?v=66"></script>
+<script src="js/intro.js?v=66"></script>
+<script src="js/tutorial.js?v=66"></script>
+<script src="js/ui.js?v=66"></script>
 <script>
   // Override window.onload to handle both buttons properly
   window.onload = () => {

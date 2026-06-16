@@ -359,6 +359,11 @@ const MATERIALS = {
   // zone 6 — อาณาจักรโกลาหล
   chaos_core:    { id:'chaos_core',    name:'แก่นโกลาหล',    icon:'🌀', zone:6, rarity:'legend' },
   cosmic_dust:   { id:'cosmic_dust',   name:'ผงจักรวาล',      icon:'✨', zone:6, rarity:'legend' },
+  // ── Dungeon-only (หลุมลึกนิรันดร์) — ตีบวก & คราฟชุดเทพ ──
+  enhance_stone: { id:'enhance_stone', name:'หินตีบวก',      icon:'🔨', zone:0, rarity:'rare',   dungeonOnly:true },
+  enhance_core:  { id:'enhance_core',  name:'แก่นเสริมพลัง',  icon:'💠', zone:0, rarity:'epic',   dungeonOnly:true },
+  void_shard:    { id:'void_shard',    name:'เศษมิติว่างเปล่า',icon:'🕳️', zone:0, rarity:'legend', dungeonOnly:true },
+  abyss_essence: { id:'abyss_essence', name:'แก่นห้วงลึก',    icon:'🌌', zone:0, rarity:'ancient',dungeonOnly:true },
 };
 
 // วัตถุดิบที่ดรอปได้ในแต่ละโซน (ไล่ตามที่ผู้เล่นอยากได้: โซนสูง = วัตถุดิบดีขึ้น)
@@ -412,6 +417,59 @@ const CRAFT_SETS = {
       { slot:'boots',  name:'รองเท้ามังกร',     icon:'👢', atk:10, def:20, mats:{dragon_scale:7, fire_essence:4}, gold:1100 },
     ],
   },
+  // ── ชุดเทพห้วงลึก — คราฟจากวัตถุดิบหายากในดันเจี้ยนเท่านั้น ──
+  abyss_set: {
+    id:'abyss_set', name:'ชุดห้วงลึกนิรันดร์', tier:4, rarity:'legend',
+    setBonus:{ need:4, atk:60, def:50, hp:500, crit:0.15, label:'ครบ 4 ชิ้น: +60 ATK +50 DEF +500 HP +15% Crit' },
+    pieces: [
+      { slot:'weapon', name:'ดาบห้วงลึก',      icon:'🗡', atk:95, def:0,  mats:{void_shard:8, abyss_essence:4}, gold:6000 },
+      { slot:'helmet', name:'หมวกมิติว่าง',    icon:'🪖', atk:18, def:42, mats:{void_shard:6, abyss_essence:2}, gold:4000 },
+      { slot:'armor',  name:'เกราะห้วงลึก',    icon:'⚔', atk:20, def:55, mats:{void_shard:10, abyss_essence:3}, gold:5500 },
+      { slot:'gloves', name:'ถุงมือมิติ',      icon:'🧤', atk:30, def:20, mats:{void_shard:6, abyss_essence:2}, gold:3800 },
+      { slot:'pants',  name:'กางเกงห้วงลึก',   icon:'👖', atk:18, def:40, mats:{void_shard:7, abyss_essence:2}, gold:4200 },
+      { slot:'boots',  name:'รองเท้ามิติ',     icon:'👢', atk:18, def:34, mats:{void_shard:6, abyss_essence:2}, gold:3800 },
+    ],
+  },
+};
+
+// ============================================================
+// ENHANCEMENT — ตีบวกอุปกรณ์ (+0 → +15)
+// ใช้ "หินตีบวก/แก่น" + ทอง · มีอัตราสำเร็จที่ลดลงตามระดับ
+// ปรัชญาสมดุล: +1..+5 ปลอดภัย/ถูก · +6..+10 เริ่มมีโอกาสล้มเหลว (ไม่ลดระดับ
+//  เสียแค่วัตถุดิบ) · +11..+15 แพง+เสี่ยง แต่ให้พลังเยอะ
+// stat ที่ได้: ทุกระดับ +8% ของ stat ฐานต่อชิ้น (สะสม) → +10 ≈ +80%, +15 ≈ +120%
+// ============================================================
+const ENHANCE = {
+  maxLevel: 15,
+  statPerLevel: 0.08,         // +8% ของ atk/def/hp/crit ฐานต่อระดับ
+  // ต่อความพยายาม 1 ครั้ง: ต้องการหิน/แก่น + ทอง + อัตราสำเร็จ
+  // level = ระดับ "ปัจจุบัน" ที่กำลังจะดันขึ้น (0 = ดันเป็น +1)
+  tiers: [
+    // upToLevel, stones, cores, gold, successRate
+    { upTo:5,  stones:2, cores:0, gold:300,   rate:1.00 },
+    { upTo:8,  stones:3, cores:1, gold:1200,  rate:0.80 },
+    { upTo:11, stones:5, cores:2, gold:4000,  rate:0.55 },
+    { upTo:13, stones:8, cores:3, gold:12000, rate:0.40 },
+    { upTo:15, stones:12,cores:5, gold:30000, rate:0.28 },
+  ],
+};
+
+// ============================================================
+// ENDLESS DUNGEON — หลุมลึกนิรันดร์ (เข้าซ้ำได้ ฟาร์มของตีบวก/คราฟหายาก)
+// ปลดล็อกเมื่อผ่านด่าน 2 · ความลึกไต่ไม่สิ้นสุด · ตายแล้วได้ของที่เก็บ
+// ทุกๆ "ชั้นบอส" (หาร 5 ลงตัว) ดรอปเยอะ + โอกาสได้ของหายากสูง
+// ============================================================
+const ENDLESS_DUNGEON = {
+  unlockZoneCleared: 2,       // ต้องผ่านด่าน 2 ก่อน
+  bossEveryFloors: 5,
+  // ดรอปต่อการสังหาร (ปกติ) — ไต่ขึ้นตามความลึก
+  drops: {
+    enhance_stone: { base: 0.55, perFloor: 0.010, cap: 0.95 },
+    enhance_core:  { base: 0.10, perFloor: 0.006, cap: 0.45, minFloor: 4 },
+    void_shard:    { base: 0.04, perFloor: 0.004, cap: 0.30, minFloor: 10 },
+    abyss_essence: { base: 0.00, perFloor: 0.002, cap: 0.12, minFloor: 16 },
+  },
+  bossBundleMult: 3,          // ชั้นบอสดรอปเป็นชุด ×3
 };
 
 // ราคาซื้อ/ขาย ตาม rarity

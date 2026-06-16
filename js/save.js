@@ -179,6 +179,7 @@ function loadGame() {
       if (!G.secretClassesFound)              G.secretClassesFound = [];
       if (!G.claimedIdleMilestones)           G.claimedIdleMilestones = [];
       if (!G.materials)                        G.materials = {};
+      if (G.dungeonBestFloor === undefined)    G.dungeonBestFloor = 0;
       // existing saves have already learned the game → don't show onboarding
       if (G.tutorialDone === undefined)       G.tutorialDone       = true;
       // transient flags — reset battle state on reload.

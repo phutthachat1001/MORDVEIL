@@ -106,6 +106,13 @@ const HUB_NPCS = [
         { label:'⚒ คราฟชุด (ใช้วัตถุดิบ)', style:'gold',  onclick:()=>hubOpenCrafting() },
         { label:`🔍 ตรวจสอบอุปกรณ์ (${c}/6)`, style:'blue',  onclick:()=>hubCheckGear()    },
       ];
+      if (typeof canEnterDungeon === 'function') {
+        if (canEnterDungeon()) {
+          acts.push({ label:'🕳️ หลุมลึกนิรันดร์ (ฟาร์มของตีบวก)', style:'purple', onclick:()=>{ closeHubDialogue(); openDungeon(); } });
+        } else {
+          acts.push({ label:`🔒 หลุมลึก — ${dungeonUnlockHint()}`, style:'close', onclick:()=>{} });
+        }
+      }
       if (G.gameMode === 'fullrpg') {
         acts.push({ label:'💎 เควส Collect', style:'gold', onclick:()=>rpgShowNpcQuests('blacksmith') });
       }

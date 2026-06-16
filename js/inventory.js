@@ -508,7 +508,8 @@ function showTooltip(item) {
   // backward compat: อาวุธเก่าไม่มี slot
   if (!item.slot) item.slot = 'weapon';
 
-  document.getElementById('tt-name').textContent    = `${item.icon||'⚔'} ${item.name}`;
+  const enhSuffix = item.enhance ? ` +${item.enhance}` : '';
+  document.getElementById('tt-name').textContent    = `${item.icon||'⚔'} ${item.name}${enhSuffix}`;
   document.getElementById('tt-name').className      = `tooltip-name rarity-glow-${item.rarity}`;
   document.getElementById('tt-rarity').innerHTML    = `<span class="rarity-glow-${item.rarity}">${r.label}</span> · <span style="color:var(--text2)">${slotMeta.label}</span>`;
   document.getElementById('tt-stats').innerHTML     = buildStatLine(item) || '-';
@@ -545,6 +546,14 @@ function showTooltip(item) {
       equipBtn.textContent = '⚔ สวมใส่';
       equipBtn.onclick = () => equipItem(currentTooltipItem);
     }
+  }
+
+  // enhance info + button
+  const enhInfo = document.getElementById('tt-enhance');
+  const enhBtn  = document.getElementById('btn-tt-enhance');
+  if (enhInfo && enhBtn && typeof enhanceTooltipLine === 'function') {
+    enhInfo.innerHTML = enhanceTooltipLine(item);
+    enhBtn.style.display = (canEquip && item.uid) ? 'inline-block' : 'none';
   }
 
   document.getElementById('tooltip-overlay').classList.add('active');

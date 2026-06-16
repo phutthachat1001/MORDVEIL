@@ -1388,6 +1388,12 @@ body.preload{visibility:hidden}
 
 .prestige-badge{display:inline-block;background:linear-gradient(135deg,#402000,#600000);border:1px solid var(--legend);padding:.2rem .6rem;border-radius:10px;font-size:.75rem;color:var(--legend)}
 
+/* ===== ENHANCE / DUNGEON ===== */
+.btn-tooltip-enhance{background:linear-gradient(135deg,#7a4a10,#caa030);border:1px solid #ffd966;color:#fff;padding:.5rem 1.1rem;border-radius:8px;cursor:pointer;font-family:'Chakra Petch','Sarabun',sans-serif;font-weight:700;font-size:.85rem;margin-right:.4rem}
+.btn-tooltip-enhance:hover{box-shadow:0 0 12px #ffd96688}
+.idle-mob.dg-boss .idle-mob-sprite{filter:drop-shadow(0 0 14px #ff5533);animation:dg-boss-pulse 1.4s ease-in-out infinite}
+@keyframes dg-boss-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
 /* ===== EVOLUTION UI ===== */
 .btn-evolve{background:linear-gradient(135deg,#3a0080,#802000);border:2px solid var(--legend);color:var(--legend);padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-family:'Chakra Petch','Sarabun',sans-serif;width:100%;margin-top:.4rem;font-size:.9rem}
 .btn-evolve:hover{box-shadow:0 0 12px var(--legend)}

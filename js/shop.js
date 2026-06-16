@@ -23,11 +23,14 @@ function getEquippedStatBonus() {
       if (slot === 'weapon') G.equippedWeaponId = null;
       return;
     }
-    if (item.atk)         bonus.atk         += item.atk;
-    if (item.def)         bonus.def         += item.def;
-    if (item.hp)          bonus.hp          += item.hp;
-    if (item.crit)        bonus.crit        += item.crit;
-    if (item.attackSpeed) bonus.attackSpeed += item.attackSpeed;
+    // Enhancement (+N) multiplies the item's own base stats.
+    const enh = item.enhance || 0;
+    const eMult = 1 + enh * ((typeof ENHANCE !== 'undefined' ? ENHANCE.statPerLevel : 0.08));
+    if (item.atk)         bonus.atk         += Math.round(item.atk * eMult);
+    if (item.def)         bonus.def         += Math.round(item.def * eMult);
+    if (item.hp)          bonus.hp          += Math.round(item.hp  * eMult);
+    if (item.crit)        bonus.crit        += Math.round(item.crit * eMult);
+    if (item.attackSpeed) bonus.attackSpeed += item.attackSpeed; // speed not enhanced (balance)
     if (item.effect) {
       const expM = item.effect.match(/EXP\+(\d+)%/);
       if (expM) bonus.expMult += parseInt(expM[1]) / 100;
@@ -239,10 +242,13 @@ function renderShopSell() {
 
 function buildStatLine(item) {
   const parts = [];
-  if (item.atk)         parts.push(`ATK+${item.atk}`);
-  if (item.def)         parts.push(`DEF+${item.def}`);
-  if (item.hp)          parts.push(`HP+${item.hp}`);
-  if (item.crit)        parts.push(`CRIT+${item.crit}%`);
+  const enh = item.enhance || 0;
+  const m = 1 + enh * ((typeof ENHANCE !== 'undefined' ? ENHANCE.statPerLevel : 0.08));
+  const v = (base) => enh > 0 ? Math.round(base * m) : base;
+  if (item.atk)         parts.push(`ATK+${v(item.atk)}`);
+  if (item.def)         parts.push(`DEF+${v(item.def)}`);
+  if (item.hp)          parts.push(`HP+${v(item.hp)}`);
+  if (item.crit)        parts.push(`CRIT+${v(item.crit)}%`);
   if (item.attackSpeed) parts.push(`⚡ Speed-${Math.round(item.attackSpeed*100)}%`);
   if (item.speed)       parts.push(`SPD+${item.speed}`);
   if (item.effect)      parts.push(item.effect);
