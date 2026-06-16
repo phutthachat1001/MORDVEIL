@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
@@ -8,17 +8,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mordveil">
 <meta name="theme-color" content="#1a0a2e">
-<title>Mordveil โ€” Work Quest RPG</title>
+<title>Mordveil — Work Quest RPG</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=66">
+<link rel="stylesheet" href="css/style.css?v=67">
 <script>
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
     const isMob = window.innerWidth <= 700;
 
-    // โ”€โ”€ swap video sources for mobile โ”€โ”€
+    // ── swap video sources for mobile ──
     const homeSrc = document.getElementById('bg-home-src');
 
     if (homeSrc && isMob) {
@@ -55,7 +55,7 @@
       }, 80);
     });
 
-    // Layout is ready โ€” reveal the page (prevents desktopโ’mobile flash)
+    // Layout is ready — reveal the page (prevents desktop→mobile flash)
     document.body.classList.remove('preload');
   });
 })();
@@ -142,17 +142,17 @@
       <rect x="36" y="40" width="2" height="2" fill="#4a6030" opacity=".5"/>
       <rect x="300" y="180" width="4" height="2" fill="#3a5020" opacity=".5"/>
       <rect x="298" y="183" width="3" height="2" fill="#4a6030" opacity=".4"/>
-      <text x="170" y="56" text-anchor="middle" font-size="9" fill="#8a7040" opacity=".8" font-family="serif">โ€” โฆ เธเธฒเธฃเธถเธเนเธซเนเธเธเธฑเธเธเธเธเธ เธฑเธข โฆ โ€”</text>
-      <text x="170" y="186" text-anchor="middle" font-size="8" fill="#7a6030" opacity=".7" font-family="serif">โ” โง โ” โง โ” โง โ”</text>
+      <text x="170" y="56" text-anchor="middle" font-size="9" fill="#8a7040" opacity=".8" font-family="serif">— ✦ จารึกแห่งนักผจญภัย ✦ —</text>
+      <text x="170" y="186" text-anchor="middle" font-size="8" fill="#7a6030" opacity=".7" font-family="serif">⚔ ✧ ⚔ ✧ ⚔ ✧ ⚔</text>
     </svg>
     <div class="intro-stone-text">
-      <div class="stone-title">โ€” เธเธณเธเธฒเธฃเธถเธ โ€”</div>
-      <p>เนเธเธขเธธเธเธ—เธตเน <b>เธเธงเธฒเธกเธเธขเธฑเธ</b> เธเธทเธญเธเธฅเธฑเธเนเธ—เนเธเธฃเธดเธ...</p>
-      <p>เนเธฅเธเนเธซเนเธ<b>เธเธงเธฒเธกเธชเธเธ</b>เธ–เธนเธเธเธฅเธทเธเธเธดเธเนเธ”เธขเธเธงเธฒเธกเธกเธทเธ”</p>
-      <p>เธกเธญเธเธชเน€เธ•เธญเธฃเนเธเธธเธ”เธเธถเนเธเธ—เธธเธเนเธซเนเธเธซเธ</p>
-      <p>เนเธ•เนเธกเธตเธเธนเนเน€เธฅเธทเธญเธ โ€” <b>เธเธฑเธเธเธเธเธ เธฑเธข</b></p>
-      <p style="margin-top:.4rem;color:#c8a860;font-size:.82rem">เธเธนเนเธ—เธณเธเธฒเธเธเธฃเธดเธ เธเธฐเนเธ”เนเธเธฅเธฑเธเธเธฃเธดเธ</p>
-      <p style="margin-top:.6rem;color:#8a7050;font-size:.75rem">โ€” เนเธ•เธฐเน€เธเธทเนเธญเธเธดเธ” โ€”</p>
+      <div class="stone-title">— คำจารึก —</div>
+      <p>ในยุคที่ <b>ความขยัน</b> คือพลังแท้จริง...</p>
+      <p>โลกแห่ง<b>ความสงบ</b>ถูกกลืนกินโดยความมืด</p>
+      <p>มอนสเตอร์ผุดขึ้นทุกแห่งหน</p>
+      <p>แต่มีผู้เลือก — <b>นักผจญภัย</b></p>
+      <p style="margin-top:.4rem;color:#c8a860;font-size:.82rem">ผู้ทำงานจริง จะได้พลังจริง</p>
+      <p style="margin-top:.6rem;color:#8a7050;font-size:.75rem">— แตะเพื่อปิด —</p>
     </div>
   </div>
 </div>
@@ -160,62 +160,62 @@
 <!-- ===== INTRO ===== -->
 <div id="screen-intro" class="screen active">
   <div class="intro-buttons">
-    <button class="btn-img-only" id="btn-continue" onclick="continueGame()" style="display:none"><img src="assets/button/playnext.png" alt="เน€เธฅเนเธเธ•เนเธญ"></button>
-    <button class="btn-img-only" id="btn-new-adventure" onclick="confirmNewGame()"><img src="assets/button/newgame.png" alt="เน€เธฃเธดเนเธกเนเธซเธกเน"></button>
+    <button class="btn-img-only" id="btn-continue" onclick="continueGame()" style="display:none"><img src="assets/button/playnext.png" alt="เล่นต่อ"></button>
+    <button class="btn-img-only" id="btn-new-adventure" onclick="confirmNewGame()"><img src="assets/button/newgame.png" alt="เริ่มใหม่"></button>
   </div>
   <div style="color:#c8b880;font-size:.85rem;text-shadow:0 1px 4px #000" id="continue-hint"></div>
 </div>
 
 <!-- ===== MODE SELECT ===== -->
 <div id="screen-mode" class="screen">
-  <h2 style="font-size:1.6rem;margin-bottom:.3rem">โ” เน€เธฅเธทเธญเธเนเธซเธกเธ”เธเธฒเธฃเน€เธฅเนเธ</h2>
-  <p class="sub" style="margin-bottom:1.8rem">เน€เธฅเธทเธญเธเธเธฃเธฐเธชเธเธเธฒเธฃเธ“เนเธ—เธตเนเธ•เธฃเธเธเธฑเธเธชเนเธ•เธฅเนเธเธญเธเธเธธเธ“</p>
+  <h2 style="font-size:1.6rem;margin-bottom:.3rem">⚔ เลือกโหมดการเล่น</h2>
+  <p class="sub" style="margin-bottom:1.8rem">เลือกประสบการณ์ที่ตรงกับสไตล์ของคุณ</p>
   <div class="mode-select-grid">
 
     <div class="mode-card" id="mode-card-working" onclick="selectMode('working')">
-      <div class="mode-icon">๐’ผ</div>
+      <div class="mode-icon">💼</div>
       <div class="mode-name">RPG Working</div>
-      <div class="mode-tag" style="background:#1a3a1a;border-color:#4a9;color:#7dff7d">เนเธซเธกเธ”เธ”เธฑเนเธเน€เธ”เธดเธก</div>
+      <div class="mode-tag" style="background:#1a3a1a;border-color:#4a9;color:#7dff7d">โหมดดั้งเดิม</div>
       <ul class="mode-features">
-        <li>โ… เน€เธเธดเนเธกเธเธฒเธเธเธฃเธดเธเน€เธเธทเนเธญเธฃเธฑเธ EXP</li>
-        <li>โ… Task deadline bonus</li>
-        <li>โ… Streak เธเธฒเธเธ—เธณเธเธฒเธเธ•เนเธญเน€เธเธทเนเธญเธ</li>
-        <li>โ… Daily quests เธฃเธฒเธขเธงเธฑเธ</li>
-        <li>โ… เธเธชเธก productivity + RPG</li>
-        <li>โ” EXP เธเธฒเธ kill เธกเธญเธ (เน€เธชเธฃเธดเธก)</li>
+        <li>✅ เพิ่มงานจริงเพื่อรับ EXP</li>
+        <li>✅ Task deadline bonus</li>
+        <li>✅ Streak จากทำงานต่อเนื่อง</li>
+        <li>✅ Daily quests รายวัน</li>
+        <li>✅ ผสม productivity + RPG</li>
+        <li>⚔ EXP จาก kill มอน (เสริม)</li>
       </ul>
-      <div class="mode-desc">เน€เธฅเนเธ RPG เธเธ“เธฐเธ—เธณเธเธฒเธเธเธฃเธดเธ โ€” เธ—เธณเธเธฒเธเน€เธชเธฃเนเธ เธฃเธฑเธ EXP เนเธฅเธฐเธชเธนเนเธกเธญเธเธชเน€เธ•เธญเธฃเน</div>
+      <div class="mode-desc">เล่น RPG ขณะทำงานจริง — ทำงานเสร็จ รับ EXP และสู้มอนสเตอร์</div>
     </div>
 
     <div class="mode-card mode-card-rpg" id="mode-card-fullrpg" onclick="selectMode('fullrpg')">
-      <div class="mode-icon">๐</div>
+      <div class="mode-icon">🐉</div>
       <div class="mode-name">Full RPG</div>
-      <div class="mode-tag" style="background:#2a1a00;border-color:#fa0;color:#fa0">เนเธซเธกเธ”เนเธซเธกเน!</div>
+      <div class="mode-tag" style="background:#2a1a00;border-color:#fa0;color:#fa0">โหมดใหม่!</div>
       <ul class="mode-features">
-        <li>โ… EXP เธเธฒเธ kill เธกเธญเธเธชเน€เธ•เธญเธฃเน</li>
-        <li>โ… เธฃเธฐเธเธเน€เธเธงเธชเธเธฒเธ NPC</li>
-        <li>โ… Grind &amp; เธชเธณเธฃเธงเธเนเธฅเธ</li>
-        <li>โ… เธชเธกเธ”เธธเธฅ EXP curve เนเธขเธ</li>
-        <li>โ… เน€เธฅเนเธเนเธ”เนเธ•เธฅเธญเธ”เน€เธงเธฅเธฒ</li>
-        <li>โ เนเธกเนเธกเธตเธฃเธฐเธเธ Task / Work</li>
+        <li>✅ EXP จาก kill มอนสเตอร์</li>
+        <li>✅ ระบบเควสจาก NPC</li>
+        <li>✅ Grind &amp; สำรวจโลก</li>
+        <li>✅ สมดุล EXP curve แยก</li>
+        <li>✅ เล่นได้ตลอดเวลา</li>
+        <li>❌ ไม่มีระบบ Task / Work</li>
       </ul>
-      <div class="mode-desc">เน€เธฅเนเธ RPG เนเธเธเน€เธ•เนเธกเธฃเธนเธเนเธเธ โ€” เธฃเธฑเธเน€เธเธงเธช เธฅเนเธฒเธกเธญเธ เน€เธเนเธเน€เธงเธฅ เนเธกเนเธ•เนเธญเธเธกเธตเธเธฒเธเธเธฃเธดเธ</div>
+      <div class="mode-desc">เล่น RPG แบบเต็มรูปแบบ — รับเควส ล่ามอน เก็บเวล ไม่ต้องมีงานจริง</div>
     </div>
 
   </div>
-  <p style="color:var(--text2);font-size:.78rem;margin-top:1.2rem;text-align:center">โ  เนเธซเธกเธ”เธ—เธตเนเน€เธฅเธทเธญเธเธเธฐเนเธเนเธ•เธฅเธญเธ” save เธเธตเน เนเธกเนเธชเธฒเธกเธฒเธฃเธ–เน€เธเธฅเธตเนเธขเธเนเธ”เนเธ เธฒเธขเธซเธฅเธฑเธ</p>
+  <p style="color:var(--text2);font-size:.78rem;margin-top:1.2rem;text-align:center">⚠ โหมดที่เลือกจะใช้ตลอด save นี้ ไม่สามารถเปลี่ยนได้ภายหลัง</p>
 </div>
 
 <!-- ===== CLASS SELECT ===== -->
 <div id="screen-class" class="screen">
-  <h2>โ” เน€เธฅเธทเธญเธเธเธฅเธฒเธชเธ•เธฑเธงเธฅเธฐเธเธฃ</h2>
-  <p class="sub">เธเธฅเธฒเธชเธ—เธตเนเน€เธฅเธทเธญเธเธเธฐเธเธณเธซเธเธ”เธชเนเธ•เธฅเนเธเธฒเธฃเน€เธฅเนเธเธ•เธฅเธญเธ”เน€เธเธก</p>
+  <h2>⚔ เลือกคลาสตัวละคร</h2>
+  <p class="sub">คลาสที่เลือกจะกำหนดสไตล์การเล่นตลอดเกม</p>
   <div class="name-row">
-    <label style="color:var(--text2)">เธเธทเนเธญเธเธฑเธเธเธเธเธ เธฑเธข:</label>
-    <input id="player-name-input" type="text" placeholder="เนเธชเนเธเธทเนเธญเธเธญเธเธเธธเธ“" maxlength="20">
+    <label style="color:var(--text2)">ชื่อนักผจญภัย:</label>
+    <input id="player-name-input" type="text" placeholder="ใส่ชื่อของคุณ" maxlength="20">
   </div>
   <div class="class-grid" id="class-grid"></div>
-  <button class="btn-confirm" id="btn-confirm-class" disabled onclick="confirmClass()">เน€เธฃเธดเนเธกเธเธฒเธฃเธเธเธเธ เธฑเธข โ’</button>
+  <button class="btn-confirm" id="btn-confirm-class" disabled onclick="confirmClass()">เริ่มการผจญภัย →</button>
 </div>
 
 <!-- ===== MAIN GAME ===== -->
@@ -223,8 +223,8 @@
 
   <!-- TOP BAR -->
   <div class="topbar">
-    <span class="player-name" id="tb-name">เธเธฑเธเธเธเธเธ เธฑเธข</span>
-    <span class="level-badge">โญ LV <span id="tb-level">1</span></span>
+    <span class="player-name" id="tb-name">นักผจญภัย</span>
+    <span class="level-badge">⭐ LV <span id="tb-level">1</span></span>
     <div class="exp-bar-wrap" title="EXP">
       <div class="exp-bar-fill" id="exp-bar" style="width:0%"></div>
       <div class="exp-text" id="exp-text">0/100</div>
@@ -233,21 +233,21 @@
       <div class="hp-bar-fill" id="hp-bar" style="width:100%"></div>
       <div class="hp-text" id="hp-text">100/100</div>
     </div>
-    <span class="stat-pill">โ” ATK: <span id="tb-atk">10</span></span>
-    <span class="stat-pill">๐ก DEF: <span id="tb-def">5</span></span>
-    <span class="stat-pill">๐’ฐ <span id="tb-gold">0</span></span>
-    <span class="topbar weapon-eq">๐—ก <b id="tb-weapon">เนเธกเนเธกเธตเธญเธฒเธงเธธเธ</b></span>
-    <span id="mode-badge" style="font-size:.75rem;font-weight:700;padding:.15rem .5rem;border-radius:4px;background:rgba(0,0,0,.3);border:1px solid currentColor;margin-left:auto">๐’ผ RPG Working</span>
-    <button onclick="showStats()"        style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">เธชเธ–เธดเธ•เธด</button>
-    <button onclick="showAchievements()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">เธเธงเธฒเธกเธชเธณเน€เธฃเนเธ</button>
-    <button onclick="replayTutorial()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">โ” เธงเธดเธเธตเน€เธฅเนเธ</button>
-    <button class="btn-mute" onclick="toggleMute()" title="เธเธดเธ”เน€เธชเธตเธขเธ" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .5rem;border-radius:4px;cursor:pointer;font-size:.9rem">๐”</button>
-    <button onclick="openShop()" style="background:linear-gradient(135deg,#1a2a40,#0f1a2e);border:2px solid var(--gold);color:var(--gold);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">๐ช เธฃเนเธฒเธเธเนเธฒ</button>
-    <button id="btn-manualsave" onclick="manualSave()" style="background:linear-gradient(135deg,#1a3a1a,#0f2e0f);border:2px solid #4caf50;color:#7dff7d;padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">๐’พ เน€เธเธ</button>
-    <button onclick="openSaveTransfer()" title="เธชเธณเธฃเธญเธ/เธเธนเนเธเธทเธเน€เธเธ" style="background:linear-gradient(135deg,#1a2a3a,#0f1a2e);border:2px solid #4488cc;color:#88ccff;padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">๐“ฆ เธชเธณเธฃเธญเธ</button>
-    <button class="btn-newgame" onclick="confirmNewGame()">๐” เน€เธฃเธดเนเธกเนเธซเธกเน</button>
+    <span class="stat-pill">⚔ ATK: <span id="tb-atk">10</span></span>
+    <span class="stat-pill">🛡 DEF: <span id="tb-def">5</span></span>
+    <span class="stat-pill">💰 <span id="tb-gold">0</span></span>
+    <span class="topbar weapon-eq">🗡 <b id="tb-weapon">ไม่มีอาวุธ</b></span>
+    <span id="mode-badge" style="font-size:.75rem;font-weight:700;padding:.15rem .5rem;border-radius:4px;background:rgba(0,0,0,.3);border:1px solid currentColor;margin-left:auto">💼 RPG Working</span>
+    <button onclick="showStats()"        style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">สถิติ</button>
+    <button onclick="showAchievements()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">ความสำเร็จ</button>
+    <button onclick="replayTutorial()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">❔ วิธีเล่น</button>
+    <button class="btn-mute" onclick="toggleMute()" title="ปิดเสียง" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .5rem;border-radius:4px;cursor:pointer;font-size:.9rem">🔊</button>
+    <button onclick="openShop()" style="background:linear-gradient(135deg,#1a2a40,#0f1a2e);border:2px solid var(--gold);color:var(--gold);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🏪 ร้านค้า</button>
+    <button id="btn-manualsave" onclick="manualSave()" style="background:linear-gradient(135deg,#1a3a1a,#0f2e0f);border:2px solid #4caf50;color:#7dff7d;padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">💾 เซฟ</button>
+    <button onclick="openSaveTransfer()" title="สำรอง/กู้คืนเซฟ" style="background:linear-gradient(135deg,#1a2a3a,#0f1a2e);border:2px solid #4488cc;color:#88ccff;padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">📦 สำรอง</button>
+    <button class="btn-newgame" onclick="confirmNewGame()">🔄 เริ่มใหม่</button>
     <button onclick="toggleEventLog()" style="background:linear-gradient(135deg,#1a0f2e,#2a1a4e);border:2px solid var(--purple);color:var(--purple);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem;position:relative">
-      ๐ฒ เน€เธซเธ•เธธเธเธฒเธฃเธ“เน<span id="ev-bag-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:red;color:#fff;border-radius:50%;width:14px;height:14px;font-size:.6rem;text-align:center;line-height:14px">!</span>
+      🎲 เหตุการณ์<span id="ev-bag-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:red;color:#fff;border-radius:50%;width:14px;height:14px;font-size:.6rem;text-align:center;line-height:14px">!</span>
     </button>
   </div>
 
@@ -257,26 +257,26 @@
   <!-- EVENT: active buffs row (desktop only) -->
   <div id="ev-active-buffs" style="display:flex;flex-wrap:wrap;gap:.3rem;padding:.3rem 1rem;min-height:28px" class="desktop-only"></div>
 
-  <!-- MOBILE STAT STRIP โ€” เธ—เธญเธ/ATK/DEF/เธญเธฒเธงเธธเธ (desktop pills เธ–เธนเธเธเนเธญเธเธเธเธกเธทเธญเธ–เธทเธญ) -->
+  <!-- MOBILE STAT STRIP — ทอง/ATK/DEF/อาวุธ (desktop pills ถูกซ่อนบนมือถือ) -->
   <div id="mob-stat-strip">
-    <span class="ms-gold">๐’ฐ <span id="ms-gold-val">0</span></span>
-    <span class="ms-atk">โ” <span id="ms-atk-val">10</span></span>
-    <span class="ms-def">๐ก <span id="ms-def-val">5</span></span>
-    <span class="ms-weapon">๐—ก <span id="ms-weapon-val">เนเธกเนเธกเธตเธญเธฒเธงเธธเธ</span></span>
+    <span class="ms-gold">💰 <span id="ms-gold-val">0</span></span>
+    <span class="ms-atk">⚔ <span id="ms-atk-val">10</span></span>
+    <span class="ms-def">🛡 <span id="ms-def-val">5</span></span>
+    <span class="ms-weapon">🗡 <span id="ms-weapon-val">ไม่มีอาวุธ</span></span>
   </div>
 
-  <!-- MOBILE ACTION BAR (เธเธธเนเธกเธ—เธตเนเธเนเธญเธเธเธฒเธ topbar) -->
+  <!-- MOBILE ACTION BAR (ปุ่มที่ซ่อนจาก topbar) -->
   <div id="mobile-action-bar">
-    <button onclick="showStats()"             style="border-color:var(--border2)">๐“ เธชเธ–เธดเธ•เธด</button>
-    <button onclick="showAchievements()"      style="border-color:var(--border2)">๐ เธเธงเธฒเธกเธชเธณเน€เธฃเนเธ</button>
-    <button onclick="replayTutorial()"        style="border-color:var(--border2)">โ” เธงเธดเธเธตเน€เธฅเนเธ</button>
-    <button class="btn-mute" onclick="toggleMute()" style="border-color:var(--border2)">๐”</button>
-    <button onclick="openShop()"              style="border-color:var(--gold);color:var(--gold)">๐ช เธฃเนเธฒเธเธเนเธฒ</button>
-    <button onclick="manualSave()"            style="border-color:#4caf50;color:#7dff7d">๐’พ เน€เธเธ</button>
-    <button onclick="openSaveTransfer()"       style="border-color:#4488cc;color:#88ccff">๐“ฆ เธชเธณเธฃเธญเธ</button>
-    <button onclick="confirmNewGame()"        style="border-color:var(--red);color:var(--red)">๐” เน€เธฃเธดเนเธกเนเธซเธกเน</button>
-    <button onclick="toggleEventLog()"        style="border-color:var(--purple);color:var(--purple);position:relative">๐ฒ เน€เธซเธ•เธธเธเธฒเธฃเธ“เน<span id="mob-ev-badge" style="display:none;position:absolute;top:2px;right:2px;background:red;color:#fff;border-radius:50%;width:10px;height:10px;font-size:.5rem;text-align:center;line-height:10px">!</span></button>
-    <span id="mode-badge-mob" style="font-size:.7rem;font-weight:700;padding:.25rem .5rem;border-radius:4px;background:rgba(0,0,0,.3);border:1px solid;align-self:center;flex-shrink:0">๐’ผ RPG Working</span>
+    <button onclick="showStats()"             style="border-color:var(--border2)">📊 สถิติ</button>
+    <button onclick="showAchievements()"      style="border-color:var(--border2)">🏆 ความสำเร็จ</button>
+    <button onclick="replayTutorial()"        style="border-color:var(--border2)">❔ วิธีเล่น</button>
+    <button class="btn-mute" onclick="toggleMute()" style="border-color:var(--border2)">🔊</button>
+    <button onclick="openShop()"              style="border-color:var(--gold);color:var(--gold)">🏪 ร้านค้า</button>
+    <button onclick="manualSave()"            style="border-color:#4caf50;color:#7dff7d">💾 เซฟ</button>
+    <button onclick="openSaveTransfer()"       style="border-color:#4488cc;color:#88ccff">📦 สำรอง</button>
+    <button onclick="confirmNewGame()"        style="border-color:var(--red);color:var(--red)">🔄 เริ่มใหม่</button>
+    <button onclick="toggleEventLog()"        style="border-color:var(--purple);color:var(--purple);position:relative">🎲 เหตุการณ์<span id="mob-ev-badge" style="display:none;position:absolute;top:2px;right:2px;background:red;color:#fff;border-radius:50%;width:10px;height:10px;font-size:.5rem;text-align:center;line-height:10px">!</span></button>
+    <span id="mode-badge-mob" style="font-size:.7rem;font-weight:700;padding:.25rem .5rem;border-radius:4px;background:rgba(0,0,0,.3);border:1px solid;align-self:center;flex-shrink:0">💼 RPG Working</span>
   </div>
 
   <div class="main-layout">
@@ -284,18 +284,18 @@
     <!-- LEFT: RPG QUEST PANEL (fullrpg mode only) -->
     <div class="panel" id="panel-rpg-quests" style="display:none">
       <div class="panel-header" style="display:flex;gap:.3rem;padding:.3rem .4rem">
-        <button class="rpq-tab active" id="rpq-tab-main"  onclick="rpqSwitchTab('main')" >๐“ เน€เธเธงเธช</button>
-        <button class="rpq-tab"        id="rpq-tab-daily" onclick="rpqSwitchTab('daily')">โญ เธงเธฑเธเธเธตเน</button>
+        <button class="rpq-tab active" id="rpq-tab-main"  onclick="rpqSwitchTab('main')" >📜 เควส</button>
+        <button class="rpq-tab"        id="rpq-tab-daily" onclick="rpqSwitchTab('daily')">⭐ วันนี้</button>
       </div>
       <div class="panel-body" style="padding:.4rem">
         <div id="rpq-pane-main" style="overflow-y:auto;max-height:calc(100vh - 200px)">
           <div id="rpg-quest-panel">
-            <div style="color:var(--text2);text-align:center;padding:2rem;font-size:.85rem">เธเธณเธฅเธฑเธเนเธซเธฅเธ”เน€เธเธงเธช...</div>
+            <div style="color:var(--text2);text-align:center;padding:2rem;font-size:.85rem">กำลังโหลดเควส...</div>
           </div>
         </div>
         <div id="rpq-pane-daily" style="display:none;overflow-y:auto;max-height:calc(100vh - 200px)">
           <div id="rpg-daily-panel">
-            <div style="color:var(--text2);text-align:center;padding:2rem;font-size:.85rem">เธเธณเธฅเธฑเธเนเธซเธฅเธ”เธ เธฒเธฃเธเธดเธเธงเธฑเธเธเธตเน...</div>
+            <div style="color:var(--text2);text-align:center;padding:2rem;font-size:.85rem">กำลังโหลดภารกิจวันนี้...</div>
           </div>
         </div>
       </div>
@@ -303,31 +303,31 @@
 
     <!-- LEFT: TASK PANEL -->
     <div class="panel" id="panel-left">
-      <div class="panel-header">๐“ เธ เธฒเธฃเธเธดเธ</div>
+      <div class="panel-header">📋 ภารกิจ</div>
       <div class="panel-body">
         <div class="streak-info">
-          ๐”ฅ Streak: <span class="streak-val" id="streak-display">0</span> เธงเธฑเธ &nbsp;|&nbsp;
-          เธงเธฑเธเธเธตเน: <span id="today-count">0</span> เธเธฒเธ
+          🔥 Streak: <span class="streak-val" id="streak-display">0</span> วัน &nbsp;|&nbsp;
+          วันนี้: <span id="today-count">0</span> งาน
           <span id="streak-bonus-display" style="color:var(--gold);margin-left:.3rem"></span>
         </div>
         <div class="task-form">
-          <input id="task-name" type="text" placeholder="เธเธทเนเธญเธเธฒเธ..." maxlength="50">
+          <input id="task-name" type="text" placeholder="ชื่องาน..." maxlength="50">
           <div class="task-row">
             <select id="task-diff" style="flex:1" onchange="updateDiffLabel()">
-              <option value="easy">เธเนเธฒเธข (+500โ€“1000 EXP)</option>
-              <option value="medium">เธเธฒเธเธเธฅเธฒเธ (+1500โ€“2000 EXP)</option>
-              <option value="hard">เธขเธฒเธ (+3000โ€“5000 EXP)</option>
-              <option value="epic">เธกเธซเธฒเนเธซเธ” (+6000โ€“12000 EXP)</option>
+              <option value="easy">ง่าย (+500–1000 EXP)</option>
+              <option value="medium">ปานกลาง (+1500–2000 EXP)</option>
+              <option value="hard">ยาก (+3000–5000 EXP)</option>
+              <option value="epic">มหาโหด (+6000–12000 EXP)</option>
             </select>
             <div id="diff-level-hint" style="font-size:.72rem;color:var(--gold);margin-top:.2rem"></div>
             <input id="task-deadline" type="date" style="flex:1">
           </div>
-          <button class="btn-add"       onclick="addTask()">+ เน€เธเธดเนเธกเธเธฒเธ</button>
-          <button class="btn-emergency" onclick="addTask(true)">โก เธ เธฒเธฃเธเธดเธเธเธธเธเน€เธเธดเธ (+50% EXP เธฃเธฑเธเธเธฃเธฐเธเธฑเธเธซเธตเธ)</button>
+          <button class="btn-add"       onclick="addTask()">+ เพิ่มงาน</button>
+          <button class="btn-emergency" onclick="addTask(true)">⚡ ภารกิจฉุกเฉิน (+50% EXP รับประกันหีบ)</button>
         </div>
         <div class="section-sep"></div>
         <div class="task-list" id="task-list">
-          <div style="color:var(--text2);text-align:center;font-size:.85rem;padding:1rem">เธขเธฑเธเนเธกเนเธกเธตเธเธฒเธ เน€เธเธดเนเธกเธเธฒเธเนเธฃเธเน€เธฅเธข!</div>
+          <div style="color:var(--text2);text-align:center;font-size:.85rem;padding:1rem">ยังไม่มีงาน เพิ่มงานแรกเลย!</div>
         </div>
       </div>
     </div>
@@ -335,9 +335,9 @@
     <!-- CENTER: BATTLE PANEL -->
     <div class="panel battle-panel" style="border-right:none">
       <div class="panel-header" style="display:flex;align-items:center;gap:.5rem">
-        <span>โ” เธชเธเธฒเธกเธฃเธ</span>
-        <button id="btn-open-bag" onclick="toggleInventoryPopup()" style="margin-left:auto;background:rgba(255,200,60,.15);border:1px solid #ffcc44;color:#ffdd88;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">๐’ เธเธฃเธฐเน€เธเนเธฒ</button>
-        <button id="btn-back-map" onclick="showBattleMap()" style="display:none;background:rgba(68,136,255,.15);border:1px solid #4488ff;color:#88aaff;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">๐—บ เนเธเธเธ—เธตเน</button>
+        <span>⚔ สนามรบ</span>
+        <button id="btn-open-bag" onclick="toggleInventoryPopup()" style="margin-left:auto;background:rgba(255,200,60,.15);border:1px solid #ffcc44;color:#ffdd88;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">🎒 กระเป๋า</button>
+        <button id="btn-back-map" onclick="showBattleMap()" style="display:none;background:rgba(68,136,255,.15);border:1px solid #4488ff;color:#88aaff;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">🗺 แผนที่</button>
       </div>
       <div class="zone-tabs" id="zone-tabs" style="display:none"></div>
       <!-- WORLD MAP embedded in battle panel -->
@@ -347,24 +347,24 @@
           <svg id="map-path-svg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible"></svg>
           <div id="map-pins"></div>
         </div>
-        <!-- monster list panel เนเธ•เนเนเธกเธ -->
+        <!-- monster list panel ใต้แมพ -->
         <div id="map-monster-panel" style="display:none;background:rgba(0,0,0,.85);border-top:2px solid var(--border2);padding:.6rem .8rem">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
             <span id="map-monster-zone-label" style="font-family:'Chakra Petch','Sarabun',sans-serif;color:var(--gold);font-size:.9rem;font-weight:700"></span>
-            <button onclick="closeMapMonsterPanel()" style="background:none;border:1px solid var(--border2);color:var(--text2);padding:.1rem .5rem;border-radius:4px;cursor:pointer;font-size:.8rem">โ• เธเธดเธ”</button>
+            <button onclick="closeMapMonsterPanel()" style="background:none;border:1px solid var(--border2);color:var(--text2);padding:.1rem .5rem;border-radius:4px;cursor:pointer;font-size:.8rem">✕ ปิด</button>
           </div>
           <div id="map-monster-list" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
         </div>
       </div>
       <div class="panel-body battle-arena" id="battle-arena">
 
-        <!-- monster list (เนเธชเธ”เธเธ•เธญเธเธขเธฑเธเนเธกเนเน€เธฅเธทเธญเธเธกเธญเธ) -->
+        <!-- monster list (แสดงตอนยังไม่เลือกมอน) -->
         <div id="monster-list-area" style="width:100%;display:block"></div>
 
-        <!-- battle content (เธเนเธญเธเธเธเธเธงเนเธฒเธเธฐเน€เธฅเธทเธญเธเธกเธญเธ) -->
+        <!-- battle content (ซ่อนจนกว่าจะเลือกมอน) -->
         <div id="battle-content" style="width:100%;display:none">
 
-          <!-- โ•โ• Full RPG Battle Scene โ•โ• -->
+          <!-- ══ Full RPG Battle Scene ══ -->
           <div id="rpg-battle-scene">
 
             <!-- Scene background -->
@@ -372,7 +372,7 @@
             <img id="battle-bg-img" alt="">
 
             <!-- Kill counter -->
-            <div id="rpg-kill-counter">๐’€ <span id="kill-counter">0</span></div>
+            <div id="rpg-kill-counter">💀 <span id="kill-counter">0</span></div>
 
             <!-- Fighter stage -->
             <div id="battle-fighters">
@@ -380,13 +380,13 @@
               <!-- Enemy side -->
               <div id="battle-enemy-side">
                 <div id="battle-enemy-info">
-                  <div id="battle-enemy-name">เธกเธญเธเธชเน€เธ•เธญเธฃเน</div>
-                  <div id="battle-enemy-type">เธจเธฑเธ•เธฃเธนเธ—เธฑเนเธงเนเธ</div>
+                  <div id="battle-enemy-name">มอนสเตอร์</div>
+                  <div id="battle-enemy-type">ศัตรูทั่วไป</div>
                   <div id="battle-enemy-hp-wrap">
                     <div id="battle-enemy-hp-fill" style="width:100%"></div>
                     <div id="battle-enemy-hp-text">100/100</div>
                   </div>
-                  <div id="battle-enemy-atk">ATK: โ€”</div>
+                  <div id="battle-enemy-atk">ATK: —</div>
                   <div id="battle-enemy-queue"></div>
                 </div>
                 <div id="pixel-monster"></div>
@@ -402,7 +402,7 @@
                     <div id="battle-player-hp-text">100/100</div>
                   </div>
                   <div id="battle-player-atk-row">
-                    <span id="battle-player-atk">ATK: โ€”</span>
+                    <span id="battle-player-atk">ATK: —</span>
                     <span id="battle-player-status-inline"></span>
                   </div>
                   <div id="class-mech-bar"></div>
@@ -427,23 +427,23 @@
                 <div id="rpg-player-status-tags"></div>
               </div>
 
-              <!-- Command Menu (2ร—2 grid) -->
+              <!-- Command Menu (2×2 grid) -->
               <div id="rpg-cmd-menu">
                 <button class="rpg-cmd-btn cmd-attack" id="btn-attack" onclick="playerAttack()">
-                  <span class="rpg-cmd-icon">โ”</span>
-                  <div class="rpg-cmd-label">เนเธเธกเธ•เธต<div class="rpg-cmd-sub">Attack</div></div>
+                  <span class="rpg-cmd-icon">⚔</span>
+                  <div class="rpg-cmd-label">โจมตี<div class="rpg-cmd-sub">Attack</div></div>
                 </button>
                 <button class="rpg-cmd-btn cmd-skills" id="btn-skills" onclick="toggleSkillMenu()">
-                  <span class="rpg-cmd-icon">โจ</span>
-                  <div class="rpg-cmd-label">เธชเธเธดเธฅ<div class="rpg-cmd-sub">Skills</div></div>
+                  <span class="rpg-cmd-icon">✨</span>
+                  <div class="rpg-cmd-label">สกิล<div class="rpg-cmd-sub">Skills</div></div>
                 </button>
                 <button class="rpg-cmd-btn cmd-auto" id="btn-auto" onclick="toggleAuto()">
-                  <span class="rpg-cmd-icon">๐ค–</span>
+                  <span class="rpg-cmd-icon">🤖</span>
                   <div class="rpg-cmd-label">IDLE<div class="rpg-cmd-sub" id="auto-status-label">OFF</div></div>
                 </button>
                 <button class="rpg-cmd-btn cmd-flee" onclick="fleeBattle()">
-                  <span class="rpg-cmd-icon">๐</span>
-                  <div class="rpg-cmd-label">เธซเธเธต<div class="rpg-cmd-sub">Flee</div></div>
+                  <span class="rpg-cmd-icon">🏃</span>
+                  <div class="rpg-cmd-label">หนี<div class="rpg-cmd-sub">Flee</div></div>
                 </button>
               </div>
 
@@ -475,15 +475,15 @@
 
         </div><!-- /battle-content -->
 
-        <!-- โ•โ• IDLE FARMING PANEL (view-only) โ•โ• -->
+        <!-- ══ IDLE FARMING PANEL (view-only) ══ -->
         <!-- Runs continuously alongside the zone fight. Player cannot click;
              auto-attacks weaker random monsters from cleared/current zones. -->
         <div id="idle-panel">
           <div id="idle-panel-header">
-            <span>๐ IDLE โ€” เธเธฒเธฃเนเธกเธญเธฑเธ•เนเธเธกเธฑเธ•เธด</span>
-            <span id="idle-panel-kills">๐’€ 0</span>
-            <span id="idle-panel-rate">๐“ โ€” EXP/เธเธฒเธ—เธต</span>
-            <span id="idle-panel-spd">โก โ€”</span>
+            <span>🌙 IDLE — ฟาร์มอัตโนมัติ</span>
+            <span id="idle-panel-kills">💀 0</span>
+            <span id="idle-panel-rate">📈 — EXP/นาที</span>
+            <span id="idle-panel-spd">⚡ —</span>
           </div>
           <div id="idle-stage"></div>
           <div id="idle-skillbar"></div>
@@ -496,60 +496,60 @@
 
     <!-- RIGHT: CHARACTER PANEL -->
     <div class="panel" id="panel-char" style="border-left:1px solid var(--border)">
-      <div class="panel-header">๐‘ค เธ•เธฑเธงเธฅเธฐเธเธฃ</div>
+      <div class="panel-header">👤 ตัวละคร</div>
       <div class="panel-body">
         <div class="tabs">
-          <div class="tab active" onclick="switchTab('char')">เธชเธ–เธฒเธเธฐ</div>
-          <div class="tab"        onclick="switchTab('daily')">เธ เธฒเธฃเธเธดเธเธงเธฑเธ</div>
-          <div class="tab"        onclick="switchTab('codex')">เธเธญเธฅเน€เธฅเธเธเธฑเธ</div>
+          <div class="tab active" onclick="switchTab('char')">สถานะ</div>
+          <div class="tab"        onclick="switchTab('daily')">ภารกิจวัน</div>
+          <div class="tab"        onclick="switchTab('codex')">คอลเลคชัน</div>
         </div>
-        <!-- TAB: เธชเธ–เธฒเธเธฐ -->
+        <!-- TAB: สถานะ -->
         <div class="tab-content active" id="tab-char">
-          <div class="char-avatar" id="char-avatar">โ”</div>
-          <div class="char-class"  id="char-class-label">เธเธฅเธฒเธช</div>
+          <div class="char-avatar" id="char-avatar">⚔</div>
+          <div class="char-class"  id="char-class-label">คลาส</div>
           <div id="cosm-tier-badge" style="font-size:.72rem;color:#aaa;text-align:center;margin-bottom:.2rem;cursor:pointer" onclick="openCosmeticFromChar()"></div>
           <div id="prestige-badge-area"></div>
           <div class="stat-grid">
-            <div class="stat-box">โค HP<br><span class="sval" id="stat-hp">100/100</span></div>
-            <div class="stat-box">โ” ATK<br><span class="sval" id="stat-atk">10</span></div>
-            <div class="stat-box">๐ก DEF<br><span class="sval" id="stat-def">5</span></div>
-            <div class="stat-box">๐’€ KO<br><span class="sval" id="stat-kills">0</span></div>
+            <div class="stat-box">❤ HP<br><span class="sval" id="stat-hp">100/100</span></div>
+            <div class="stat-box">⚔ ATK<br><span class="sval" id="stat-atk">10</span></div>
+            <div class="stat-box">🛡 DEF<br><span class="sval" id="stat-def">5</span></div>
+            <div class="stat-box">💀 KO<br><span class="sval" id="stat-kills">0</span></div>
           </div>
-          <div class="section-title">โก เธงเธดเธงเธฑเธ’เธเธฒเธเธฒเธฃเธเธฅเธฒเธช</div>
+          <div class="section-title">⚡ วิวัฒนาการคลาส</div>
           <div id="evolution-btn-area" style="margin-bottom:.5rem"></div>
-          <div class="section-title">๐ณ Skill Tree</div>
+          <div class="section-title">🌳 Skill Tree</div>
           <div id="skill-tree-summary" style="margin-bottom:.5rem"></div>
-          <div class="section-title">๐ด เธเธธเธ”เน€เธเนเธ•</div>
+          <div class="section-title">🎴 ชุดเซ็ต</div>
           <div id="set-progress-area" style="margin-bottom:.5rem"></div>
-          <div class="section-title">๐ก เธญเธธเธเธเธฃเธ“เนเธ—เธตเนเธชเธงเธกเนเธชเน</div>
+          <div class="section-title">🛡 อุปกรณ์ที่สวมใส่</div>
           <div id="equip-slots-grid" class="equip-slots-grid"></div>
-          <div class="section-title" style="margin-top:.6rem">๐—ก เธญเธฒเธงเธธเธ</div>
+          <div class="section-title" style="margin-top:.6rem">🗡 อาวุธ</div>
           <div class="equipped-weapon" id="equipped-weapon-display">
-            <div style="color:var(--text2);font-size:.85rem">เนเธกเนเธกเธตเธญเธฒเธงเธธเธ</div>
+            <div style="color:var(--text2);font-size:.85rem">ไม่มีอาวุธ</div>
           </div>
-          <div class="section-title">โญ เธเธงเธฒเธกเธชเธณเน€เธฃเนเธเธฅเนเธฒเธชเธธเธ”</div>
-          <div id="recent-ach" style="font-size:.8rem;color:var(--text2)">เธขเธฑเธเนเธกเนเธกเธต</div>
+          <div class="section-title">⭐ ความสำเร็จล่าสุด</div>
+          <div id="recent-ach" style="font-size:.8rem;color:var(--text2)">ยังไม่มี</div>
         </div>
-        <!-- TAB: เธเธญเธฅเน€เธฅเธเธเธฑเธ -->
+        <!-- TAB: คอลเลคชัน -->
         <div class="tab-content" id="tab-codex">
-          <div class="section-title">๐งฌ เธชเธฒเธขเธงเธดเธงเธฑเธ’เธเธฒเธเธฒเธฃเธเธฅเธฒเธช</div>
+          <div class="section-title">🧬 สายวิวัฒนาการคลาส</div>
           <div id="class-codex"></div>
-          <div class="section-title" style="margin-top:1rem">๐“– Collection Log</div>
+          <div class="section-title" style="margin-top:1rem">📖 Collection Log</div>
           <div id="codex-zone-tabs" style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.6rem"></div>
           <div id="codex-content"></div>
-          <div class="section-title" style="margin-top:1rem">โก Weekly Boss</div>
+          <div class="section-title" style="margin-top:1rem">⚡ Weekly Boss</div>
           <div id="weekly-boss-panel"></div>
         </div>
-        <!-- TAB: เธ เธฒเธฃเธเธดเธเธงเธฑเธ -->
+        <!-- TAB: ภารกิจวัน -->
         <div class="tab-content" id="tab-daily">
-          <div class="section-title">๐ฏ เธ เธฒเธฃเธเธดเธเธเธฃเธฐเธเธณเธงเธฑเธ</div>
+          <div class="section-title">🎯 ภารกิจประจำวัน</div>
           <div class="daily-quests" id="daily-quests"></div>
-          <div class="section-title" style="margin-top:1rem">๐ Prestige</div>
-          <div id="prestige-info" style="font-size:.82rem;color:var(--text2)">เธ–เธถเธเน€เธฅเน€เธงเธฅ 100 เน€เธเธทเนเธญ Prestige</div>
+          <div class="section-title" style="margin-top:1rem">🏆 Prestige</div>
+          <div id="prestige-info" style="font-size:.82rem;color:var(--text2)">ถึงเลเวล 100 เพื่อ Prestige</div>
           <button id="btn-prestige" onclick="doPrestige()"
             style="display:none;background:linear-gradient(135deg,#402000,#600000);border:2px solid var(--legend);
                    color:var(--legend);padding:.6rem 1rem;border-radius:8px;cursor:pointer;
-                   font-family:'Chakra Petch','Sarabun',sans-serif;width:100%;margin-top:.5rem">โจ PRESTIGE</button>
+                   font-family:'Chakra Petch','Sarabun',sans-serif;width:100%;margin-top:.5rem">✨ PRESTIGE</button>
         </div>
       </div>
     </div>
@@ -559,39 +559,39 @@
   <!-- MOBILE BOTTOM NAV -->
   <nav id="mobile-nav" aria-label="mobile navigation">
     <button class="mnav-btn active" id="mnav-left"   onclick="switchMobileTab('left')">
-      <span class="mnav-icon">๐“<span class="mnav-badge" id="badge-quest" style="display:none">0</span></span><span id="mnav-left-label">เธ เธฒเธฃเธเธดเธ</span>
+      <span class="mnav-icon">📋<span class="mnav-badge" id="badge-quest" style="display:none">0</span></span><span id="mnav-left-label">ภารกิจ</span>
     </button>
     <button class="mnav-btn"        id="mnav-battle" onclick="switchMobileTab('battle')">
-      <span class="mnav-icon">โ”</span><span>เธชเธเธฒเธกเธฃเธ</span>
+      <span class="mnav-icon">⚔</span><span>สนามรบ</span>
     </button>
     <button class="mnav-btn"        id="mnav-idle"   onclick="switchMobileTab('idle')">
-      <span class="mnav-icon">๐</span><span>IDLE</span>
+      <span class="mnav-icon">🌙</span><span>IDLE</span>
     </button>
     <button class="mnav-btn"        id="mnav-char"   onclick="switchMobileTab('char')">
-      <span class="mnav-icon">๐‘ค</span><span>เธ•เธฑเธงเธฅเธฐเธเธฃ</span>
+      <span class="mnav-icon">👤</span><span>ตัวละคร</span>
     </button>
     <button class="mnav-btn"        id="mnav-bag"    onclick="switchMobileTab('bag')">
-      <span class="mnav-icon">๐’<span class="mnav-badge" id="badge-bag" style="display:none">0</span></span><span>เธเธฃเธฐเน€เธเนเธฒ</span>
+      <span class="mnav-icon">🎒<span class="mnav-badge" id="badge-bag" style="display:none">0</span></span><span>กระเป๋า</span>
     </button>
   </nav>
 
 </div><!-- end screen-game -->
 
-<!-- WORLD MAP POPUP removed โ€” map is now embedded in battle panel -->
+<!-- WORLD MAP POPUP removed — map is now embedded in battle panel -->
 
 <!-- ===== INVENTORY POPUP ===== -->
 <div id="inv-popup-overlay" onclick="if(event.target===this)closeInventoryPopup()">
   <div class="inv-popup-box" onclick="event.stopPropagation()">
     <div class="inv-popup-header">
-      <span class="inv-popup-title">๐’ เธเธฃเธฐเน€เธเนเธฒเธชเธฑเธกเธ เธฒเธฃเธฐ
+      <span class="inv-popup-title">🎒 กระเป๋าสัมภาระ
         <span style="font-size:.75rem;color:var(--text2);font-weight:400">
           (<span id="inv-count">0</span>/50
-          <span id="inv-full-badge" style="display:none;color:var(--red)"> เน€เธ•เนเธก!</span>)
-          ๐“ฆ <span id="chest-count-display">0</span>
+          <span id="inv-full-badge" style="display:none;color:var(--red)"> เต็ม!</span>)
+          📦 <span id="chest-count-display">0</span>
         </span>
       </span>
-      <button class="btn-auto-equip" onclick="autoEquipBest()" title="เธชเธงเธกเธเธญเธเธ—เธตเนเธ”เธตเธ—เธตเนเธชเธธเธ”เธ—เธธเธเธเนเธญเธเธญเธฑเธ•เนเธเธกเธฑเธ•เธด">โก เธเธฑเธ”เธเธธเธ”</button>
-      <button class="inv-popup-close" onclick="closeInventoryPopup()">โ•</button>
+      <button class="btn-auto-equip" onclick="autoEquipBest()" title="สวมของที่ดีที่สุดทุกช่องอัตโนมัติ">⚡ จัดชุด</button>
+      <button class="inv-popup-close" onclick="closeInventoryPopup()">✕</button>
     </div>
     <div class="inv-popup-body">
       <div id="inv-filter-bar" class="inv-filter-bar inv-popup-filter"></div>
@@ -607,13 +607,13 @@
 <!-- ===== EVENT POPUP OVERLAY ===== -->
 <div class="overlay ev-popup-overlay" id="ev-popup-overlay">
   <div class="ev-popup-box" onclick="event.stopPropagation()">
-    <div class="ev-popup-icon" id="ev-popup-icon">โก</div>
-    <div class="ev-popup-title" id="ev-popup-title">เน€เธซเธ•เธธเธเธฒเธฃเธ“เนเธเธดเน€เธจเธฉ!</div>
+    <div class="ev-popup-icon" id="ev-popup-icon">⚡</div>
+    <div class="ev-popup-title" id="ev-popup-title">เหตุการณ์พิเศษ!</div>
     <div class="ev-popup-desc"  id="ev-popup-desc"></div>
     <div class="ev-countdown"   id="ev-countdown" style="display:none"></div>
     <div class="ev-popup-actions">
-      <button class="ev-btn-a" id="ev-btn-a">เธ•เธเธฅเธ</button>
-      <button class="ev-btn-b" id="ev-btn-b" style="display:none">เธเธเธดเน€เธชเธ</button>
+      <button class="ev-btn-a" id="ev-btn-a">ตกลง</button>
+      <button class="ev-btn-b" id="ev-btn-b" style="display:none">ปฏิเสธ</button>
     </div>
   </div>
 </div>
@@ -622,8 +622,8 @@
 <div class="overlay" id="ev-log-overlay" onclick="toggleEventLog()">
   <div class="modal ev-log-modal" onclick="event.stopPropagation()" style="max-width:480px;width:95%">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem">
-      <h2 style="color:var(--purple)">๐ฒ เธเธฃเธฐเธงเธฑเธ•เธดเน€เธซเธ•เธธเธเธฒเธฃเธ“เน</h2>
-      <button onclick="toggleEventLog()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .7rem;border-radius:6px;cursor:pointer">โ•</button>
+      <h2 style="color:var(--purple)">🎲 ประวัติเหตุการณ์</h2>
+      <button onclick="toggleEventLog()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .7rem;border-radius:6px;cursor:pointer">✕</button>
     </div>
     <div id="event-log-list" class="ev-log-list"></div>
   </div>
@@ -637,7 +637,7 @@
 <!-- ===== ACHIEVEMENT TOAST ===== -->
 <div id="ach-toast" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999;pointer-events:none;text-align:center">
   <div id="ach-toast-inner" style="background:linear-gradient(135deg,#1a1a2e,#2a1a4e);border:2px solid #ffd700;border-radius:16px;padding:1.2rem 2rem;box-shadow:0 0 40px #ffd70088">
-    <div style="font-size:.75rem;color:#ffd700;letter-spacing:2px;margin-bottom:.3rem">๐ ACHIEVEMENT UNLOCKED</div>
+    <div style="font-size:.75rem;color:#ffd700;letter-spacing:2px;margin-bottom:.3rem">🏆 ACHIEVEMENT UNLOCKED</div>
     <div id="ach-toast-icon" style="font-size:2.5rem;line-height:1.2"></div>
     <div id="ach-toast-name" style="font-size:1.1rem;font-weight:bold;color:#fff;margin:.2rem 0"></div>
     <div id="ach-toast-desc" style="font-size:.75rem;color:#aaa"></div>
@@ -647,7 +647,7 @@
 <!-- ===== GACHA / CHEST OVERLAY ===== -->
 <div class="overlay" id="chest-overlay">
   <div class="gacha-modal">
-    <div class="gacha-title" id="gacha-title">เน€เธเธดเธ”เธซเธตเธเธชเธกเธเธฑเธ•เธด</div>
+    <div class="gacha-title" id="gacha-title">เปิดหีบสมบัติ</div>
 
     <!-- spinning reel -->
     <div class="gacha-reel-wrap">
@@ -660,14 +660,14 @@
     <!-- result (shown after spin stops) -->
     <div class="gacha-result" id="gacha-result" style="display:none">
       <div class="gacha-result-flash" id="gacha-result-flash"></div>
-      <div class="chest-result-icon" id="chest-item-icon">โ”</div>
+      <div class="chest-result-icon" id="chest-item-icon">⚔</div>
       <div class="chest-result-name" id="chest-item-name"></div>
       <div id="chest-item-rarity"></div>
       <div class="chest-result-stats" id="chest-item-stats"></div>
       <div class="chest-result-effect" id="chest-item-effect"></div>
       <div class="gacha-btns">
-        <button class="btn-equip-modal" onclick="equipFromChest()">โ” เธชเธงเธกเนเธชเนเธ—เธฑเธเธ—เธต</button>
-        <button class="btn-close-modal" onclick="closeChestModal()">เน€เธเนเธเธฅเธเธเธฃเธฐเน€เธเนเธฒ</button>
+        <button class="btn-equip-modal" onclick="equipFromChest()">⚔ สวมใส่ทันที</button>
+        <button class="btn-close-modal" onclick="closeChestModal()">เก็บลงกระเป๋า</button>
       </div>
     </div>
   </div>
@@ -676,14 +676,14 @@
 <!-- ===== OFFLINE PROGRESS (welcome back) OVERLAY ===== -->
 <div class="offline-overlay" id="offline-overlay">
   <div class="offline-modal">
-    <div class="offline-moon">๐</div>
-    <div class="offline-title">เธขเธดเธเธ”เธตเธ•เนเธญเธเธฃเธฑเธเธเธฅเธฑเธ!</div>
-    <div class="offline-sub">เธฎเธตเนเธฃเนเธเธญเธเธเธธเธ“เธเธฒเธฃเนเธกเธ•เนเธญเธฃเธฐเธซเธงเนเธฒเธเธ—เธตเนเธเธธเธ“เนเธกเนเธญเธขเธนเน</div>
-    <div class="offline-time-row">โฐ เธซเธฒเธขเนเธ <b id="offline-time"></b>
-      <span id="offline-capped" style="display:none;color:var(--orange);font-size:.75rem">(เธเธฑเธเธชเธนเธเธชเธธเธ” 3 เธเธก.)</span>
+    <div class="offline-moon">🌙</div>
+    <div class="offline-title">ยินดีต้อนรับกลับ!</div>
+    <div class="offline-sub">ฮีโร่ของคุณฟาร์มต่อระหว่างที่คุณไม่อยู่</div>
+    <div class="offline-time-row">⏰ หายไป <b id="offline-time"></b>
+      <span id="offline-capped" style="display:none;color:var(--orange);font-size:.75rem">(นับสูงสุด 3 ชม.)</span>
     </div>
     <div class="offline-rewards" id="offline-rewards"></div>
-    <button class="offline-claim" onclick="claimOfflineRewards()">๐ เธฃเธฑเธเธฃเธฒเธเธงเธฑเธฅ</button>
+    <button class="offline-claim" onclick="claimOfflineRewards()">🎁 รับรางวัล</button>
   </div>
 </div>
 
@@ -701,9 +701,9 @@
     <div id="tt-enhance" style="font-size:.78rem;margin:.3rem 0"></div>
     <div class="tooltip-actions">
       <button class="btn-tooltip-enhance" id="btn-tt-enhance" onclick="openEnhancePanel(currentTooltipItem)" style="display:none">🔨 ตีบวก</button>
-      <button class="btn-tooltip-equip"   onclick="equipItem(currentTooltipItem)">โ” เธชเธงเธกเนเธชเน</button>
-      <button class="btn-tooltip-discard" onclick="discardItem(currentTooltipItem)">๐—‘ เธ—เธดเนเธ</button>
-      <button class="btn-tooltip-close"   onclick="closeTooltip()">เธเธดเธ”</button>
+      <button class="btn-tooltip-equip"   onclick="equipItem(currentTooltipItem)">⚔ สวมใส่</button>
+      <button class="btn-tooltip-discard" onclick="discardItem(currentTooltipItem)">🗑 ทิ้ง</button>
+      <button class="btn-tooltip-close"   onclick="closeTooltip()">ปิด</button>
     </div>
   </div>
 </div>
@@ -711,29 +711,29 @@
 <!-- ===== STATS MODAL ===== -->
 <div class="overlay" id="stats-overlay" onclick="this.classList.remove('active')">
   <div class="modal" onclick="event.stopPropagation()" style="max-width:400px">
-    <h2 style="color:var(--gold);margin-bottom:1rem">๐“ เธชเธ–เธดเธ•เธด</h2>
+    <h2 style="color:var(--gold);margin-bottom:1rem">📊 สถิติ</h2>
     <div id="stats-content" style="text-align:left;line-height:2;font-size:.9rem;color:var(--text2)"></div>
-    <button class="btn-close-modal" onclick="document.getElementById('stats-overlay').classList.remove('active')">เธเธดเธ”</button>
+    <button class="btn-close-modal" onclick="document.getElementById('stats-overlay').classList.remove('active')">ปิด</button>
   </div>
 </div>
 
 <!-- ===== EVOLUTION MODAL ===== -->
 <div class="overlay" id="evo-overlay" onclick="this.classList.remove('active')">
   <div class="modal" onclick="event.stopPropagation()" style="max-width:360px;text-align:center">
-    <div style="font-size:3rem" id="evo-modal-icon">โจ</div>
+    <div style="font-size:3rem" id="evo-modal-icon">✨</div>
     <div style="font-size:1.4rem;font-weight:bold;margin:.4rem 0" id="evo-modal-name"></div>
     <div style="color:var(--text2);margin-bottom:.6rem" id="evo-modal-tier"></div>
     <div style="color:var(--gold);font-size:.9rem;margin-bottom:1rem" id="evo-modal-bonuses"></div>
-    <button class="btn-close-modal" onclick="document.getElementById('evo-overlay').classList.remove('active')">เธเธดเธ”</button>
+    <button class="btn-close-modal" onclick="document.getElementById('evo-overlay').classList.remove('active')">ปิด</button>
   </div>
 </div>
 
 <!-- ===== ACHIEVEMENTS MODAL ===== -->
 <div class="overlay" id="ach-overlay" onclick="this.classList.remove('active')">
   <div class="modal" onclick="event.stopPropagation()" style="max-width:500px">
-    <h2 style="color:var(--gold);margin-bottom:1rem">๐ เธเธงเธฒเธกเธชเธณเน€เธฃเนเธ</h2>
+    <h2 style="color:var(--gold);margin-bottom:1rem">🏆 ความสำเร็จ</h2>
     <div class="ach-list" id="ach-list"></div>
-    <button class="btn-close-modal" onclick="document.getElementById('ach-overlay').classList.remove('active')">เธเธดเธ”</button>
+    <button class="btn-close-modal" onclick="document.getElementById('ach-overlay').classList.remove('active')">ปิด</button>
   </div>
 </div>
 
@@ -741,19 +741,19 @@
 <div class="overlay" id="shop-overlay" onclick="this.classList.remove('active')">
   <div class="modal shop-modal" onclick="event.stopPropagation()" style="max-width:600px;width:95%">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-      <h2 style="color:var(--gold)">๐ช เธฃเนเธฒเธเธเนเธฒ</h2>
-      <button onclick="closeShop()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.3rem .8rem;border-radius:6px;cursor:pointer">โ• เธเธดเธ”</button>
+      <h2 style="color:var(--gold)">🏪 ร้านค้า</h2>
+      <button onclick="closeShop()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.3rem .8rem;border-radius:6px;cursor:pointer">✕ ปิด</button>
     </div>
-    <div class="shop-gold-display">๐’ฐ เธ—เธญเธเธเธญเธเธเธธเธ“: <span id="shop-gold-display" style="color:var(--gold);font-weight:700">0</span></div>
+    <div class="shop-gold-display">💰 ทองของคุณ: <span id="shop-gold-display" style="color:var(--gold);font-weight:700">0</span></div>
     <div class="shop-tabs">
-      <button class="shop-tab active" data-tab="sell" onclick="switchShopTab('sell')">๐“ค เธเธฒเธขเธเธญเธ</button>
-      <button class="shop-tab" data-tab="buy" onclick="switchShopTab('buy')">๐“ฅ เธเธทเนเธญเธเธญเธ</button>
+      <button class="shop-tab active" data-tab="sell" onclick="switchShopTab('sell')">📤 ขายของ</button>
+      <button class="shop-tab" data-tab="buy" onclick="switchShopTab('buy')">📥 ซื้อของ</button>
     </div>
     <!-- sell panel -->
     <div id="shop-sell-panel" style="margin-top:.6rem">
       <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem">
-        <button class="btn-shop-action" onclick="sellNonClassItems()">๐”’ เธเธฒเธขเธเธญเธเธเธฅเธฒเธชเธญเธทเนเธ</button>
-        <button class="btn-shop-action" onclick="sellAllExceptEquipped()">๐’ธ เธเธฒเธขเธ—เธฑเนเธเธซเธกเธ” (เธขเธเน€เธงเนเธเธชเธงเธกเธญเธขเธนเน)</button>
+        <button class="btn-shop-action" onclick="sellNonClassItems()">🔒 ขายของคลาสอื่น</button>
+        <button class="btn-shop-action" onclick="sellAllExceptEquipped()">💸 ขายทั้งหมด (ยกเว้นสวมอยู่)</button>
       </div>
       <div id="shop-sell-list" class="shop-sell-list"></div>
     </div>
@@ -768,8 +768,8 @@
 <div class="overlay" id="skilltree-overlay" onclick="if(event.target===this)closeSkillTreeFull()">
   <div class="modal" onclick="event.stopPropagation()" style="max-width:920px;width:96%;max-height:92vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;position:sticky;top:0;background:var(--bg2,#16161e);padding-bottom:.5rem;z-index:2">
-      <h2 style="color:var(--gold);margin:0">๐ณ Skill Tree</h2>
-      <button onclick="closeSkillTreeFull()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.35rem .9rem;border-radius:6px;cursor:pointer">โ• เธเธดเธ”</button>
+      <h2 style="color:var(--gold);margin:0">🌳 Skill Tree</h2>
+      <button onclick="closeSkillTreeFull()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.35rem .9rem;border-radius:6px;cursor:pointer">✕ ปิด</button>
     </div>
     <div id="skill-tree-area-full"></div>
   </div>
@@ -778,7 +778,7 @@
 <!-- ===== HUB FULL-SCREEN SCENE ===== -->
 <div id="hub-screen" style="display:none;position:fixed;inset:0;z-index:500;overflow:hidden">
 
-  <!-- โ”€โ”€ HUB VIDEO BG โ”€โ”€ -->
+  <!-- ── HUB VIDEO BG ── -->
   <video id="hub-bg-video" muted playsinline preload="auto" loop
     style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:1;">
     <source id="hub-bg-src" src="assets/bg/bg_hub.mp4" type="video/mp4">
@@ -787,21 +787,21 @@
   <div style="position:absolute;inset:0;z-index:1;background:rgba(0,0,0,.10);pointer-events:none"></div>
 
 
-  <!-- โ”€โ”€ TOWN TITLE โ”€โ”€ -->
+  <!-- ── TOWN TITLE ── -->
   <div class="hub-town-title">
-    <div class="hub-town-name">๐ก เน€เธกเธทเธญเธเธเธฑเธเนเธฃเธก</div>
-    <div class="hub-town-sub">Restville โ€” เธ”เธดเธเนเธ”เธเนเธซเนเธเธเธฒเธฃเธเธฑเธเนเธ</div>
+    <div class="hub-town-name">🏡 เมืองพักแรม</div>
+    <div class="hub-town-sub">Restville — ดินแดนแห่งการพักใจ</div>
   </div>
 
-  <!-- โ”€โ”€ CLOSE BUTTON โ”€โ”€ -->
-  <button class="hub-close-btn" onclick="closeHub()">โ• เธญเธญเธ</button>
+  <!-- ── CLOSE BUTTON ── -->
+  <button class="hub-close-btn" onclick="closeHub()">✕ ออก</button>
 
-  <!-- โ”€โ”€ NPC SCENE LAYER โ”€โ”€ -->
+  <!-- ── NPC SCENE LAYER ── -->
   <div class="hub-scene" id="hub-scene">
     <!-- NPC slots injected by JS -->
   </div>
 
-  <!-- โ”€โ”€ DIALOGUE BOX (RPG style) โ”€โ”€ -->
+  <!-- ── DIALOGUE BOX (RPG style) ── -->
   <div class="hub-dialogue-box" id="hub-dlg" style="display:none">
     <div class="hub-dlg-portrait-wrap">
       <div class="hub-dlg-portrait" id="hub-dlg-portrait"></div>
@@ -813,11 +813,11 @@
     </div>
   </div>
 
-  <!-- โ”€โ”€ PANEL (quests / gear check) โ”€โ”€ -->
+  <!-- ── PANEL (quests / gear check) ── -->
   <div class="hub-panel" id="hub-panel" style="display:none">
     <div class="hub-panel-header">
-      <span id="hub-panel-title">๐“ เน€เธเธงเธช</span>
-      <button onclick="closeHubPanel()" class="hub-panel-close">โ•</button>
+      <span id="hub-panel-title">📜 เควส</span>
+      <button onclick="closeHubPanel()" class="hub-panel-close">✕</button>
     </div>
     <div class="hub-panel-body" id="hub-panel-body"></div>
   </div>
@@ -828,7 +828,7 @@
 <div id="npc-encounter-overlay">
   <div id="npc-encounter-box">
     <div class="npc-enc-top">
-      <div class="npc-enc-portrait" id="npc-enc-portrait">๐ง</div>
+      <div class="npc-enc-portrait" id="npc-enc-portrait">🧙</div>
       <div class="npc-enc-right">
         <div class="npc-enc-name" id="npc-enc-name">NPC</div>
         <div class="npc-enc-text" id="npc-enc-text"></div>
@@ -841,10 +841,10 @@
 <!-- ===== NEW GAME CONFIRM ===== -->
 <div id="newgame-overlay">
   <div class="newgame-modal">
-    <h3>โ  เน€เธฃเธดเนเธกเน€เธฅเนเธเนเธซเธกเน?</h3>
-    <p>เธเนเธญเธกเธนเธฅเธ—เธฑเนเธเธซเธกเธ”เธเธฐเธ–เธนเธเธฅเธเธ–เธฒเธงเธฃ<br>เน€เธฅเน€เธงเธฅ, เธญเธฒเธงเธธเธ, เนเธฅเธฐเธเธงเธฒเธกเธชเธณเน€เธฃเนเธเธ—เธฑเนเธเธซเธกเธ”เธเธฐเธซเธฒเธขเนเธ</p>
-    <button class="btn-newgame-confirm" onclick="doNewGame()">โ“ เธขเธทเธเธขเธฑเธ เธฅเธเธเนเธญเธกเธนเธฅ</button>
-    <button class="btn-newgame-cancel"  onclick="cancelNewGame()">โ• เธขเธเน€เธฅเธดเธ</button>
+    <h3>⚠ เริ่มเล่นใหม่?</h3>
+    <p>ข้อมูลทั้งหมดจะถูกลบถาวร<br>เลเวล, อาวุธ, และความสำเร็จทั้งหมดจะหายไป</p>
+    <button class="btn-newgame-confirm" onclick="doNewGame()">✓ ยืนยัน ลบข้อมูล</button>
+    <button class="btn-newgame-cancel"  onclick="cancelNewGame()">✕ ยกเลิก</button>
   </div>
 </div>
 
@@ -853,38 +853,38 @@
   <div id="infinity-stage" class="infinity-stage"></div>
 </div>
 
-<!-- ===== SCRIPTS (เนเธซเธฅเธ”เธ•เธฒเธกเธฅเธณเธ”เธฑเธ dependency) =====
+<!-- ===== SCRIPTS (โหลดตามลำดับ dependency) =====
      NOTE: ?v=NN busts the browser/iOS HTTP cache. Bump this number (and the SW
      CACHE version in sw.js) on every deploy so updates show without reinstall. -->
-<script src="js/data.js?v=66"></script>
-<script src="js/state.js?v=66"></script>
-<script src="js/audio.js?v=66"></script>
-<script src="js/save.js?v=66"></script>
-<script src="js/achievements.js?v=66"></script>
-<script src="js/daily.js?v=66"></script>
-<script src="js/evolution.js?v=66"></script>
-<script src="js/infinity.js?v=66"></script>
-<script src="js/t4dungeon.js?v=66"></script>
-<script src="js/dungeon.js?v=66"></script>
-<script src="js/enhance.js?v=66"></script>
-<script src="js/skilltree.js?v=66"></script>
-<script src="js/exp.js?v=66"></script>
-<script src="js/shop.js?v=66"></script>
-<script src="js/inventory.js?v=66"></script>
-<script src="js/events.js?v=66"></script>
-<script src="js/cosmetic.js?v=66"></script>
-<script src="js/rpg-quests.js?v=66"></script>
-<script src="js/npc-encounter.js?v=66"></script>
-<script src="js/battle.js?v=66"></script>
-<script src="js/idle.js?v=66"></script>
-<script src="js/offline.js?v=66"></script>
-<script src="js/idle-events.js?v=66"></script>
-<script src="js/codex.js?v=66"></script>
-<script src="js/tasks.js?v=66"></script>
-<script src="js/hub.js?v=66"></script>
-<script src="js/intro.js?v=66"></script>
-<script src="js/tutorial.js?v=66"></script>
-<script src="js/ui.js?v=66"></script>
+<script src="js/data.js?v=67"></script>
+<script src="js/state.js?v=67"></script>
+<script src="js/audio.js?v=67"></script>
+<script src="js/save.js?v=67"></script>
+<script src="js/achievements.js?v=67"></script>
+<script src="js/daily.js?v=67"></script>
+<script src="js/evolution.js?v=67"></script>
+<script src="js/infinity.js?v=67"></script>
+<script src="js/t4dungeon.js?v=67"></script>
+<script src="js/dungeon.js?v=67"></script>
+<script src="js/enhance.js?v=67"></script>
+<script src="js/skilltree.js?v=67"></script>
+<script src="js/exp.js?v=67"></script>
+<script src="js/shop.js?v=67"></script>
+<script src="js/inventory.js?v=67"></script>
+<script src="js/events.js?v=67"></script>
+<script src="js/cosmetic.js?v=67"></script>
+<script src="js/rpg-quests.js?v=67"></script>
+<script src="js/npc-encounter.js?v=67"></script>
+<script src="js/battle.js?v=67"></script>
+<script src="js/idle.js?v=67"></script>
+<script src="js/offline.js?v=67"></script>
+<script src="js/idle-events.js?v=67"></script>
+<script src="js/codex.js?v=67"></script>
+<script src="js/tasks.js?v=67"></script>
+<script src="js/hub.js?v=67"></script>
+<script src="js/intro.js?v=67"></script>
+<script src="js/tutorial.js?v=67"></script>
+<script src="js/ui.js?v=67"></script>
 <script>
   // Override window.onload to handle both buttons properly
   window.onload = () => {
@@ -893,7 +893,7 @@
     const btnContinue = document.getElementById('btn-continue');
     const hint        = document.getElementById('continue-hint');
 
-    // เธ–เนเธฒเธกเธฒเธเธฒเธ doNewGame() เธเธฐเธกเธต sessionStorage flag โ’ เนเธเน€เธฅเธทเธญเธเนเธซเธกเธ”เธเนเธญเธ
+    // ถ้ามาจาก doNewGame() จะมี sessionStorage flag → ไปเลือกโหมดก่อน
     if (sessionStorage.getItem('wq_newgame') === '1') {
       sessionStorage.removeItem('wq_newgame');
       showModeSelect();
@@ -901,25 +901,25 @@
     }
 
     if (G.classId) {
-      // เธกเธตเน€เธเธ: เธเธธเนเธกเน€เธฅเนเธเธ•เนเธญ active
+      // มีเซฟ: ปุ่มเล่นต่อ active
       btnContinue.style.display  = 'inline-block';
       btnContinue.disabled       = false;
       btnContinue.style.opacity  = '1';
       btnContinue.style.cursor   = 'pointer';
-      hint.textContent = 'เธกเธตเธเนเธญเธกเธนเธฅเน€เธเธเธญเธขเธนเน โ€” เธเธ” "เน€เธฅเนเธเธ•เนเธญ" เน€เธเธทเนเธญเน€เธฅเนเธเธ•เนเธญ';
+      hint.textContent = 'มีข้อมูลเซฟอยู่ — กด "เล่นต่อ" เพื่อเล่นต่อ';
       // init event system
       migrateEventState();
       scheduleNextCombatEvent();
       startEventTimers();
       renderActiveBuffs();
     } else {
-      // เนเธกเนเธกเธตเน€เธเธ: เนเธชเธ”เธเธเธธเนเธกเนเธ•เน greyed out เธเธ”เนเธกเนเนเธ”เน
+      // ไม่มีเซฟ: แสดงปุ่มแต่ greyed out กดไม่ได้
       btnContinue.style.display  = 'inline-block';
       btnContinue.disabled       = true;
       btnContinue.style.opacity  = '0.35';
       btnContinue.style.cursor   = 'not-allowed';
       btnContinue.style.filter   = 'grayscale(1)';
-      hint.textContent           = 'เธขเธฑเธเนเธกเนเธกเธตเธเนเธญเธกเธนเธฅเน€เธเธ';
+      hint.textContent           = 'ยังไม่มีข้อมูลเซฟ';
     }
   };
 
@@ -927,7 +927,7 @@
     saveGame();
     const btn = document.getElementById("btn-manualsave");
     const orig = btn.textContent;
-    btn.textContent = "โ… เน€เธเธเนเธฅเนเธง!";
+    btn.textContent = "✅ เซฟแล้ว!";
     btn.style.borderColor = "#7dff7d";
     setTimeout(() => { btn.textContent = orig; }, 1500);
   }
@@ -938,7 +938,7 @@
     if (typeof applyGameModeLayout === 'function') applyGameModeLayout();
   });
 
-  // override doNewGame โ€” เนเธเน sessionStorage flag (เนเธเนเนเธ”เนเธเธฑเธ file://)
+  // override doNewGame — ใช้ sessionStorage flag (ใช้ได้กับ file://)
   function doNewGame() {
     try {
       localStorage.removeItem('workquest_save');
@@ -948,7 +948,7 @@
     window.location.reload();
   }
 
-  // โ”€โ”€ Inventory popup โ”€โ”€
+  // ── Inventory popup ──
   function toggleInventoryPopup() {
     const ov = document.getElementById('inv-popup-overlay');
     if (ov.classList.contains('active')) {
@@ -970,15 +970,15 @@
 </script>
 
 <script>
-  // โ”€โ”€ WORLD MAP (embedded in battle panel) โ”€โ”€
+  // ── WORLD MAP (embedded in battle panel) ──
   const MAP_PINS = [
-    { type:'hub',  label:'๐ก เธซเธกเธนเนเธเนเธฒเธ', left:'10%', top:'28%', color:'#ffdd66' },
-    { zone:1, icon:'๐ฒ', label:'เธเนเธฒเธเธญเธเธฅเธดเธ',      sub:'Lv 1',  left:'35%', top:'25%', color:'#44ff88' },
-    { zone:2, icon:'๐ชฆ', label:'เธซเธธเธเน€เธเธฒเธเธญเธกเธเธตเน',   sub:'Lv 10', left:'28%', top:'70%', color:'#44ccff' },
-    { zone:3, icon:'๐', label:'เธ–เนเธณเธกเธฑเธเธเธฃ',        sub:'Lv 25', left:'64%', top:'22%', color:'#ff7744' },
-    { zone:4, icon:'๐’€', label:'เธเธฒเธเธญเธชเธนเธฃ',         sub:'Lv 40', left:'85%', top:'26%', color:'#dd88ff' },
-    { zone:5, icon:'๐ฐ', label:'เธเธฃเธฒเธชเธฒเธ—เธกเธทเธ”',       sub:'Lv 60', left:'60%', top:'70%', color:'#99aaff' },
-    { zone:6, icon:'๐€', label:'เธญเธฒเธ“เธฒเธเธฑเธเธฃเนเธเธฅเธฒเธซเธฅ', sub:'Lv 80', left:'83%', top:'72%', color:'#ffaa00' },
+    { type:'hub',  label:'🏡 หมู่บ้าน', left:'10%', top:'28%', color:'#ffdd66' },
+    { zone:1, icon:'🌲', label:'ป่ากอบลิน',      sub:'Lv 1',  left:'35%', top:'25%', color:'#44ff88' },
+    { zone:2, icon:'🪦', label:'หุบเขาซอมบี้',   sub:'Lv 10', left:'28%', top:'70%', color:'#44ccff' },
+    { zone:3, icon:'🐉', label:'ถ้ำมังกร',        sub:'Lv 25', left:'64%', top:'22%', color:'#ff7744' },
+    { zone:4, icon:'💀', label:'ซากอสูร',         sub:'Lv 40', left:'85%', top:'26%', color:'#dd88ff' },
+    { zone:5, icon:'🏰', label:'ปราสาทมืด',       sub:'Lv 60', left:'60%', top:'70%', color:'#99aaff' },
+    { zone:6, icon:'🌀', label:'อาณาจักรโกลาหล', sub:'Lv 80', left:'83%', top:'72%', color:'#ffaa00' },
   ];
 
   function renderMapPins() {
