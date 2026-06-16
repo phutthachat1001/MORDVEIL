@@ -438,7 +438,7 @@ function _showCompareTooltip(e, item) {
   const box = document.createElement('div');
   box.id = 'item-compare-tt';
   box.style.cssText = 'position:fixed;z-index:9999;background:#12121a;border:1px solid #3a3a60;border-radius:8px;padding:.6rem .8rem;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.7);min-width:130px;font-family:Sarabun,sans-serif';
-  box.innerHTML = `<div style="font-size:.72rem;color:#ffd700;margin-bottom:.3rem;font-family:'Chakra Petch',sans-serif">เทียบกับที่สวมอยู่</div>${rows}`;
+  box.innerHTML = `<div style="font-size:.72rem;color:#ffd700;margin-bottom:.3rem;font-family:'Chakra Petch','Sarabun',sans-serif">เทียบกับที่สวมอยู่</div>${rows}`;
   document.body.appendChild(box);
   _compareEl = box;
   _positionCompareTooltip(e.currentTarget, box);

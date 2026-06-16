@@ -807,7 +807,7 @@ function rpgShowNpcQuests(npcId) {
       ? `<button class="rpq-btn-accept" onclick="rpgAcceptQuestFromNpc('${q.id}','${npcId}')">รับเควส</button>` : '';
     html += `<div class="rpq-npc-card ${statusCls}">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <span style="font-family:'Chakra Petch',sans-serif;font-size:.85rem;color:var(--text)">${typeIcon[q.type]||'📜'} ${q.name}</span>
+        <span style="font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.85rem;color:var(--text)">${typeIcon[q.type]||'📜'} ${q.name}</span>
         <span style="font-size:.72rem;color:#888">${statusLabel}</span>
       </div>
       <div style="font-size:.78rem;color:var(--text2);margin:.2rem 0">${q.desc}</div>

@@ -20,7 +20,7 @@ body{
   transition:opacity 1.2s ease;
 }
 #bg-video.fade-out{ opacity:0; }
-h1,h2,h3,.title{font-family:'Chakra Petch',sans-serif}
+h1,h2,h3,.title{font-family:'Chakra Petch','Sarabun',sans-serif}
 
 /* SCREEN MANAGEMENT */
 /* body starts invisible — JS removes this after layout is determined to prevent flash */
@@ -59,7 +59,7 @@ body.preload{visibility:hidden}
 }
 .intro-stone-text p{ font-size:.88rem; text-shadow:0 1px 3px #000; margin:.1rem 0; }
 .intro-stone-text .stone-title{
-  font-family:'Chakra Petch',sans-serif;
+  font-family:'Chakra Petch','Sarabun',sans-serif;
   font-size:.75rem;letter-spacing:3px;
   color:#b89a50;margin-bottom:.4rem;
   text-transform:uppercase;
@@ -94,7 +94,7 @@ body.preload{visibility:hidden}
   background: transparent !important;
 }
 
-.btn-start{background:linear-gradient(135deg,#4a2080,#2040a0);border:2px solid var(--purple);color:#fff;padding:.9rem 3rem;font-size:1.2rem;font-family:'Chakra Petch',sans-serif;cursor:pointer;border-radius:8px;transition:all .3s;letter-spacing:2px;text-shadow:0 1px 3px #000}
+.btn-start{background:linear-gradient(135deg,#4a2080,#2040a0);border:2px solid var(--purple);color:#fff;padding:.9rem 3rem;font-size:1.2rem;font-family:'Chakra Petch','Sarabun',sans-serif;cursor:pointer;border-radius:8px;transition:all .3s;letter-spacing:2px;text-shadow:0 1px 3px #000}
 .btn-start:hover{box-shadow:0 0 20px var(--purple),0 0 40px #aa44ff44;transform:scale(1.05)}
 
 /* ===== CLASS SELECT ===== */
@@ -110,17 +110,17 @@ body.preload{visibility:hidden}
 .class-card.locked{cursor:not-allowed;opacity:.45;filter:grayscale(.7)}
 .class-card.locked:hover{border-color:var(--border);box-shadow:none;background:var(--bg2)}
 .class-icon{font-size:3rem;margin-bottom:.8rem}
-.class-name{font-family:'Chakra Petch',sans-serif;font-size:1rem;color:var(--gold);margin-bottom:.5rem}
+.class-name{font-family:'Chakra Petch','Sarabun',sans-serif;font-size:1rem;color:var(--gold);margin-bottom:.5rem}
 .class-desc{font-size:.8rem;color:var(--text2);line-height:1.4}
 .class-stats{margin-top:.8rem;font-size:.75rem;color:var(--blue)}
-.btn-confirm{background:linear-gradient(135deg,#2a1060,#104080);border:2px solid var(--blue);color:#fff;padding:.8rem 2.5rem;font-size:1.1rem;font-family:'Chakra Petch',sans-serif;cursor:pointer;border-radius:8px;transition:all .3s}
+.btn-confirm{background:linear-gradient(135deg,#2a1060,#104080);border:2px solid var(--blue);color:#fff;padding:.8rem 2.5rem;font-size:1.1rem;font-family:'Chakra Petch','Sarabun',sans-serif;cursor:pointer;border-radius:8px;transition:all .3s}
 .btn-confirm:hover{box-shadow:0 0 15px var(--blue)}
 .btn-confirm:disabled{opacity:.4;cursor:not-allowed}
 
 /* ===== MAIN GAME ===== */
 #screen-game{flex-direction:column;background:rgba(10,10,15,.82)}
 .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:.5rem 1rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
-.topbar .player-name{font-family:'Chakra Petch',sans-serif;color:var(--gold);font-size:1.1rem}
+.topbar .player-name{font-family:'Chakra Petch','Sarabun',sans-serif;color:var(--gold);font-size:1.1rem}
 .topbar .level-badge{background:var(--bg4);border:1px solid var(--border2);padding:.2rem .8rem;border-radius:20px;font-size:.85rem;color:var(--blue)}
 .exp-bar-wrap{flex:1;min-width:150px;background:var(--bg4);border-radius:10px;height:14px;position:relative;overflow:hidden;border:1px solid var(--border)}
 .exp-bar-fill{height:100%;background:linear-gradient(90deg,#4488ff,#aa44ff);transition:width .5s ease;border-radius:10px}
@@ -137,7 +137,7 @@ body.preload{visibility:hidden}
 
 /* PANELS */
 .panel{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-.panel-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:.6rem 1rem;font-family:'Chakra Petch',sans-serif;color:var(--gold);font-size:.95rem;display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.panel-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:.6rem 1rem;font-family:'Chakra Petch','Sarabun',sans-serif;color:var(--gold);font-size:.95rem;display:flex;align-items:center;gap:.5rem;flex-shrink:0}
 .panel-body{padding:1rem;overflow-y:auto;flex:1}
 .panel-body::-webkit-scrollbar{width:4px}
 .panel-body::-webkit-scrollbar-track{background:var(--bg2)}
@@ -178,7 +178,7 @@ body.preload{visibility:hidden}
    =================================================== */
 .battle-panel{border-left:1px solid var(--border);border-right:1px solid var(--border)}
 .zone-tabs{display:flex;gap:.3rem;padding:.5rem;background:var(--bg3);border-bottom:1px solid var(--border);flex-wrap:wrap}
-.zone-tab{background:var(--bg4);border:1px solid var(--border);color:var(--text2);padding:.3rem .7rem;border-radius:6px;cursor:pointer;font-size:.8rem;font-family:'Chakra Petch',sans-serif;transition:all .2s}
+.zone-tab{background:var(--bg4);border:1px solid var(--border);color:var(--text2);padding:.3rem .7rem;border-radius:6px;cursor:pointer;font-size:.8rem;font-family:'Chakra Petch','Sarabun',sans-serif;transition:all .2s}
 .zone-tab.active{border-color:var(--gold);color:var(--gold);background:var(--bg3);box-shadow:0 0 8px var(--gold)44}
 .zone-tab.locked{opacity:.4;cursor:not-allowed}
 .battle-arena{padding:0;display:flex;flex-direction:column;align-items:center;overflow-y:auto;flex:1}
@@ -248,7 +248,7 @@ body.preload{visibility:hidden}
   backdrop-filter:blur(6px);
 }
 .fighter-label{
-  font-family:'Chakra Petch',sans-serif;font-size:.78rem;font-weight:700;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.78rem;font-weight:700;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   text-shadow:0 1px 4px #000;line-height:1.3;
 }
@@ -259,7 +259,7 @@ body.preload{visibility:hidden}
 .fighter-hp-fill{height:100%;transition:width .35s ease;border-radius:5px}
 .fighter-hp-text{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:.56rem;color:#fff;font-family:'Chakra Petch',sans-serif;
+  font-size:.56rem;color:#fff;font-family:'Chakra Petch','Sarabun',sans-serif;
   text-shadow:0 0 3px #000;
 }
 .fighter-atk-row{
@@ -403,7 +403,7 @@ body.preload{visibility:hidden}
 /* info panel below sprite — no box, just text + hp bar */
 .enemy-card-info{width:100%;text-align:center}
 .enemy-card-name{
-  font-family:'Chakra Petch',sans-serif;font-size:.74rem;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.74rem;
   color:#ffaaaa;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   text-shadow:0 1px 4px #000,0 0 8px rgba(0,0,0,.9);
 }
@@ -414,7 +414,7 @@ body.preload{visibility:hidden}
 .enemy-card-hp-fill{height:100%;transition:width .35s ease}
 .enemy-card-hp-text{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:.55rem;color:#fff;font-family:'Chakra Petch',sans-serif;
+  font-size:.55rem;color:#fff;font-family:'Chakra Petch','Sarabun',sans-serif;
   text-shadow:0 0 3px #000;
 }
 .enemy-card-atk{font-size:.58rem;color:#ffbb99;text-shadow:0 1px 3px #000}
@@ -456,7 +456,7 @@ body.preload{visibility:hidden}
   backdrop-filter:blur(6px);
 }
 #battle-player-label{
-  font-family:'Chakra Petch',sans-serif;font-size:.78rem;font-weight:700;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.78rem;font-weight:700;
   color:#88ddff;text-shadow:0 1px 4px #000;line-height:1.3;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
@@ -471,7 +471,7 @@ body.preload{visibility:hidden}
 }
 #battle-player-hp-text{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:.56rem;color:#fff;font-family:'Chakra Petch',sans-serif;
+  font-size:.56rem;color:#fff;font-family:'Chakra Petch','Sarabun',sans-serif;
   text-shadow:0 0 3px #000;
 }
 #battle-player-atk-row{
@@ -519,13 +519,13 @@ body.preload{visibility:hidden}
   border-bottom:1px solid rgba(255,255,255,.07);
 }
 #rpg-player-name{
-  font-family:'Chakra Petch',sans-serif;font-size:.82rem;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.82rem;
   color:var(--gold);white-space:nowrap;flex-shrink:0;min-width:80px;
 }
 .rpg-hp-wrap{
   flex:1;display:flex;flex-direction:column;gap:2px;
 }
-.rpg-hp-label{font-size:.58rem;color:#88aabb;letter-spacing:1px;font-family:'Chakra Petch',sans-serif}
+.rpg-hp-label{font-size:.58rem;color:#88aabb;letter-spacing:1px;font-family:'Chakra Petch','Sarabun',sans-serif}
 .rpg-hp-track{
   height:11px;background:rgba(0,0,0,.6);border-radius:5px;
   overflow:hidden;position:relative;border:1px solid rgba(100,200,100,.25);
@@ -536,7 +536,7 @@ body.preload{visibility:hidden}
 }
 #rpg-player-hp-text{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:.6rem;color:#fff;font-family:'Chakra Petch',sans-serif;
+  font-size:.6rem;color:#fff;font-family:'Chakra Petch','Sarabun',sans-serif;
   text-shadow:0 0 4px #000;
 }
 #rpg-player-status-tags{
@@ -561,7 +561,7 @@ body.preload{visibility:hidden}
   background:rgba(20,20,40,.9);
   border:1px solid rgba(100,100,200,.4);
   color:#c8c8e8;
-  font-family:'Chakra Petch',sans-serif;font-size:.82rem;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.82rem;
   padding:.5rem .8rem;border-radius:7px;cursor:pointer;
   display:flex;align-items:center;gap:.4rem;
   transition:all .15s;
@@ -622,7 +622,7 @@ body.preload{visibility:hidden}
   position:absolute;top:.5rem;left:.8rem;z-index:5;
   background:rgba(0,0,0,.7);border:1px solid rgba(255,60,60,.4);
   border-radius:20px;padding:.15rem .6rem;font-size:.7rem;
-  color:#ff8888;font-family:'Chakra Petch',sans-serif;
+  color:#ff8888;font-family:'Chakra Petch','Sarabun',sans-serif;
 }
 
 /* Legacy battle-log for non-battle pages */
@@ -639,7 +639,7 @@ body.preload{visibility:hidden}
 .log-crit{color:#ff8800;font-weight:600}
 
 /* Damage numbers float */
-.damage-float{position:fixed;pointer-events:none;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:1.2rem;animation:floatUp .8s forwards;z-index:9999}
+.damage-float{position:fixed;pointer-events:none;font-family:'Chakra Petch','Sarabun',sans-serif;font-weight:700;font-size:1.2rem;animation:floatUp .8s forwards;z-index:9999}
 @keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-60px)}}
 @keyframes arenaFlash{0%{opacity:.3}100%{opacity:0}}
 
@@ -672,7 +672,7 @@ body.preload{visibility:hidden}
 .npc-enc-portrait img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
 .npc-enc-right{flex:1}
 .npc-enc-name{
-  font-family:'Chakra Petch',sans-serif;color:var(--gold);
+  font-family:'Chakra Petch','Sarabun',sans-serif;color:var(--gold);
   font-size:.88rem;margin-bottom:.3rem;
 }
 .npc-enc-text{
@@ -690,7 +690,7 @@ body.preload{visibility:hidden}
 .npc-enc-btn{
   background:rgba(60,40,100,.8);border:1px solid rgba(150,100,255,.6);
   color:#cc99ff;padding:.35rem .9rem;border-radius:7px;cursor:pointer;
-  font-family:'Chakra Petch',sans-serif;font-size:.8rem;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.8rem;
   transition:all .15s;
 }
 .npc-enc-btn:hover{background:rgba(100,60,160,.9);border-color:#aa66ff;color:#fff}
@@ -752,7 +752,7 @@ body.preload{visibility:hidden}
   0%,100%{transform:translateY(0)}
   50%{transform:translateY(-4px)}
 }
-.char-class{font-family:'Chakra Petch',sans-serif;color:var(--purple);text-align:center;font-size:.9rem;margin-bottom:.8rem}
+.char-class{font-family:'Chakra Petch','Sarabun',sans-serif;color:var(--purple);text-align:center;font-size:.9rem;margin-bottom:.8rem}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin:.8rem 0}
 .stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.4rem .6rem;font-size:.82rem}
 .stat-box .sval{color:var(--gold);font-weight:600}
@@ -760,7 +760,7 @@ body.preload{visibility:hidden}
 .weapon-name{font-size:.9rem;margin-bottom:.2rem}
 .weapon-bonus{font-size:.78rem;color:var(--text2)}
 .weapon-effect{font-size:.75rem;color:var(--blue);margin-top:.2rem}
-.section-title{font-family:'Chakra Petch',sans-serif;font-size:.85rem;color:var(--text2);margin:.8rem 0 .4rem;border-bottom:1px solid var(--border);padding-bottom:.3rem}
+.section-title{font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.85rem;color:var(--text2);margin:.8rem 0 .4rem;border-bottom:1px solid var(--border);padding-bottom:.3rem}
 .daily-quests{display:flex;flex-direction:column;gap:.4rem}
 .dq-item{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.5rem .6rem;font-size:.8rem}
 .dq-item.done{opacity:.5;text-decoration:line-through}
@@ -807,7 +807,7 @@ body.preload{visibility:hidden}
   background:rgba(0,0,0,.92);
   border:2px solid currentColor;
   border-radius:8px;padding:.35rem .75rem;
-  font-family:'Chakra Petch',sans-serif;font-size:.95rem;font-weight:700;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.95rem;font-weight:700;
   color:inherit;white-space:nowrap;margin-bottom:6px;
   -webkit-text-stroke:.6px #000;paint-order:stroke fill;
   box-shadow:0 0 12px currentColor, 0 3px 16px rgba(0,0,0,.8);
@@ -853,7 +853,7 @@ body.preload{visibility:hidden}
 /* INVENTORY */
 .inventory-panel{border-top:1px solid var(--border);background:var(--bg2);padding:.8rem 1rem;flex-shrink:0}
 .inventory-panel .inv-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem}
-.inventory-panel h3{font-family:'Chakra Petch',sans-serif;color:var(--gold);font-size:.9rem}
+.inventory-panel h3{font-family:'Chakra Petch','Sarabun',sans-serif;color:var(--gold);font-size:.9rem}
 
 /* ── Inventory trigger bar ── */
 .inv-trigger-bar{
@@ -867,7 +867,7 @@ body.preload{visibility:hidden}
 }
 .inv-trigger-bar:hover{background:linear-gradient(90deg,var(--bg3),var(--bg4))}
 .inv-trigger-icon{font-size:1.1rem}
-.inv-trigger-label{font-family:'Chakra Petch',sans-serif;color:var(--gold);font-size:.85rem;font-weight:700}
+.inv-trigger-label{font-family:'Chakra Petch','Sarabun',sans-serif;color:var(--gold);font-size:.85rem;font-weight:700}
 .inv-trigger-count{font-size:.78rem;color:var(--text2);margin-left:.3rem}
 .inv-trigger-arrow{margin-left:auto;color:var(--text2);font-size:.75rem;transition:transform .2s}
 .inv-trigger-bar.open .inv-trigger-arrow{transform:rotate(180deg)}
@@ -906,7 +906,7 @@ body.preload{visibility:hidden}
   background:var(--bg3);flex-shrink:0;
 }
 .inv-popup-title{
-  font-family:'Chakra Petch',sans-serif;color:var(--gold);font-size:.95rem;font-weight:700;
+  font-family:'Chakra Petch','Sarabun',sans-serif;color:var(--gold);font-size:.95rem;font-weight:700;
   display:flex;align-items:center;gap:.5rem;
 }
 .inv-popup-close{
@@ -1013,7 +1013,7 @@ body.preload{visibility:hidden}
   text-align:center;pointer-events:none;z-index:20;
 }
 .hub-town-name{
-  font-family:'Chakra Petch',sans-serif;font-size:2rem;font-weight:700;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:2rem;font-weight:700;
   color:#ffe8b0;text-shadow:0 0 30px #ff990088,0 0 60px #ff660044,0 2px 0 #000;
   letter-spacing:3px;
 }
@@ -1073,7 +1073,7 @@ body.preload{visibility:hidden}
   background:rgba(0,0,0,.85);border:1px solid #4caf50;
   color:#b8ffb8;font-size:.75rem;padding:.25rem .6rem;border-radius:4px;
   white-space:nowrap;opacity:0;transition:all .2s;pointer-events:none;
-  font-family:'Chakra Petch',sans-serif;
+  font-family:'Chakra Petch','Sarabun',sans-serif;
 }
 .hub-npc-label::after{
   content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
@@ -1081,7 +1081,7 @@ body.preload{visibility:hidden}
 }
 /* NPC name below sprite */
 .hub-npc-name-tag{
-  margin-top:.4rem;font-size:.8rem;font-family:'Chakra Petch',sans-serif;
+  margin-top:.4rem;font-size:.8rem;font-family:'Chakra Petch','Sarabun',sans-serif;
   color:#b8d898;text-shadow:0 1px 4px #000;text-align:center;
 }
 .hub-npc-role-tag{font-size:.65rem;color:#7a9a60;text-align:center;margin-top:.1rem}
@@ -1134,7 +1134,7 @@ body.preload{visibility:hidden}
 }
 .hub-dlg-portrait{font-size:0;position:relative;z-index:1;image-rendering:pixelated}
 .hub-dlg-portrait-name{
-  font-family:'Chakra Petch',sans-serif;font-size:.78rem;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.78rem;
   color:var(--npc-color,#b8ffb8);text-align:center;margin-top:.3rem;
   text-shadow:0 0 8px var(--npc-color,#4caf50);position:relative;z-index:1;
 }
@@ -1176,7 +1176,7 @@ body.preload{visibility:hidden}
   border-bottom:2px solid #3a6428;
   padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center;
 }
-.hub-panel-header span{font-family:'Chakra Petch',sans-serif;color:#b8ff88;font-size:.95rem}
+.hub-panel-header span{font-family:'Chakra Petch','Sarabun',sans-serif;color:#b8ff88;font-size:.95rem}
 .hub-panel-close{
   background:transparent;border:none;color:#667788;
   cursor:pointer;font-size:1rem;padding:.1rem .4rem;transition:color .2s;
@@ -1251,7 +1251,7 @@ body.preload{visibility:hidden}
 .levelup-overlay.active{display:flex;align-items:center;justify-content:center}
 .levelup-anim{animation:levelPulse 1.5s forwards}
 @keyframes levelPulse{0%{opacity:0;transform:scale(.5)}30%{opacity:1;transform:scale(1.2)}70%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8)}}
-.levelup-text{font-family:'Chakra Petch',sans-serif;font-size:3rem;color:var(--gold);text-shadow:0 0 30px #ffd700;text-align:center;pointer-events:none}
+.levelup-text{font-family:'Chakra Petch','Sarabun',sans-serif;font-size:3rem;color:var(--gold);text-shadow:0 0 30px #ffd700;text-align:center;pointer-events:none}
 .levelup-flash{position:fixed;inset:0;background:radial-gradient(ellipse,#ffd70033,transparent 70%);pointer-events:none;animation:flash .5s forwards}
 @keyframes flash{0%{opacity:1}100%{opacity:0}}
 
@@ -1262,7 +1262,7 @@ body.preload{visibility:hidden}
   box-shadow:0 0 60px rgba(0,0,0,.8);position:relative;overflow:hidden;
 }
 .gacha-title{
-  font-family:'Chakra Petch',sans-serif;font-size:1.1rem;color:var(--gold);
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:1.1rem;color:var(--gold);
   letter-spacing:2px;margin-bottom:1.2rem;text-shadow:0 0 12px var(--gold);
 }
 
@@ -1316,7 +1316,7 @@ body.preload{visibility:hidden}
 @keyframes gachaFlash{0%{opacity:.6}100%{opacity:0}}
 .chest-result-icon{font-size:3.4rem;margin-bottom:.5rem;animation:revealItem .5s backwards}
 @keyframes revealItem{0%{transform:scale(0) rotate(-180deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
-.chest-result-name{font-family:'Chakra Petch',sans-serif;font-size:1.4rem;margin-bottom:.3rem}
+.chest-result-name{font-family:'Chakra Petch','Sarabun',sans-serif;font-size:1.4rem;margin-bottom:.3rem}
 .chest-result-stats{color:var(--text2);font-size:.9rem;margin-bottom:.5rem}
 .chest-result-effect{color:var(--blue);font-size:.85rem;margin:.3rem 0}
 .gacha-btns{display:flex;gap:.5rem;justify-content:center;margin-top:.8rem;flex-wrap:wrap}
@@ -1339,7 +1339,7 @@ body.preload{visibility:hidden}
 }
 @keyframes dtFadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .drop-tooltip-title{
-  font-family:'Chakra Petch',sans-serif;font-size:.82rem;color:var(--gold);
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.82rem;color:var(--gold);
   border-bottom:1px solid var(--border);padding-bottom:.35rem;margin-bottom:.45rem;letter-spacing:1px;
 }
 .drop-tooltip-row{
@@ -1354,7 +1354,7 @@ body.preload{visibility:hidden}
 .tooltip-overlay{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;background:#00000066}
 .tooltip-overlay.active{display:flex}
 .tooltip-box{background:var(--bg2);border:2px solid var(--border2);border-radius:12px;padding:1.5rem;max-width:320px;width:90%}
-.tooltip-name{font-family:'Chakra Petch',sans-serif;font-size:1.2rem;margin-bottom:.3rem}
+.tooltip-name{font-family:'Chakra Petch','Sarabun',sans-serif;font-size:1.2rem;margin-bottom:.3rem}
 .tooltip-rarity{font-size:.85rem;margin-bottom:.8rem}
 .tooltip-stats{color:var(--text2);font-size:.9rem;margin-bottom:.4rem}
 .tooltip-effect{color:var(--blue);font-size:.85rem;margin-bottom:.8rem}
@@ -1373,7 +1373,7 @@ body.preload{visibility:hidden}
 .ach-group-header{
   display:flex;justify-content:space-between;align-items:center;
   margin-top:.5rem;padding:.3rem .6rem .25rem;
-  font-family:'Chakra Petch',sans-serif;font-size:.82rem;font-weight:700;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.82rem;font-weight:700;
   color:var(--gold);letter-spacing:.5px;
   border-bottom:1px solid var(--border2);
 }
@@ -1389,7 +1389,7 @@ body.preload{visibility:hidden}
 .prestige-badge{display:inline-block;background:linear-gradient(135deg,#402000,#600000);border:1px solid var(--legend);padding:.2rem .6rem;border-radius:10px;font-size:.75rem;color:var(--legend)}
 
 /* ===== EVOLUTION UI ===== */
-.btn-evolve{background:linear-gradient(135deg,#3a0080,#802000);border:2px solid var(--legend);color:var(--legend);padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-family:'Chakra Petch',sans-serif;width:100%;margin-top:.4rem;font-size:.9rem}
+.btn-evolve{background:linear-gradient(135deg,#3a0080,#802000);border:2px solid var(--legend);color:var(--legend);padding:.5rem 1.2rem;border-radius:8px;cursor:pointer;font-family:'Chakra Petch','Sarabun',sans-serif;width:100%;margin-top:.4rem;font-size:.9rem}
 .btn-evolve:hover{box-shadow:0 0 12px var(--legend)}
 .evo-next-name{font-size:.9rem;font-weight:bold;margin-bottom:.3rem}
 .evo-conds{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.3rem}
@@ -1463,7 +1463,7 @@ body.preload{visibility:hidden}
   top: 3px; right: 5px;
   font-size: .68rem;
   color: var(--blue);
-  font-family: 'Chakra Petch', sans-serif;
+  font-family: 'Chakra Petch','Sarabun',sans-serif;
   font-weight: 700;
 }
 
@@ -2487,7 +2487,7 @@ body.preload{visibility:hidden}
 }
 
 .ev-popup-title {
-  font-family: 'Chakra Petch', sans-serif;
+  font-family: 'Chakra Petch','Sarabun',sans-serif;
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--gold);
@@ -2507,7 +2507,7 @@ body.preload{visibility:hidden}
   font-weight: 700;
   color: var(--red);
   margin-bottom: .7rem;
-  font-family: 'Chakra Petch', sans-serif;
+  font-family: 'Chakra Petch','Sarabun',sans-serif;
   animation: ev-blink 1s step-end infinite;
 }
 @keyframes ev-blink { 50% { opacity:.4; } }
@@ -2521,7 +2521,7 @@ body.preload{visibility:hidden}
   padding: .55rem 1.3rem;
   border-radius: 8px;
   cursor: pointer;
-  font-family: 'Chakra Petch', sans-serif;
+  font-family: 'Chakra Petch','Sarabun',sans-serif;
   font-size: .88rem;
   font-weight: 600;
   transition: all .2s;
@@ -2548,7 +2548,7 @@ body.preload{visibility:hidden}
   border-radius: 20px;
   font-size: .74rem;
   font-weight: 600;
-  font-family: 'Chakra Petch', sans-serif;
+  font-family: 'Chakra Petch','Sarabun',sans-serif;
 }
 .buff-gold   { background: rgba(255,215,0,.15);  border: 1px solid var(--gold);   color: var(--gold);   }
 .buff-orange { background: rgba(255,136,0,.15);  border: 1px solid var(--orange); color: var(--orange); }
@@ -2733,7 +2733,7 @@ body.preload{visibility:hidden}
 
 /* ── Cosmetic UI Panel ── */
 .cosm-header {
-  font-family: 'Chakra Petch', sans-serif;
+  font-family: 'Chakra Petch','Sarabun',sans-serif;
   font-size: 1.1rem;
   color: var(--gold);
   padding: .8rem 1rem;
@@ -2777,7 +2777,7 @@ body.preload{visibility:hidden}
 .cosm-tile.active { background: rgba(255,255,255,.04); }
 .cosm-tile-icon { font-size: 1.4rem; }
 .cosm-tile-name {
-  font-family: 'Chakra Petch', sans-serif;
+  font-family: 'Chakra Petch','Sarabun',sans-serif;
   font-size: .78rem;
   font-weight: 700;
 }
@@ -2845,7 +2845,7 @@ body.preload{visibility:hidden}
 .mode-card.selected,.mode-card:active{ transform:scale(.98); }
 .mode-icon{ font-size:3.5rem;margin-bottom:.8rem;line-height:1 }
 .mode-name{
-  font-family:'Chakra Petch',sans-serif;font-size:1.3rem;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:1.3rem;
   color:var(--gold);margin-bottom:.5rem;font-weight:700;
 }
 .mode-tag{
@@ -2869,7 +2869,7 @@ body.preload{visibility:hidden}
 
 /* ===== RPG QUEST PANEL ===== */
 .rpq-section-title{
-  font-family:'Chakra Petch',sans-serif;font-size:.78rem;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.78rem;
   color:var(--gold);letter-spacing:.8px;
   padding:.4rem .3rem .2rem;border-bottom:1px solid var(--border2);
   margin-bottom:.4rem;margin-top:.6rem;
@@ -2886,7 +2886,7 @@ body.preload{visibility:hidden}
   margin-bottom:.2rem;
 }
 .rpq-name{
-  font-family:'Chakra Petch',sans-serif;font-size:.85rem;
+  font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.85rem;
   color:var(--text);font-weight:700;
 }
 .rpq-zone{ font-size:.7rem;font-weight:600 }
@@ -2903,7 +2903,7 @@ body.preload{visibility:hidden}
 .rpq-reward{ font-size:.75rem;color:var(--gold);margin-bottom:.4rem }
 .rpq-btn-accept,.rpq-btn-abandon{
   font-size:.72rem;padding:.25rem .6rem;border-radius:6px;
-  cursor:pointer;border:1px solid;font-family:'Chakra Petch',sans-serif;
+  cursor:pointer;border:1px solid;font-family:'Chakra Petch','Sarabun',sans-serif;
   transition:all .15s;
 }
 .rpq-btn-accept{
@@ -2919,7 +2919,7 @@ body.preload{visibility:hidden}
 
 /* RPQ tabs */
 .rpq-tab{
-  flex:1;font-family:'Chakra Petch',sans-serif;font-size:.75rem;
+  flex:1;font-family:'Chakra Petch','Sarabun',sans-serif;font-size:.75rem;
   background:var(--bg2);border:1px solid var(--border2);color:var(--text2);
   padding:.3rem .4rem;border-radius:6px;cursor:pointer;transition:all .15s;
 }
@@ -3291,7 +3291,7 @@ body.preload{visibility:hidden}
 #boss-splash.out{animation:bossSplashOut .45s ease forwards}
 @keyframes bossSplashIn{from{opacity:0}to{opacity:1}}
 @keyframes bossSplashOut{from{opacity:1}to{opacity:0}}
-.boss-splash-inner{text-align:center;font-family:'Chakra Petch',sans-serif}
+.boss-splash-inner{text-align:center;font-family:'Chakra Petch','Sarabun',sans-serif}
 .boss-splash-label{
   color:#ff5544;font-size:1rem;letter-spacing:10px;font-weight:700;
   text-shadow:0 0 18px #ff220088;
@@ -3378,7 +3378,7 @@ body.preload{visibility:hidden}
 .offline-moon{font-size:2.6rem;animation:offlineFloat 3s ease-in-out infinite}
 @keyframes offlineFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 .offline-title{
-  font-family:'Chakra Petch',sans-serif;color:#88bbff;font-size:1.25rem;
+  font-family:'Chakra Petch','Sarabun',sans-serif;color:#88bbff;font-size:1.25rem;
   font-weight:700;margin:.3rem 0 .15rem;letter-spacing:1px;
 }
 .offline-sub{color:var(--text2);font-size:.82rem;margin-bottom:.8rem}

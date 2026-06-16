@@ -944,7 +944,7 @@ function openCosmeticFromChar() {
   }
   ov.innerHTML = `
     <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;width:min(420px,94vw);max-height:85vh;overflow:hidden;display:flex;flex-direction:column;">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;border-bottom:1px solid var(--border);font-family:'Chakra Petch',sans-serif;color:var(--gold);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;border-bottom:1px solid var(--border);font-family:'Chakra Petch','Sarabun',sans-serif;color:var(--gold);">
         ✨ รูปลักษณ์ตัวละคร
         <button onclick="document.getElementById('cosm-overlay').remove()" style="background:none;border:none;color:#aaa;font-size:1.2rem;cursor:pointer">✕</button>
       </div>

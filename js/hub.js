@@ -1275,7 +1275,7 @@ function hubShowQuests() {
 
   if (pending.length) {
     const hdr = document.createElement('div');
-    hdr.style.cssText = 'color:#88ff88;font-size:.75rem;letter-spacing:1px;margin-bottom:.4rem;font-family:Chakra Petch,sans-serif';
+    hdr.style.cssText = 'color:#88ff88;font-size:.75rem;letter-spacing:1px;margin-bottom:.4rem;font-family:"Chakra Petch","Sarabun",sans-serif';
     hdr.textContent = '✅ รับรางวัลได้เลย';
     body.appendChild(hdr);
   }
@@ -1293,7 +1293,7 @@ function hubShowQuests() {
 
   if (locked.length) {
     const hdr = document.createElement('div');
-    hdr.style.cssText = 'color:#778899;font-size:.75rem;letter-spacing:1px;margin:.6rem 0 .4rem;font-family:Chakra Petch,sans-serif';
+    hdr.style.cssText = 'color:#778899;font-size:.75rem;letter-spacing:1px;margin:.6rem 0 .4rem;font-family:"Chakra Petch","Sarabun",sans-serif';
     hdr.textContent = '🔒 ยังไม่เสร็จ';
     body.appendChild(hdr);
   }
