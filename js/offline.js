@@ -51,7 +51,31 @@ function _calcOfflineRewards(ms) {
   const goldMult = 1 + (G.goldBonusFromTree || 0) + (G.idleGoldBonus || 0);
   goldPer = Math.floor(goldPer * goldMult);
 
-  return { kills, exp: expPer * kills, gold: goldPer * kills, ms };
+  // ── Offline gear drops — like IDLE but ~2.25x rarer ──
+  // live IDLE rate: 0.04 + (zone-1)*0.01 (+ class/tree bonus), cap 0.18
+  const cls2 = (typeof CLASSES !== 'undefined') ? CLASSES.find(c => c.id === G.classId) : null;
+  const dropBonus = cls2 && cls2.bonuses && cls2.bonuses.dropBonus ? cls2.bonuses.dropBonus : 0;
+  const liveDropRate = Math.min(0.18, 0.04 + (curZone - 1) * 0.01 + dropBonus + (G.dropBonusFromTree || 0));
+  const OFFLINE_DROP_DIVISOR = 2.25;            // offline gear ~2.25x rarer than live IDLE
+  const offlineDropRate = liveDropRate / OFFLINE_DROP_DIVISOR;
+  const OFFLINE_ITEM_CAP = 15;                  // กันกระเป๋าล้นจากรันยาวๆ
+  const expectedItems = kills * offlineDropRate;
+  let itemCount = Math.floor(expectedItems);
+  if (Math.random() < (expectedItems - itemCount)) itemCount++; // เศษ = โอกาสได้เพิ่ม 1
+  itemCount = Math.min(OFFLINE_ITEM_CAP, itemCount);
+
+  // ── Dungeon keys — SAME rate as live (no divisor) ──
+  let keyCount = 0;
+  if (typeof ENDLESS_DUNGEON !== 'undefined' && typeof canEnterDungeon === 'function' && canEnterDungeon()) {
+    const k = ENDLESS_DUNGEON.keyDrop || {};
+    const keyChance = Math.min(k.cap || 0.025, (k.baseByZone1 || 0.0025) + ((Math.min(6, Math.max(1, curZone)) - 1) * (k.perZone || 0.0045)));
+    const expectedKeys = kills * keyChance;       // offline = non-boss → no bossMult
+    keyCount = Math.floor(expectedKeys);
+    if (Math.random() < (expectedKeys - keyCount)) keyCount++;
+    keyCount = Math.min(20, keyCount);            // sane cap
+  }
+
+  return { kills, exp: expPer * kills, gold: goldPer * kills, ms, itemCount, keyCount, dropZone: curZone, dropTier: tier };
 }
 
 // called from continueGame() after renderAll()
@@ -82,10 +106,15 @@ function _showOfflinePopup(r, awayMs, cap) {
     capEl.style.display = awayMs > cap ? '' : 'none';
     capEl.textContent = `(นับสูงสุด ${Math.round(cap/3600000)} ชม.)`;
   }
+  const itemRow = r.itemCount > 0
+    ? `<div class="offline-reward-row"><span>💎 อุปกรณ์ที่เก็บได้</span><b style="color:#66ddff">${r.itemCount} ชิ้น</b></div>` : '';
+  const keyRow = r.keyCount > 0
+    ? `<div class="offline-reward-row"><span>🗝️ กุญแจหลุมลึก</span><b style="color:#cc88ff">+${r.keyCount}</b></div>` : '';
   document.getElementById('offline-rewards').innerHTML = `
     <div class="offline-reward-row"><span>💀 มอนสเตอร์ที่ล่าได้</span><b>${r.kills.toLocaleString()} ตัว</b></div>
     <div class="offline-reward-row"><span>⭐ EXP</span><b style="color:var(--purple)">+${r.exp.toLocaleString()}</b></div>
-    <div class="offline-reward-row"><span>💰 ทอง</span><b style="color:var(--gold)">+${r.gold.toLocaleString()}</b></div>`;
+    <div class="offline-reward-row"><span>💰 ทอง</span><b style="color:var(--gold)">+${r.gold.toLocaleString()}</b></div>
+    ${itemRow}${keyRow}`;
   ov.classList.add('active');
   if (typeof playSound === 'function') playSound('chest');
 }
@@ -100,8 +129,25 @@ function claimOfflineRewards() {
   G.gold = (G.gold || 0) + r.gold;
   G.idleKills = (G.idleKills || 0) + r.kills; // offline farm = IDLE kills (no achievement credit)
   if (typeof giveExp === 'function') giveExp(r.exp);
-  logBattle(`<span class="log-exp">🌙 ฮีโร่ฟาร์มระหว่างคุณไม่อยู่: 💀${r.kills.toLocaleString()} ตัว · +${r.exp.toLocaleString()} EXP · 💰+${r.gold.toLocaleString()}</span>`);
+
+  // grant offline gear drops (uses the IDLE drop helper → zone rarity + floor)
+  let gotItems = 0;
+  if (r.itemCount > 0 && typeof _idleDropItem === 'function') {
+    for (let i = 0; i < r.itemCount; i++) {
+      if (G.inventory && G.inventory.length >= 50) break; // bag full
+      if (_idleDropItem(r.dropZone || G.currentZone || 1, r.dropTier || 3)) gotItems++;
+    }
+  }
+  // grant offline dungeon keys
+  if (r.keyCount > 0) {
+    if (!G.materials) G.materials = {};
+    G.materials.dungeon_key = (G.materials.dungeon_key || 0) + r.keyCount;
+  }
+
+  const extra = (gotItems ? ` · 💎${gotItems} ชิ้น` : '') + (r.keyCount ? ` · 🗝️${r.keyCount}` : '');
+  logBattle(`<span class="log-exp">🌙 ฮีโร่ฟาร์มระหว่างคุณไม่อยู่: 💀${r.kills.toLocaleString()} ตัว · +${r.exp.toLocaleString()} EXP · 💰+${r.gold.toLocaleString()}${extra}</span>`);
   updateTopBar();
+  if (typeof renderInventory === 'function') renderInventory();
   if (typeof checkAchievements === 'function') checkAchievements('idle');
   saveGame();
   if (typeof playSound === 'function') playSound('exp');
