@@ -77,6 +77,11 @@ function renderMonsterList() {
     </div>`;
   area.appendChild(header);
 
+  // ── Drop info: what this zone drops (gear rarity + craft materials) ──
+  const dropInfo = document.createElement('div');
+  dropInfo.innerHTML = _renderZoneDropInfo(G.currentZone);
+  area.appendChild(dropInfo);
+
   // ── Kill milestone progress ──
   const milestoneHtml = _renderMilestoneProgress();
   if (milestoneHtml) {
@@ -196,6 +201,59 @@ function _renderMilestoneProgress() {
   </div>`;
 }
 
+// Always-visible panel showing what the CURRENT zone drops:
+//  • gear rarities (from the zone drop table) with their roll %
+//  • the zone's craft materials (zone-specific)
+//  • boss bonus note
+// Gear is zone-based (not tied to a specific monster), so we describe it
+// per zone. Materials come from ZONE_MATERIALS / MATERIALS.
+function _renderZoneDropInfo(zone) {
+  zone = Math.min(6, Math.max(1, zone || 1));
+  const table = (typeof _ZONE_DROP_TABLES !== 'undefined' && _ZONE_DROP_TABLES[zone]) || [];
+  const total = table.reduce((s, [, w]) => s + w, 0) || 1;
+
+  // gear rarity chips
+  const gearChips = table.map(([r, w]) => {
+    const R = (typeof RARITIES !== 'undefined' && RARITIES[r]) || { label:r, color:'#aaa' };
+    const pct = Math.round((w / total) * 100);
+    return `<span style="display:inline-flex;align-items:center;gap:.2rem;padding:.12rem .4rem;border-radius:6px;
+      background:rgba(255,255,255,.04);border:1px solid ${R.color};color:${R.color};font-size:.66rem;font-weight:700">
+      ${R.label} <span style="color:#999;font-weight:400">${pct}%</span></span>`;
+  }).join('');
+
+  // craft materials for this zone
+  let matChips = '';
+  if (typeof ZONE_MATERIALS !== 'undefined' && typeof MATERIALS !== 'undefined') {
+    const ids = ZONE_MATERIALS[zone] || [];
+    matChips = ids.map(id => {
+      const m = MATERIALS[id];
+      if (!m) return '';
+      const R = RARITIES[m.rarity] || { color:'#aaa' };
+      const have = (G.materials && G.materials[id]) || 0;
+      return `<span style="display:inline-flex;align-items:center;gap:.2rem;padding:.12rem .4rem;border-radius:6px;
+        background:rgba(255,255,255,.04);border:1px solid #444;font-size:.66rem">
+        ${m.icon} <span style="color:${R.color}">${m.name}</span> <span style="color:#888">×${have}</span></span>`;
+    }).join('');
+  }
+
+  return `
+    <details class="zone-drop-info" style="margin-bottom:.7rem;background:rgba(255,255,255,.03);border:1px solid #2a2a3a;border-radius:10px;overflow:hidden">
+      <summary style="cursor:pointer;padding:.5rem .7rem;font-size:.78rem;color:#ccd;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center">
+        <span>💎 ของที่ดรอปในด่านนี้</span>
+        <span style="color:#778;font-size:.66rem;font-weight:400">แตะเพื่อดู ▾</span>
+      </summary>
+      <div style="padding:.2rem .7rem .7rem">
+        <div style="color:#99a;font-size:.66rem;margin:.3rem 0 .25rem">⚔ อุปกรณ์ (สุ่มตามด่าน — มอนทุกตัวในด่านดรอปเหมือนกัน):</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem">${gearChips}</div>
+        ${matChips ? `<div style="color:#99a;font-size:.66rem;margin:.55rem 0 .25rem">🧱 วัตถุดิบคราฟ (เฉพาะด่านนี้):</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem">${matChips}</div>` : ''}
+        <div style="color:#ffcc66;font-size:.64rem;margin-top:.55rem;line-height:1.5">
+          👑 บอสด่าน: ดรอปแน่นอน 1-2 ชิ้น + วัตถุดิบเป็นชุด · ⭐ มอน Tier 5-6 มีโอกาสดรอปของหายากขึ้น
+        </div>
+      </div>
+    </details>`;
+}
+
 function _showMonsterDropTooltip(el, m) {
   const cls       = CLASSES.find(c => c.id === G.classId);
   const dropBonus = cls && cls.bonuses && cls.bonuses.dropBonus ? cls.bonuses.dropBonus : 0;
@@ -210,7 +268,7 @@ function _showMonsterDropTooltip(el, m) {
     const baseRate = 0.06 + (zone - 1) * 0.015; // sync กับ monsterDie
     const total    = Math.min(0.30, baseRate + dropBonus + (G.dropBonusFromTree || 0));
     const pctStr   = `${Math.round(total * 100)}%`;
-    const rarityLabel = {1:'ธรรมดา-พิเศษ', 2:'พิเศษ-หายาก', 3:'หายาก-ยอดเยี่ยม', 4:'หายาก-ยอดเยี่ยม', 5:'ยอดเยี่ยม-ตำนาน', 6:'ยอดเยี่ยม-โบราณ'}[zone] || '';
+    const rarityLabel = {1:'ธรรมดา-หายาก', 2:'พิเศษ-มหากาพย์', 3:'หายาก-ตำนาน', 4:'มหากาพย์-โบราณ', 5:'ตำนาน-โบราณ', 6:'ตำนาน-โบราณ'}[zone] || '';
     const lines = [`📦 ดรอปโดยตรง (ไม่มีกล่อง)`, `ด่าน ${zone}: ${rarityLabel}`];
     showDropTooltip(el, lines, `โอกาสดรอป: ${pctStr}`);
   }
@@ -2446,20 +2504,21 @@ function playerAttack() {
 // ---------- Drop rarity table by zone ----------
 // zone 1: common/uncommon; zone 2-3: uncommon/rare; zone 4-5: rare/epic; zone 6: epic/legend
 // boss always 1 tier higher than normal
+// weighted gear-rarity table per zone: [rarity, weight]
+// Each zone has a CLEAN, distinct loot window so the gear you find climbs
+// meaningfully zone-by-zone — no more "junk to godly everywhere".
+//  z1 common-leaning → z6 legend/ancient only.
+const _ZONE_DROP_TABLES = {
+  1: [['common',70],['uncommon',28],['rare',2]],
+  2: [['uncommon',58],['rare',38],['epic',4]],
+  3: [['rare',55],['epic',40],['legend',5]],
+  4: [['epic',62],['legend',32],['ancient',6]],
+  5: [['legend',70],['ancient',30]],
+  6: [['legend',45],['ancient',55]],
+};
+
 function _dropRarityForZone(zone, isBoss, tier = 3) {
-  // weighted table: [rarity, weight]
-  // Each zone has a CLEAN, distinct loot window so the gear you find
-  // climbs meaningfully zone-by-zone — no more "junk to godly everywhere".
-  //  z1 common-leaning → z6 legend/ancient only.
-  const tables = {
-    1: [['common',70],['uncommon',28],['rare',2]],
-    2: [['uncommon',58],['rare',38],['epic',4]],
-    3: [['rare',55],['epic',40],['legend',5]],
-    4: [['epic',62],['legend',32],['ancient',6]],
-    5: [['legend',70],['ancient',30]],
-    6: [['legend',45],['ancient',55]],
-  };
-  let table = tables[Math.min(6, Math.max(1, zone))];
+  let table = _ZONE_DROP_TABLES[Math.min(6, Math.max(1, zone))];
   // high-tier monsters (5-6) in the zone: shift toward rarer
   if (!isBoss && tier >= 5) {
     table = table.map(([r, w]) => {
