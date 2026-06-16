@@ -20,11 +20,12 @@ function _matCount(id) { return (G.materials && G.materials[id]) || 0; }
 
 // บรรทัดเตือนความเสี่ยงตามระดับปัจจุบัน (lvl = ระดับที่กำลังดันขึ้น)
 function _enhRiskLine(lvl) {
-  const safe  = (typeof ENHANCE !== 'undefined' ? ENHANCE.safeUpTo : 4);
-  const brk   = (typeof ENHANCE !== 'undefined' ? ENHANCE.breakFromLevel : 7);
-  if (lvl < safe) return `<div style="font-size:.72rem;color:#66ff99;margin-top:.2rem">🛡️ ปลอดภัย — ไม่มีโอกาสพลาด</div>`;
-  if (lvl < brk)  return `<div style="font-size:.72rem;color:#ffcc66;margin-top:.2rem">⚠ ล้มเหลว = เสียของ แต่ระดับคงเดิม</div>`;
-  return `<div style="font-size:.72rem;color:#ff5544;margin-top:.2rem">💥 เสี่ยงแตก! ล้มเหลว = ลดระดับลง 1</div>`;
+  const safe = (typeof ENHANCE !== 'undefined' ? ENHANCE.safeUpTo : 4);
+  const del  = (typeof ENHANCE !== 'undefined' ? ENHANCE.delevelFromLevel : 5);
+  const des  = (typeof ENHANCE !== 'undefined' ? ENHANCE.destroyFromLevel : 10);
+  if (lvl < safe || lvl < del) return `<div style="font-size:.72rem;color:#66ff99;margin-top:.2rem">🛡️ ปลอดภัย — ไม่มีโอกาสพลาด</div>`;
+  if (lvl < des)               return `<div style="font-size:.72rem;color:#ffaa44;margin-top:.2rem">⚠ ล้มเหลว = ลดระดับลง 1</div>`;
+  return `<div style="font-size:.72rem;color:#ff3322;margin-top:.2rem;font-weight:700">💥 อันตราย! ล้มเหลว = ของหายทั้งชิ้น!</div>`;
 }
 
 // ข้อความบรรทัดสรุปในกล่องไอเทม
@@ -38,8 +39,11 @@ function enhanceTooltipLine(item) {
   const okCores  = t.cores ? _matCount('enhance_core') >= t.cores : true;
   const okGold   = (G.gold || 0) >= t.gold;
   const col = (okStones && okCores && okGold) ? '#88ddff' : '#aa8888';
-  const brk = (typeof ENHANCE !== 'undefined' ? ENHANCE.breakFromLevel : 7);
-  const risk = lvl >= brk ? ' <span style="color:#ff5544">💥เสี่ยงแตก</span>' : '';
+  const del = (typeof ENHANCE !== 'undefined' ? ENHANCE.delevelFromLevel : 5);
+  const des = (typeof ENHANCE !== 'undefined' ? ENHANCE.destroyFromLevel : 10);
+  let risk = '';
+  if (lvl >= des)      risk = ' <span style="color:#ff3322;font-weight:700">💥ของหาย</span>';
+  else if (lvl >= del) risk = ' <span style="color:#ffaa44">⚠ลดระดับ</span>';
   return `<span style="color:${col}">🔨 ตีบวก +${lvl}→+${lvl+1} · สำเร็จ ${Math.round(t.rate*100)}%</span>${risk}`;
 }
 
@@ -137,6 +141,13 @@ function attemptEnhance(uid) {
   const cores  = _matCount('enhance_core');
   if (stones < t.stones || (t.cores && cores < t.cores) || (G.gold || 0) < t.gold) return;
 
+  // เตือนก่อนถ้าระดับนี้ "ล้มเหลว = ของหาย"
+  const destroyFromLvl = (typeof ENHANCE !== 'undefined' ? ENHANCE.destroyFromLevel : 10);
+  if (lvl >= destroyFromLvl) {
+    const ok = confirm(`⚠ อันตราย!\n\nตีบวก +${lvl}→+${lvl+1} ถ้าล้มเหลว "${item.name}" จะหายไปถาวร!\nโอกาสสำเร็จ ${Math.round(t.rate*100)}%\n\nยืนยันที่จะเสี่ยง?`);
+    if (!ok) return;
+  }
+
   // consume
   if (!G.materials) G.materials = {};
   G.materials.enhance_stone = stones - t.stones;
@@ -145,18 +156,28 @@ function attemptEnhance(uid) {
 
   const fb = document.getElementById('enhance-feedback');
   const success = Math.random() < t.rate;
-  const breakFrom = (typeof ENHANCE !== 'undefined' ? ENHANCE.breakFromLevel : 7);
+  const delevelFrom = (typeof ENHANCE !== 'undefined' ? ENHANCE.delevelFromLevel : 5);
+  const destroyFrom = (typeof ENHANCE !== 'undefined' ? ENHANCE.destroyFromLevel : 10);
+  let destroyed = false;
+
   if (success) {
     item.enhance = lvl + 1;
     if (fb) { fb.style.color = '#66ff99'; fb.textContent = `✨ สำเร็จ! → +${item.enhance}`; }
     if (typeof logBattle === 'function')
       logBattle(`<span class="log-exp">🔨 ตีบวกสำเร็จ: ${item.icon||'⚔'} ${item.name} → +${item.enhance}</span>`);
-  } else if (lvl >= breakFrom) {
-    // แตก! — ลดระดับลง 1
-    item.enhance = Math.max(0, lvl - 1);
-    if (fb) { fb.style.color = '#ff4444'; fb.textContent = `💥 แตก! ลดระดับ → +${item.enhance}`; }
+  } else if (lvl >= destroyFrom) {
+    // แตกหาย! — ของหายทั้งชิ้น
+    destroyed = true;
+    if (isItemEquipped && isItemEquipped(item.uid) && typeof unequipSlot === 'function') unequipSlot(item.slot);
+    G.inventory = (G.inventory || []).filter(i => i.uid !== item.uid);
     if (typeof logBattle === 'function')
-      logBattle(`<span class="log-sys" style="color:#ff5544">💥 ตีบวกแตก! ${item.name} ลดเหลือ +${item.enhance}</span>`);
+      logBattle(`<span class="log-sys" style="color:#ff3322">💥💥 ตีบวกแตก! ${item.icon||'⚔'} ${item.name} +${lvl} หายไปแล้ว!</span>`);
+  } else if (lvl >= delevelFrom) {
+    // ล้มเหลว — ลดระดับลง 1
+    item.enhance = Math.max(0, lvl - 1);
+    if (fb) { fb.style.color = '#ff7744'; fb.textContent = `💢 ล้มเหลว! ลดระดับ → +${item.enhance}`; }
+    if (typeof logBattle === 'function')
+      logBattle(`<span class="log-sys" style="color:#ff8844">💢 ตีบวกล้มเหลว: ${item.name} ลดเหลือ +${item.enhance}</span>`);
   } else {
     if (fb) { fb.style.color = '#ff7766'; fb.textContent = `💢 ล้มเหลว! (ระดับคงเดิม +${lvl})`; }
     if (typeof logBattle === 'function')
@@ -167,6 +188,21 @@ function attemptEnhance(uid) {
   if (typeof updateTopBar === 'function') updateTopBar();
   if (typeof updateCharPanel === 'function') updateCharPanel();
   if (typeof renderInventory === 'function') renderInventory();
+
+  if (destroyed) {
+    // ของหายแล้ว — ปิดหน้าตีบวก แสดงข้อความ
+    const ov = document.getElementById('enhance-overlay');
+    if (ov) {
+      ov.innerHTML = `<div class="modal" onclick="event.stopPropagation()" style="max-width:340px;width:92%;text-align:center">
+        <div style="font-size:2.4rem">💥</div>
+        <div style="color:#ff4433;font-weight:800;margin:.4rem 0">อุปกรณ์แตกหาย!</div>
+        <div style="font-size:.8rem;color:#caa">${item.icon||'⚔'} ${item.name} +${lvl} หายไปจากการตีบวกที่ล้มเหลว</div>
+        <button class="btn-close-modal" onclick="document.getElementById('enhance-overlay').classList.remove('active')">ปิด</button>
+      </div>`;
+    }
+    return;
+  }
+
   // re-render panel to refresh costs/stats, keep feedback briefly
   const keep = fb ? fb.textContent : '';
   const keepCol = fb ? fb.style.color : '';
