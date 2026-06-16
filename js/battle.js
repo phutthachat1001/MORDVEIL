@@ -2448,15 +2448,16 @@ function playerAttack() {
 // boss always 1 tier higher than normal
 function _dropRarityForZone(zone, isBoss, tier = 3) {
   // weighted table: [rarity, weight]
-  // each zone drops a clean 3-rarity window that climbs with the zone:
-  // z1 common/uncommon/rare → z2 uncommon/rare/epic → ... → z6 legend/ancient/mythic-ish
+  // Each zone has a CLEAN, distinct loot window so the gear you find
+  // climbs meaningfully zone-by-zone — no more "junk to godly everywhere".
+  //  z1 common-leaning → z6 legend/ancient only.
   const tables = {
-    1: [['common',65],['uncommon',30],['rare',5]],
-    2: [['uncommon',60],['rare',32],['epic',8]],
-    3: [['rare',58],['epic',34],['legend',8]],
-    4: [['rare',35],['epic',50],['legend',15]],
-    5: [['epic',55],['legend',38],['ancient',7]],
-    6: [['legend',60],['ancient',40]],
+    1: [['common',70],['uncommon',28],['rare',2]],
+    2: [['uncommon',58],['rare',38],['epic',4]],
+    3: [['rare',55],['epic',40],['legend',5]],
+    4: [['epic',62],['legend',32],['ancient',6]],
+    5: [['legend',70],['ancient',30]],
+    6: [['legend',45],['ancient',55]],
   };
   let table = tables[Math.min(6, Math.max(1, zone))];
   // high-tier monsters (5-6) in the zone: shift toward rarer
@@ -2485,7 +2486,14 @@ function _dropRarityForZone(zone, isBoss, tier = 3) {
 
 const _RARITY_ORDER = ['common','uncommon','rare','epic','legend','ancient'];
 
-function _dropDirectItem(rarity) {
+// Lowest rarity each zone is allowed to drop. When a slot has no item of the
+// rolled rarity we fall DOWN to the next lower rarity that exists — but never
+// below this floor, so late zones never dump common/uncommon trash.
+const _ZONE_RARITY_FLOOR = { 1:'common', 2:'uncommon', 3:'rare', 4:'epic', 5:'legend', 6:'legend' };
+
+function _dropDirectItem(rarity, zone) {
+  zone = zone || G.currentZone || 1;
+  const floorIdx = _RARITY_ORDER.indexOf(_ZONE_RARITY_FLOOR[Math.min(6, Math.max(1, zone))] || 'common');
   if (G.inventory && G.inventory.length >= 50) {
     logBattle(`<span class="log-sys">⚠ กระเป๋าเต็ม! ขายของก่อน</span>`);
     return;
@@ -2499,6 +2507,12 @@ function _dropDirectItem(rarity) {
   let effRarity = rarity;
   let pool = (ALL_ITEMS_BY_SLOT[slot] || []).filter(i => i.rarity === effRarity);
   let ri = _RARITY_ORDER.indexOf(rarity);
+  // fall down toward the zone floor, then (only if still empty) below it
+  while (!pool.length && ri > floorIdx) {
+    ri--;
+    effRarity = _RARITY_ORDER[ri];
+    pool = (ALL_ITEMS_BY_SLOT[slot] || []).filter(i => i.rarity === effRarity);
+  }
   while (!pool.length && ri > 0) {
     ri--;
     effRarity = _RARITY_ORDER[ri];
@@ -2804,8 +2818,8 @@ function monsterDie() {
   if (monster.isBoss) {
     // boss guaranteed 1-2 items, rarity based on zone
     const bossRarity = _dropRarityForZone(G.currentZone, true);
-    _dropDirectItem(bossRarity);
-    if (Math.random() < 0.5) _dropDirectItem(bossRarity);
+    _dropDirectItem(bossRarity, G.currentZone);
+    if (Math.random() < 0.5) _dropDirectItem(bossRarity, G.currentZone);
   } else {
     // normal monster: lower drop rate than boss (boss = guaranteed)
     // base drop rate scales with zone (6% → 13.5%), bonus from class + tree
@@ -2814,7 +2828,7 @@ function monsterDie() {
     const dropRate = Math.min(0.30, baseRate + dropBonus + (G.dropBonusFromTree || 0));
     if (Math.random() < dropRate) {
       const rarity = _dropRarityForZone(G.currentZone, false, monster.tier);
-      _dropDirectItem(rarity);
+      _dropDirectItem(rarity, G.currentZone);
     }
   }
   // crafting materials drop (separate from gear)

@@ -411,6 +411,29 @@ function _idleMobDie(idx, mob) {
   // achievements / evolution quests (those are for manual zone fights only).
   G.idleKills = (G.idleKills || 0) + 1;
   _idleSessionKills++;
+
+  // ── Zone Progress: IDLE farming can ALSO advance/unlock zones ──
+  // The minimap unlocks the next zone once the current one is fully cleared.
+  // Previously only manual fights advanced zoneProgress, so a player who
+  // farms via IDLE would stay stuck at 0/6 and never unlock the map.
+  // Advance only when the killed mob's tier matches the next-needed tier
+  // in the CURRENT zone (same rule as manual combat).
+  if (!mob.special && mob.zone === (G.currentZone || 1)) {
+    if (!G.zoneProgress) G.zoneProgress = {};
+    const zoneMonsters = (ZONES.find(z => z.id === mob.zone) || {}).monsters || [];
+    const cur = G.zoneProgress[mob.zone] || 0;
+    if (mob.tier === cur + 1 && cur < zoneMonsters.length) {
+      G.zoneProgress[mob.zone] = cur + 1;
+      const np = G.zoneProgress[mob.zone];
+      if (np >= zoneMonsters.length) {
+        const nz = ZONES.find(z => z.id === mob.zone + 1);
+        if (typeof logBattle === 'function')
+          logBattle(`<span class="log-exp" style="color:#44ff88">🗺️ ฟาร์มผ่านด่าน ${(ZONES.find(z=>z.id===mob.zone)||{}).name}!${nz ? ` ปลดล็อค ${nz.emoji} ${nz.name}` : ' 🏆 ครบทุกด่าน!'}</span>`);
+      }
+      if (typeof renderZoneTabs === 'function') renderZoneTabs();
+      saveGame();
+    }
+  }
   if (typeof giveExp === 'function') giveExp(expGain);
   if (typeof checkAchievements === 'function') checkAchievements('idle');
   if (typeof checkIdleMilestone === 'function') checkIdleMilestone();
@@ -468,6 +491,14 @@ function _idleDropItem(zone, tier) {
   let effRarity = rarity;
   let pool = (ALL_ITEMS_BY_SLOT[slot] || []).filter(i => i.rarity === effRarity);
   let ri = (typeof _RARITY_ORDER !== 'undefined') ? _RARITY_ORDER.indexOf(rarity) : 0;
+  // respect the zone rarity floor (no trash drops in late zones), then below it only if forced
+  const floorIdx = (typeof _ZONE_RARITY_FLOOR !== 'undefined' && typeof _RARITY_ORDER !== 'undefined')
+    ? _RARITY_ORDER.indexOf(_ZONE_RARITY_FLOOR[Math.min(6, Math.max(1, zone))] || 'common') : 0;
+  while (!pool.length && ri > floorIdx) {
+    ri--;
+    effRarity = _RARITY_ORDER[ri];
+    pool = (ALL_ITEMS_BY_SLOT[slot] || []).filter(i => i.rarity === effRarity);
+  }
   while (!pool.length && ri > 0) {
     ri--;
     effRarity = _RARITY_ORDER[ri];
