@@ -27,6 +27,52 @@ function dungeonUnlockHint() {
   return `ผ่านด่าน ${z ? z.emoji + ' ' + z.name : need} ให้ครบก่อน`;
 }
 
+function _dgTodayStr() { return new Date().toISOString().slice(0, 10); }
+
+function dungeonFreeRunsLeft() {
+  const max = (typeof ENDLESS_DUNGEON !== 'undefined') ? (ENDLESS_DUNGEON.freeRunsPerDay || 1) : 1;
+  if (G.dungeonFreeDate !== _dgTodayStr()) return max; // วันใหม่ = รีเซ็ต
+  return Math.max(0, max - (G.dungeonFreeUsed || 0));
+}
+
+function dungeonKeys() { return (G.materials && G.materials.dungeon_key) || 0; }
+
+// เข้าได้ไหม (ฟรีวันนี้เหลือ หรือมีกุญแจ)
+function dungeonCanRun() {
+  return dungeonFreeRunsLeft() > 0 || dungeonKeys() > 0;
+}
+
+// หักสิทธิ์เข้า: ใช้ฟรีก่อน ถ้าหมดค่อยใช้กุญแจ · คืน true ถ้าเข้าได้
+function _dgConsumeEntry() {
+  if (dungeonFreeRunsLeft() > 0) {
+    if (G.dungeonFreeDate !== _dgTodayStr()) { G.dungeonFreeDate = _dgTodayStr(); G.dungeonFreeUsed = 0; }
+    G.dungeonFreeUsed = (G.dungeonFreeUsed || 0) + 1;
+    return true;
+  }
+  if (dungeonKeys() > 0) {
+    G.materials.dungeon_key = dungeonKeys() - 1;
+    return true;
+  }
+  return false;
+}
+
+// ดรอปกุญแจจากการสังหารมอน (เรียกจาก battle.js / idle.js)
+function dungeonRollKeyDrop(zone, isBoss) {
+  if (typeof ENDLESS_DUNGEON === 'undefined' || !canEnterDungeon()) return; // ยังไม่ปลดล็อก = ไม่ดรอป
+  const k = ENDLESS_DUNGEON.keyDrop || {};
+  let chance = Math.min(k.cap || 0.025, (k.baseByZone1 || 0.0025) + ((Math.min(6, Math.max(1, zone || 1)) - 1) * (k.perZone || 0.0045)));
+  if (isBoss) chance *= (k.bossMult || 2);
+  if (Math.random() < chance) {
+    if (!G.materials) G.materials = {};
+    G.materials.dungeon_key = (G.materials.dungeon_key || 0) + 1;
+    if (typeof logBattle === 'function')
+      logBattle(`<span class="log-exp" style="color:#cc88ff">🗝️ ดรอปกุญแจหลุมลึก! (มี ${G.materials.dungeon_key} ดอก)</span>`);
+    if (typeof updateTopBar === 'function') updateTopBar();
+    return true;
+  }
+  return false;
+}
+
 // ---------- entry / overlay ----------
 function openDungeon() {
   let ov = document.getElementById('dg-overlay');
@@ -63,6 +109,14 @@ function _renderDgIntro() {
     return;
   }
   const best = G.dungeonBestFloor || 0;
+  const free = dungeonFreeRunsLeft();
+  const keys = dungeonKeys();
+  const canRun = dungeonCanRun();
+  const entryLine = free > 0
+    ? `<span style="color:#66ff99">🆓 เข้าฟรีวันนี้ได้อีก ${free} รอบ</span>`
+    : (keys > 0
+        ? `<span style="color:#cc88ff">🗝️ ใช้กุญแจ 1 ดอก (มี ${keys})</span>`
+        : `<span style="color:#ff7766">หมดสิทธิ์ฟรีวันนี้ — ต้องมีกุญแจ (ดรอปจากมอน)</span>`);
   stage.innerHTML = `
     <div class="trial-intro">
       <div class="trial-title">🕳️ หลุมลึกนิรันดร์</div>
@@ -71,10 +125,12 @@ function _renderDgIntro() {
         <li>🔨 ดรอป <b>หินตีบวก / แก่นเสริมพลัง</b> ไว้ตีบวกอุปกรณ์</li>
         <li>🌌 ยิ่งลึก ยิ่งมีโอกาสได้ <b>เศษมิติ / แก่นห้วงลึก</b> (คราฟชุดเทพ)</li>
         <li>👹 ทุก <b>5 ชั้น</b> = ชั้นบอส ดรอปเป็นชุด ×3</li>
+        <li>🗝️ เข้า <b>ฟรีวันละ 1 รอบ</b> · รอบถัดไปใช้กุญแจ (ดรอปจากมอนทุกด่าน)</li>
         <li>❤️ HP ไม่ฟื้นระหว่างดิ่ง — ตายแล้วของที่เก็บยังอยู่ทั้งหมด</li>
       </ul>
-      <div class="t4d-progress">ความลึกที่ดีที่สุด: <b>ชั้น ${best}</b></div>
-      <button class="btn-trial-start" onclick="startDungeon()">🕳️ ดิ่งลงหลุม</button>
+      <div class="t4d-progress">ความลึกที่ดีที่สุด: <b>ชั้น ${best}</b> · กุญแจ: <b>${keys}</b> 🗝️</div>
+      <div style="margin:.4rem 0;font-size:.82rem">${entryLine}</div>
+      <button class="btn-trial-start" onclick="startDungeon()" ${canRun?'':'disabled style="opacity:.4;cursor:not-allowed"'}>${free>0?'🆓 ดิ่งลงหลุม (ฟรี)':keys>0?'🗝️ ใช้กุญแจดิ่งลงหลุม':'🔒 ไม่มีสิทธิ์เข้า'}</button>
       <button class="btn-trial-cancel" onclick="closeDungeon()">ออก</button>
     </div>`;
 }
@@ -82,6 +138,9 @@ function _renderDgIntro() {
 // ---------- run ----------
 function startDungeon() {
   if (!canEnterDungeon()) { closeDungeon(); return; }
+  // ต้องมีสิทธิ์เข้า (ฟรีวันนี้ หรือกุญแจ) — หักเมื่อเริ่มจริง
+  if (!_dgConsumeEntry()) { _renderDgIntro(); return; }
+  if (typeof saveGame === 'function') saveGame();
   _dgActive = true;
   _dgFloor = 0;
   _dgSkillCd = {};
@@ -272,7 +331,9 @@ function _renderDgResult() {
         ${dropLines}
       </div>
       <div class="trial-result-hint">นำวัตถุดิบไปตีบวกอุปกรณ์ (กดที่ไอเทมในกระเป๋า) หรือคราฟชุดที่ช่างตีเหล็ก</div>
-      <button class="btn-trial-start" onclick="startDungeon()">🕳️ ดิ่งอีกครั้ง</button>
+      ${dungeonCanRun()
+        ? `<button class="btn-trial-start" onclick="startDungeon()">${dungeonFreeRunsLeft()>0?'🆓 ดิ่งอีกครั้ง (ฟรี)':'🗝️ ใช้กุญแจดิ่งอีกครั้ง ('+dungeonKeys()+')'}</button>`
+        : `<div style="color:#ff7766;font-size:.82rem;margin:.4rem 0">หมดสิทธิ์เข้าแล้ว — ฆ่ามอนเพื่อหากุญแจ หรือกลับมาพรุ่งนี้</div>`}
       <button class="btn-trial-cancel" onclick="closeDungeon()">ออก</button>
     </div>`;
 }

@@ -456,6 +456,9 @@ function _idleMobDie(idx, mob) {
       _floatAboveIdleMob(idx, `<span style="color:${col}">${dropped.icon||'⚔'} ${dropped.name}</span>`, 'idle-drop-float');
     }
   }
+  // dungeon key drop from IDLE farming (same rate as manual; boss/special x2)
+  if (typeof dungeonRollKeyDrop === 'function') dungeonRollKeyDrop(mob.zone, !!mob.special);
+
   // crafting materials from IDLE farming (lower rate than manual)
   if (typeof ZONE_MATERIALS !== 'undefined' && (mob.special || Math.random() < 0.20)) {
     const pool = ZONE_MATERIALS[Math.min(6, Math.max(1, mob.zone || 1))] || [];

@@ -2892,6 +2892,8 @@ function monsterDie() {
   }
   // crafting materials drop (separate from gear)
   _dropMaterial(G.currentZone, monster.isBoss, monster.tier || 1);
+  // dungeon key drop (every zone; boss x2)
+  if (typeof dungeonRollKeyDrop === 'function') dungeonRollKeyDrop(G.currentZone, monster.isBoss);
 
   // Gold: boss = atk × 3 (baseline); normal = 35% of that ≈ atk × 1.05
   let goldGain = Math.floor(stats.atk * 1.5 * rewardMult); // ลดจาก ×3 กันเงินเฟ้อ

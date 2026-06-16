@@ -18,6 +18,15 @@ function enhanceMaxed(item) {
 
 function _matCount(id) { return (G.materials && G.materials[id]) || 0; }
 
+// บรรทัดเตือนความเสี่ยงตามระดับปัจจุบัน (lvl = ระดับที่กำลังดันขึ้น)
+function _enhRiskLine(lvl) {
+  const safe  = (typeof ENHANCE !== 'undefined' ? ENHANCE.safeUpTo : 4);
+  const brk   = (typeof ENHANCE !== 'undefined' ? ENHANCE.breakFromLevel : 7);
+  if (lvl < safe) return `<div style="font-size:.72rem;color:#66ff99;margin-top:.2rem">🛡️ ปลอดภัย — ไม่มีโอกาสพลาด</div>`;
+  if (lvl < brk)  return `<div style="font-size:.72rem;color:#ffcc66;margin-top:.2rem">⚠ ล้มเหลว = เสียของ แต่ระดับคงเดิม</div>`;
+  return `<div style="font-size:.72rem;color:#ff5544;margin-top:.2rem">💥 เสี่ยงแตก! ล้มเหลว = ลดระดับลง 1</div>`;
+}
+
 // ข้อความบรรทัดสรุปในกล่องไอเทม
 function enhanceTooltipLine(item) {
   if (!item || !item.uid) return '';
@@ -29,7 +38,9 @@ function enhanceTooltipLine(item) {
   const okCores  = t.cores ? _matCount('enhance_core') >= t.cores : true;
   const okGold   = (G.gold || 0) >= t.gold;
   const col = (okStones && okCores && okGold) ? '#88ddff' : '#aa8888';
-  return `<span style="color:${col}">🔨 ตีบวก +${lvl}→+${lvl+1} · สำเร็จ ${Math.round(t.rate*100)}%</span>`;
+  const brk = (typeof ENHANCE !== 'undefined' ? ENHANCE.breakFromLevel : 7);
+  const risk = lvl >= brk ? ' <span style="color:#ff5544">💥เสี่ยงแตก</span>' : '';
+  return `<span style="color:${col}">🔨 ตีบวก +${lvl}→+${lvl+1} · สำเร็จ ${Math.round(t.rate*100)}%</span>${risk}`;
 }
 
 // ---------- panel ----------
@@ -90,7 +101,8 @@ function _renderEnhancePanel(item) {
           ${t.cores ? line('💠','แก่นเสริมพลัง',t.cores,cores) : ''}
           <span style="color:${okGold?'#ffd966':'#e88'}">💰 ${t.gold.toLocaleString()} ทอง</span>
         </div>
-        <div style="font-size:.74rem;margin-top:.4rem;color:#88ddff">โอกาสสำเร็จ: <b>${Math.round(t.rate*100)}%</b>${t.rate<1?' · ล้มเหลว = เสียของแต่ไม่ลดระดับ':''}</div>
+        <div style="font-size:.74rem;margin-top:.4rem;color:#88ddff">โอกาสสำเร็จ: <b>${Math.round(t.rate*100)}%</b></div>
+        ${_enhRiskLine(lvl)}
       </div>`;
   }
 
@@ -133,11 +145,18 @@ function attemptEnhance(uid) {
 
   const fb = document.getElementById('enhance-feedback');
   const success = Math.random() < t.rate;
+  const breakFrom = (typeof ENHANCE !== 'undefined' ? ENHANCE.breakFromLevel : 7);
   if (success) {
     item.enhance = lvl + 1;
     if (fb) { fb.style.color = '#66ff99'; fb.textContent = `✨ สำเร็จ! → +${item.enhance}`; }
     if (typeof logBattle === 'function')
       logBattle(`<span class="log-exp">🔨 ตีบวกสำเร็จ: ${item.icon||'⚔'} ${item.name} → +${item.enhance}</span>`);
+  } else if (lvl >= breakFrom) {
+    // แตก! — ลดระดับลง 1
+    item.enhance = Math.max(0, lvl - 1);
+    if (fb) { fb.style.color = '#ff4444'; fb.textContent = `💥 แตก! ลดระดับ → +${item.enhance}`; }
+    if (typeof logBattle === 'function')
+      logBattle(`<span class="log-sys" style="color:#ff5544">💥 ตีบวกแตก! ${item.name} ลดเหลือ +${item.enhance}</span>`);
   } else {
     if (fb) { fb.style.color = '#ff7766'; fb.textContent = `💢 ล้มเหลว! (ระดับคงเดิม +${lvl})`; }
     if (typeof logBattle === 'function')
