@@ -196,6 +196,7 @@ function getHubQuestsLocked() {
 // ---------- open / close ----------
 
 function openHub() {
+  if (typeof closeInventoryPopup === 'function') closeInventoryPopup();
   renderHubScene();
   closeHubDialogue();
   closeHubPanel();

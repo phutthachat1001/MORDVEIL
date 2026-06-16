@@ -115,6 +115,8 @@ function updateCharPanel() {
 }
 
 function switchTab(name) {
+  // ปิดกระเป๋าค้าง เมื่อสลับแท็บ
+  if (typeof closeInventoryPopup === 'function') closeInventoryPopup();
   const tabNames = ['char','daily','codex'];
   document.querySelectorAll('.tab').forEach((t, i) => {
     t.classList.toggle('active', tabNames[i] === name);
@@ -285,6 +287,9 @@ function switchMobileTab(tab) {
     if (typeof toggleInventoryPopup === 'function') toggleInventoryPopup();
     return;
   }
+
+  // เปลี่ยนไปแท็บอื่นที่ไม่ใช่กระเป๋า → ปิดกระเป๋าที่เปิดค้างอยู่
+  if (typeof closeInventoryPopup === 'function') closeInventoryPopup();
 
   // any bottom-nav tap leaves the full-screen Hub (acts as "back to map/game")
   const hub = document.getElementById('hub-screen');

@@ -1,4 +1,4 @@
-const CACHE = 'mordveil-v72';
+const CACHE = 'mordveil-v78';
 const ASSETS = [
   './Play.html',
   './css/style.css',
@@ -31,18 +31,9 @@ const ASSETS = [
   './js/offline.js',
   './assets/button/playnext.png',
   './assets/button/newgame.png',
-  './assets/effects/rogue_T1.png',
-  './assets/effects/rogue_T2.png',
-  './assets/effects/rogue_T3-A.png',
-  './assets/effects/rogue_T3-B.png',
-  './assets/effects/rogue_T3-C.png',
-  './assets/effects/rogue_T3-D.png',
-  './assets/effects/rogue_T3-S.png',
-  './assets/effects/rogue_T4-A.png',
-  './assets/effects/rogue_T4-B.png',
-  './assets/effects/rogue_T4-C.png',
-  './assets/effects/rogue_T4-D.png',
-  './assets/effects/rogue_T4-S.png',
+  // NOTE: attack-effect PNGs are NOT precached here — they are cached lazily by
+  // the fetch handler (cache-first for images). Precaching every per-class file
+  // would make install() fail entirely if any single file is missing (404).
 ];
 
 self.addEventListener('install', e => {

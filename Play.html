@@ -55,6 +55,12 @@
       }, 80);
     });
 
+    // Pre-apply the mobile panel layout BEFORE revealing the page so the
+    // desktop 3-column grid never flashes on phones when entering the game.
+    if (isMob && typeof applyMobileLayout === 'function') {
+      try { applyMobileLayout(); } catch (e) {}
+    }
+
     // Layout is ready — reveal the page (prevents desktop→mobile flash)
     document.body.classList.remove('preload');
   });
@@ -333,7 +339,7 @@
     </div>
 
     <!-- CENTER: BATTLE PANEL -->
-    <div class="panel battle-panel" style="border-right:none">
+    <div class="panel battle-panel mobile-active" style="border-right:none">
       <div class="panel-header" style="display:flex;align-items:center;gap:.5rem">
         <span>⚔ สนามรบ</span>
         <span style="margin-left:auto"></span>

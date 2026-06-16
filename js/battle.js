@@ -2142,10 +2142,22 @@ function useSkill(id) {
   if ((_skillCooldowns[id] || 0) > 0) return;
 
   document.getElementById('btn-attack').disabled = true;
-  _skillCooldowns[id] = sk.cd;
+
+  // ── MAGE MP mechanic: MP เต็ม (≥100) → ปล่อย Overload: สกิล CD ครึ่งเดียว + ดาเมจ +25% ──
+  let mpOverload = false;
+  if (G.classId === 'mage' && (_classMechanic.mp || 0) >= (_classMechanic.maxMp || 100)) {
+    mpOverload = true;
+    _classMechanic.mp = 0;
+    _skillCooldowns[id] = Math.max(1, Math.ceil(sk.cd / 2));
+    logBattle('<span class="log-crit">🔮 MANA OVERLOAD! สกิลแรงขึ้น + คูลดาวน์ครึ่งเดียว!</span>');
+    _renderClassMechBar();
+  } else {
+    _skillCooldowns[id] = sk.cd;
+  }
 
   const eqBonus  = (typeof getEquippedStatBonus === 'function') ? getEquippedStatBonus() : { atk:0 };
   let baseAtk    = G.baseAtk + (eqBonus.atk || 0) + Math.floor(Math.random() * G.level) + 1;
+  if (mpOverload) baseAtk = Math.floor(baseAtk * 1.25);  // +25% damage on overloaded skill
 
   const monStats = getMonsterStats(G.currentZone, G.currentMonster.tier, G.currentMonster.isBoss);
   let dmg = 0;
@@ -2273,6 +2285,34 @@ function useSkill(id) {
       _skillBuffs.lightShieldRegen = 3;
       skipMonsterTurn = true;
       logBattle(`<span class="log-heal">🌟 โล่แสง! ลด DMG 40% ใน 3 ตา + ฟื้น HP/ตา</span>`);
+      break;
+
+    // ── T2 skills (ชุดที่ 2 — บัฟเปลี่ยนสไตล์การเล่น) ──
+    case 'war_cry':
+      _skillBuffs.warCry = 3;
+      skipMonsterTurn = true;
+      logBattle(`<span class="log-heal">📣 โห่ร้องศึก! ATK +50% เป็นเวลา 3 ตา</span>`);
+      break;
+    case 'mana_surge':
+      _skillBuffs.manaSurge = 3;
+      skipMonsterTurn = true;
+      logBattle(`<span class="log-heal">🌊 คลื่นมานา! ดาเมจเวท +40% เป็นเวลา 3 ตา</span>`);
+      break;
+    case 'smoke_bomb':
+      _skillBuffs.smokeBomb = 2;
+      _skillBuffs.dodge = 2;
+      skipMonsterTurn = true;
+      logBattle(`<span class="log-heal">💨 ระเบิดควัน! หลบ 2 ตา + 2 โจมตีถัดไป crit แน่นอน</span>`);
+      break;
+    case 'eagle_eye':
+      _skillBuffs.eagleEye = 4;
+      skipMonsterTurn = true;
+      logBattle(`<span class="log-heal">🦅 ตาอินทรี! ทะลุ DEF + crit +30% เป็นเวลา 4 ตา</span>`);
+      break;
+    case 'consecrate':
+      _skillBuffs.consecrate = 4;
+      skipMonsterTurn = true;
+      logBattle(`<span class="log-heal">⛪ พื้นศักดิ์สิทธิ์! ฟื้น 10% HP/ตา + สะท้อน 30% ใน 4 ตา</span>`);
       break;
 
     // ── T4 branch A skills ──
@@ -2410,7 +2450,13 @@ function playerAttack() {
 
   const cls = CLASSES.find(c => c.id === G.classId);
   let critChance = .05 + (cls && cls.bonuses.critBonus ? cls.bonuses.critBonus : 0) + (eqBonus.crit || 0) / 100 + (G.critBonusFromTree || 0);
+  // ── T2 self-buffs ──
+  if ((_skillBuffs.eagleEye||0) > 0) critChance += 0.30;        // archer: +crit
   let isCrit = Math.random() < critChance;
+  if ((_skillBuffs.smokeBomb||0) > 0) { isCrit = true; _skillBuffs.smokeBomb--; } // rogue: guaranteed crit
+  if ((_skillBuffs.warCry||0)    > 0) atk = Math.floor(atk * 1.5);  // warrior: +50% ATK
+  if ((_skillBuffs.manaSurge||0) > 0) atk = Math.floor(atk * 1.4);  // mage: +40% spell dmg
+  if ((_skillBuffs.eagleEye||0)  > 0) atk += Math.floor(G.currentMonsterMaxHp * 0.05); // archer: pierce DEF
 
   let lifesteal = 0;
   if (weapon && weapon.effect) {
@@ -2649,6 +2695,10 @@ function _showAttackEffect(container, isCrit) {
 
   const img = document.createElement('img');
   img.src = src;
+  // if a branch-specific effect is missing, fall back to the base-tier FX
+  if (typeof getAttackFxFallbackUrl === 'function') {
+    img.onerror = () => { img.onerror = null; img.src = getAttackFxFallbackUrl(); };
+  }
   img.className = 'attack-fx-img' + (isCrit ? ' crit' : '');
   img.draggable = false;
   container.appendChild(img);
@@ -2687,8 +2737,11 @@ function _singleMonsterAttack(enemyObj) {
   if (_skillBuffs.slamStun)       { dmgTaken = 0; _skillBuffs.slamStun = false;       logBattle(`<span class="log-heal">💥 ศัตรูหยุดโจมตีจาก Slam!</span>`); }
   if (_skillBuffs.thunderStun > 0){ dmgTaken = 0; _skillBuffs.thunderStun--;           logBattle(`<span class="log-heal">⚡ ศัตรูถูก stun จาก Thunder Storm!</span>`); }
   if (_skillBuffs.shadowStep)     { dmgTaken = 0; _skillBuffs.shadowStep = false;      logBattle(`<span class="log-heal">🌑 หลบการโจมตีได้จาก Shadow Step!</span>`); }
+  if ((_skillBuffs.dodge||0) > 0) { dmgTaken = 0; _skillBuffs.dodge--;                 logBattle(`<span class="log-heal">💨 หลบการโจมตีจากระเบิดควัน!</span>`); }
   if (_skillBuffs.ironShield > 0)   dmgTaken = Math.floor(dmgTaken * 0.5);
   if (_skillBuffs.lightShield > 0) { dmgTaken = Math.floor(dmgTaken * 0.6); _skillBuffs.lightShield--; }
+  // paladin Faith → Light Armor (ลดดาเมจ 80%)
+  if ((_classMechanic.lightArmor||0) > 0) { dmgTaken = Math.floor(dmgTaken * 0.2); _classMechanic.lightArmor--; _renderClassMechBar(); }
   if (_skillBuffs.eternalFortress > 0) {
     const counterDmg = Math.floor((G.baseAtk + ((typeof getEquippedStatBonus==='function'?getEquippedStatBonus():{atk:0}).atk||0)) * 3);
     G.currentMonsterHp -= counterDmg;
@@ -2704,6 +2757,15 @@ function _singleMonsterAttack(enemyObj) {
     dmgTaken = Math.floor(dmgTaken * 0.3);
     _skillBuffs.divineRadiance--;
     logBattle(`<span class="log-crit">☀️ แสงตอบโต้! ${radDmg} ดาเมจ (-70% DMG รับ)</span>`);
+  }
+  // consecrate (paladin T2): reflect 30% + regen handled after damage
+  if ((_skillBuffs.consecrate||0) > 0 && dmgTaken > 0) {
+    const reflectDmg = Math.floor(dmgTaken * 0.3);
+    if (reflectDmg > 0) {
+      G.currentMonsterHp -= reflectDmg;
+      if (G.enemies && G.enemies[G.targetIndex]) G.enemies[G.targetIndex].hp = G.currentMonsterHp;
+      logBattle(`<span class="log-crit">⛪ สะท้อน ${reflectDmg} ดาเมจกลับ!</span>`);
+    }
   }
   G.hp = Math.max(0, G.hp - dmgTaken);
   if (dmgTaken > 0) {
@@ -2755,6 +2817,14 @@ function _singleMonsterAttack(enemyObj) {
     G.totalHpHealed = (G.totalHpHealed||0) + lsHeal;
     logBattle(`<span class="log-heal">🌟 โล่แสง ฟื้น ${lsHeal} HP</span>`);
     _skillBuffs.lightShieldRegen--;
+  }
+  // consecrate per-turn regen (paladin T2)
+  if ((_skillBuffs.consecrate||0) > 0) {
+    const cHeal = Math.floor(G.maxHp * 0.10);
+    G.hp = Math.min(G.maxHp, G.hp + cHeal);
+    G.totalHpHealed = (G.totalHpHealed||0) + cHeal;
+    logBattle(`<span class="log-heal">⛪ พื้นศักดิ์สิทธิ์ ฟื้น ${cHeal} HP</span>`);
+    _skillBuffs.consecrate--;
   }
   // heavenRain per-turn regen
   if ((_skillBuffs.heavenRain||0) > 0) {
@@ -3267,35 +3337,37 @@ function _renderClassMechBar() {
     </div>`;
   } else if (cls === 'mage') {
     const mp = _classMechanic.mp || 0, maxMp = _classMechanic.maxMp || 100;
-    html = `<div class="cmb-wrap cmb-mage">
+    const ready = mp >= maxMp;
+    html = `<div class="cmb-wrap cmb-mage${ready?' cmb-focus-ready':''}">
       <span class="cmb-icon">🔮</span>
-      <span class="cmb-label">MP</span>
-      <div class="cmb-bar-bg"><div class="cmb-bar-fill" style="width:${(mp/maxMp)*100}%;background:linear-gradient(90deg,#4400aa,#aa44ff)"></div></div>
+      <span class="cmb-label">${ready?'OVERLOAD!':'MP'}</span>
+      <div class="cmb-bar-bg"><div class="cmb-bar-fill" style="width:${(mp/maxMp)*100}%;background:${ready?'#dd66ff':'linear-gradient(90deg,#4400aa,#aa44ff)'}"></div></div>
       <span class="cmb-val">${mp}/${maxMp}</span>
     </div>`;
   } else if (cls === 'rogue') {
     const c = _classMechanic.combo || 0;
-    const ready = c >= 3;
+    const ready = c >= 6;
     html = `<div class="cmb-wrap cmb-rogue${ready?' cmb-crit-ready':''}">
       <span class="cmb-icon">🗡</span>
-      <span class="cmb-label">${ready?'CRIT!':'Combo'}</span>
-      <div class="cmb-pip-row">${[0,1,2].map(i=>`<div class="cmb-pip${i<c?' filled':''}"></div>`).join('')}</div>
-      <span class="cmb-val">${c}/3</span>
+      <span class="cmb-label">${ready?'PERFECT!':(c>=3?'CRIT!':'Combo')}</span>
+      <div class="cmb-pip-row">${[0,1,2,3,4,5].map(i=>`<div class="cmb-pip${i<c?' filled':''}"></div>`).join('')}</div>
+      <span class="cmb-val">${c}/6</span>
     </div>`;
   } else if (cls === 'archer') {
     const f = Math.min(100, _classMechanic.focus || 0);
-    const ready = f >= 50;
-    html = `<div class="cmb-wrap cmb-archer${ready?' cmb-focus-ready':''}">
+    const ready = f >= 100;
+    html = `<div class="cmb-wrap cmb-archer${(f>=50)?' cmb-focus-ready':''}">
       <span class="cmb-icon">🏹</span>
-      <span class="cmb-label">${ready?'FOCUS!':'Focus'}</span>
+      <span class="cmb-label">${ready?'PERFECT!':(f>=50?'FOCUS!':'Focus')}</span>
       <div class="cmb-bar-bg"><div class="cmb-bar-fill" style="width:${f}%;background:linear-gradient(90deg,#886600,#ffd700)"></div></div>
       <span class="cmb-val">${f}/100</span>
     </div>`;
   } else if (cls === 'paladin') {
     const fa = Math.min(10, _classMechanic.faith || 0);
-    html = `<div class="cmb-wrap cmb-paladin">
-      <span class="cmb-icon">✨</span>
-      <span class="cmb-label">Faith</span>
+    const armor = _classMechanic.lightArmor || 0;
+    html = `<div class="cmb-wrap cmb-paladin${armor>0?' cmb-crit-ready':''}">
+      <span class="cmb-icon">${armor>0?'🛡️':'✨'}</span>
+      <span class="cmb-label">${armor>0?`เกราะแสง ${armor}`:'Faith'}</span>
       <div class="cmb-pip-row">${[0,1,2,3,4,5,6,7,8,9].map(i=>`<div class="cmb-pip${i<fa?' filled faith-pip':''}"></div>`).join('')}</div>
       <span class="cmb-val">${fa}/10</span>
     </div>`;
@@ -3307,21 +3379,35 @@ function _renderClassMechBar() {
 function _applyClassMechOnAttack(atk) {
   const cls = G.classId;
   if (cls === 'warrior') {
+    // Rage โหมด: ยิ่งเข้าโหมดด้วย rage สูง ยิ่งแรง (เก็บไว้ที่ rageMult ตอนปล่อย)
     if (_classMechanic.rageMode) {
-      atk = Math.floor(atk * 1.5);
+      const mult = _classMechanic.rageMult || 1.5;
+      atk = Math.floor(atk * mult);
       _classMechanic.rage = Math.max(0, (_classMechanic.rage||0) - 25);
-      if (_classMechanic.rage <= 0) { _classMechanic.rageMode = false; logBattle('<span class="log-heal">⚔ Rage สิ้นสุด</span>'); }
+      if (_classMechanic.rage <= 0) {
+        _classMechanic.rageMode = false; _classMechanic.rageMult = 1.5;
+        logBattle('<span class="log-heal">⚔ Rage สิ้นสุด</span>');
+      }
     }
   } else if (cls === 'rogue') {
-    if ((_classMechanic.combo||0) >= 3) {
-      atk = Math.floor(atk * 2.5);
+    // Combo สะสมต่อเนื่องถึง 6 — ทุก ๆ 3 combo ปล่อย crit ที่แรงขึ้นเป็นชั้น
+    _classMechanic.combo = (_classMechanic.combo||0) + 1;
+    const c = _classMechanic.combo;
+    if (c >= 6) {
+      atk = Math.floor(atk * 4);
       _classMechanic.combo = 0;
-      logBattle('<span class="log-crit">🗡 Combo Crit x2.5!</span>');
-    } else {
-      _classMechanic.combo = (_classMechanic.combo||0) + 1;
+      logBattle('<span class="log-crit">🗡 PERFECT COMBO x4! เงาสังหาร!</span>');
+    } else if (c >= 3 && c % 3 === 0) {
+      atk = Math.floor(atk * 2.5);
+      logBattle(`<span class="log-crit">🗡 Combo Crit x2.5! (combo ${c}/6)</span>`);
     }
   } else if (cls === 'archer') {
-    if ((_classMechanic.focus||0) >= 50) {
+    // Focus: auto-spend ที่ 100 ก่อน (โบนัสใหญ่), ไม่งั้นที่ 50 (โบนัสเล็ก)
+    if ((_classMechanic.focus||0) >= 100) {
+      atk = Math.floor(atk * 1.8);
+      _classMechanic.focus = 0;
+      logBattle('<span class="log-crit">🎯 PERFECT FOCUS! +80% ATK!</span>');
+    } else if ((_classMechanic.focus||0) >= 50) {
       atk = Math.floor(atk * 1.3);
       _classMechanic.focus = 0;
       logBattle('<span class="log-crit">🏹 Focus! +30% ATK</span>');
@@ -3338,12 +3424,15 @@ function _applyClassMechOnHit(dmg) {
   if (cls === 'warrior' && dmg > 0) {
     const gain = Math.min(20, Math.floor(dmg / 5) + 5);
     _classMechanic.rage = Math.min(100, (_classMechanic.rage||0) + gain);
+    // เข้าโหมด Rage อัตโนมัติเมื่อเต็ม 100 → +100% ATK (แรงกว่าเดิมที่ +50%)
     if (_classMechanic.rage >= 100 && !_classMechanic.rageMode) {
       _classMechanic.rageMode = true;
-      logBattle('<span class="log-crit">🔥 RAGE! +50% ATK ชั่วคราว!</span>');
+      _classMechanic.rageMult = 2.0;
+      logBattle('<span class="log-crit">🔥 FULL RAGE! +100% ATK ชั่วคราว!</span>');
     }
   } else if (cls === 'rogue' && dmg > 0) {
-    _classMechanic.combo = 0;
+    // โดนตี = combo หลุดครึ่งหนึ่ง (ไม่รีเซ็ตหมดเหมือนเดิม — ให้เล่นต่อได้ลื่นขึ้น)
+    _classMechanic.combo = Math.floor((_classMechanic.combo||0) / 2);
     _renderClassMechBar();
   } else if (cls === 'paladin' && dmg > 0) {
     const faithHeal = Math.floor(G.maxHp * 0.02 * (1 + (_classMechanic.faith||0)));
@@ -3361,11 +3450,20 @@ function _applyClassMechOnHit(dmg) {
 function _tickClassMechTurn() {
   const cls = G.classId;
   if (cls === 'mage') {
+    // ทุกการโจมตีปกติเติม MP — เก็บจนเต็มเพื่อปล่อย Mana Overload กับสกิล
     _classMechanic.mp = Math.min(_classMechanic.maxMp||100, (_classMechanic.mp||0) + 10);
     _renderClassMechBar();
   } else if (cls === 'archer') {
     _classMechanic.focus = Math.min(100, (_classMechanic.focus||0) + 5);
     _renderClassMechBar();
+  } else if (cls === 'paladin') {
+    // Faith เต็ม 10 → แปลงเป็น "เกราะแสง" อัตโนมัติ: ลด DMG รับ Faith×8% (สูงสุด ~80%) 3 ตา
+    if ((_classMechanic.faith||0) >= 10 && !(_classMechanic.lightArmor > 0)) {
+      _classMechanic.lightArmor = 3;
+      _classMechanic.faith = 0;
+      logBattle('<span class="log-crit">🛡️✨ เกราะแสงศักดิ์สิทธิ์! ลดดาเมจ 80% เป็นเวลา 3 ตา!</span>');
+      _renderClassMechBar();
+    }
   }
 }
 

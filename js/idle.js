@@ -21,9 +21,16 @@ let _idlePlayerHp   = 0;        // hero HP inside the IDLE panel (separate from 
 let _idlePlayerMax  = 0;
 let _idleSkillReady = {};       // skillId -> timestamp(ms) when it can cast again
 
-// Damage skills usable in IDLE: extra hits / damage multiplier vs a normal hit.
-// (Buff/utility skills are skipped in IDLE — only offensive ones auto-cast.)
+// Skills usable in IDLE. Each entry: { mult, hits, label, buff? }
+//   • mult/hits = damage profile vs a normal hit (mult:1 hits:1 = no direct dmg)
+//   • buff (optional) = a temporary self-buff applied for `turns` IDLE hits:
+//       { atk:1.5 }      → ATK ×1.5 while active
+//       { crit:true }    → guaranteed crit while active
+//       { lifesteal:0.2 }→ heal 20% of damage dealt while active
+//       { speed:true }   → (flavor) faster — handled via shorter effective CD
+//     plus turns:<n>
 const _IDLE_SKILL_DMG = {
+  // ── T1 / branch damage skills ──
   quick_stab:    { mult: 1.2, hits: 2, label: '🗡 แทงเร็ว' },
   slam:          { mult: 2.5, hits: 1, label: '💥 กระทืบ' },
   dragon_breath: { mult: 2.0, hits: 1, label: '🐉 ลมหายใจ' },
@@ -34,9 +41,24 @@ const _IDLE_SKILL_DMG = {
   power_shot:    { mult: 2.4, hits: 1, label: '🏹 ธนูทรง' },
   fireball:      { mult: 2.6, hits: 1, label: '🔥 ไฟบรรลัย' },
   shadow_strike: { mult: 2.8, hits: 1, label: '🌑 เงาสังหาร' },
+  // ── extra damage skills that previously only worked in manual fights ──
+  heavy_blow:    { mult: 2.0, hits: 1, label: '💢 โจมตีหนัก' },
+  blade_storm:   { mult: 0.8, hits: 4, label: '🌀 พายุดาบ' },
+  blizzard:      { mult: 1.0, hits: 3, label: '❄️ พายุน้ำแข็ง' },
+  triple_shot:   { mult: 1.2, hits: 3, label: '🏹 ยิงสามลูก' },
+  arcane_burst:  { mult: 4.0, hits: 1, label: '💥 เวทระเบิด' },
+  // ── T2 BUFF skills (ชุดที่ 2 — ทำงานใน IDLE ด้วย) ──
+  war_cry:    { mult: 1, hits: 1, label: '📣 โห่ร้องศึก',   buff: { atk: 1.5, turns: 4 } },
+  mana_surge: { mult: 1, hits: 1, label: '🌊 คลื่นมานา',    buff: { atk: 1.4, turns: 4 } },
+  smoke_bomb: { mult: 1, hits: 1, label: '💨 ระเบิดควัน',   buff: { crit: true, turns: 3 } },
+  eagle_eye:  { mult: 1, hits: 1, label: '🦅 ตาอินทรี',     buff: { crit: true, turns: 4 } },
+  consecrate: { mult: 1, hits: 1, label: '⛪ พื้นศักดิ์สิทธิ์', buff: { lifesteal: 0.25, turns: 5 } },
 };
 // merge in the C/D/S branch skills defined in data.js (Infinity Trial branches)
 if (typeof INFINITY_IDLE_SKILLS !== 'undefined') Object.assign(_IDLE_SKILL_DMG, INFINITY_IDLE_SKILLS);
+
+// active IDLE buffs: { atk:<mult>, crit:<bool>, lifesteal:<pct>, turns:<remaining> }
+let _idleBuffs = {};
 let _idleDead       = false;    // hero is dead, waiting to respawn
 let _idleRespawnAt  = 0;        // timestamp when hero respawns
 
@@ -254,13 +276,27 @@ function _floatAboveIdleMob(idx, html, cls) {
 // Resolve the attack-effect image URL for the current class/tier/branch.
 // Rogue has per-tier/per-branch art (rogue_T1, rogue_T3-A ... rogue_T4-S).
 // Other classes fall back to rogue's tier art until their own art exists.
+// classes that have their own attack-effect art uploaded (per-class FX).
+// others fall back to rogue's effects until their art is added.
+const _FX_CLASSES = ['warrior', 'mage', 'rogue', 'archer'];
+
+function _fxClass() {
+  return _FX_CLASSES.includes(G.classId) ? G.classId : 'rogue';
+}
+
 function getAttackFxUrl() {
   const tier = Math.min(4, Math.max(1, G.classTier || 1));
   const branch = G.classBranch;
-  const fxClass = (G.classId === 'rogue') ? 'rogue' : 'rogue'; // TODO: per-class art
+  const fxClass = _fxClass();
   // T1/T2 have no branch; T3/T4 use the chosen branch (A/B/C/D/S)
   const suffix = (tier >= 3 && branch) ? `-${branch}` : '';
   return `./assets/effects/${fxClass}_T${tier}${suffix}.png`;
+}
+
+// base-tier FX (no branch) — fallback when a branch-specific effect is missing
+function getAttackFxFallbackUrl() {
+  const tier = Math.min(4, Math.max(1, G.classTier || 1));
+  return `./assets/effects/${_fxClass()}_T${Math.min(2, tier)}.png`;
 }
 
 function _showIdleFx(idx) {
@@ -270,7 +306,12 @@ function _showIdleFx(idx) {
   if (!wrap) return;
   const el = document.createElement('div');
   el.className = 'idle-fx';
-  el.style.backgroundImage = `url('${getAttackFxUrl()}')`;
+  const main = getAttackFxUrl(), fb = getAttackFxFallbackUrl();
+  // probe the branch-specific FX; if it 404s, swap to the base-tier FX
+  const probe = new Image();
+  probe.onerror = () => { el.style.backgroundImage = `url('${fb}')`; };
+  probe.src = main;
+  el.style.backgroundImage = `url('${main}')`;
   wrap.parentElement.appendChild(el);
   setTimeout(() => el.remove(), 400);
 }
@@ -329,21 +370,33 @@ function _idleAttackTick() {
                    + (eqBonus.crit || 0) / 100 + (G.critBonusFromTree || 0);
   let isCrit = Math.random() < critChance;
 
-  // skill auto-cast: if an equipped damage skill is off cooldown, use it
+  // apply any ACTIVE self-buff (from a buff skill cast earlier)
+  if ((_idleBuffs.turns || 0) > 0) {
+    if (_idleBuffs.atk)  atk = Math.floor(atk * _idleBuffs.atk);
+    if (_idleBuffs.crit) isCrit = true;
+  }
+
+  // skill auto-cast: if an equipped skill is off cooldown, use it
   const skill = _idleReadySkill();
   let hits = 1, label = '';
+  let castBuffLabel = '';
   if (skill) {
     const def = _IDLE_SKILL_DMG[skill.id];
-    atk = Math.floor(atk * def.mult);
-    hits = def.hits;
-    label = def.label;
-    // skill crit bonus (e.g. quick_stab +20%)
-    if (skill.id === 'quick_stab' && Math.random() < 0.2) isCrit = true;
-    // cooldown in seconds = skill.cd turns × current attack interval
+    if (def.buff) {
+      // buff skill — apply the temporary buff instead of doing direct damage
+      _idleBuffs = { ...def.buff };  // {atk?,crit?,lifesteal?,turns}
+      castBuffLabel = def.label;
+    } else {
+      atk = Math.floor(atk * def.mult);
+      hits = def.hits;
+      label = def.label;
+      if (skill.id === 'quick_stab' && Math.random() < 0.2) isCrit = true;
+    }
     const cdMs = (skill.cd || 3) * getAttackInterval();
     _idleSkillReady[skill.id] = performance.now() + cdMs;
   }
   if (isCrit) atk = Math.floor(atk * 2);
+  if (castBuffLabel) _floatAboveIdleMob(idx, `${castBuffLabel}!`, 'idle-dmg-float crit');
 
   // hero attack animation
   const heroSpr = document.getElementById('idle-hero-sprite');
@@ -355,6 +408,16 @@ function _idleAttackTick() {
   _showIdleFx(idx);
   const dmgText = (label ? label + ' ' : '') + (hits > 1 ? `${atk}×${hits}` : `${totalDmg}`);
   _floatAboveIdleMob(idx, `${isCrit ? '💥' : ''}${dmgText}`, 'idle-dmg-float' + (isCrit ? ' crit' : ''));
+
+  // lifesteal from active buff (+ secret-trait lifesteal stacks)
+  const buffLeech = ((_idleBuffs.turns||0) > 0 && _idleBuffs.lifesteal) ? _idleBuffs.lifesteal : 0;
+  const totalLeech = buffLeech + (G.lifestealBonus || 0);
+  if (totalLeech > 0) {
+    const heal = Math.floor(totalDmg * totalLeech);
+    if (heal > 0) _idlePlayerHp = Math.min(_idlePlayerMax, _idlePlayerHp + heal);
+  }
+  // tick down the active buff (1 IDLE hit = 1 turn)
+  if ((_idleBuffs.turns||0) > 0) { _idleBuffs.turns--; if (_idleBuffs.turns <= 0) _idleBuffs = {}; }
 
   if (mob.hp <= 0) {
     mob.dead = true;
@@ -412,28 +475,10 @@ function _idleMobDie(idx, mob) {
   G.idleKills = (G.idleKills || 0) + 1;
   _idleSessionKills++;
 
-  // ── Zone Progress: IDLE farming can ALSO advance/unlock zones ──
-  // The minimap unlocks the next zone once the current one is fully cleared.
-  // Previously only manual fights advanced zoneProgress, so a player who
-  // farms via IDLE would stay stuck at 0/6 and never unlock the map.
-  // Advance only when the killed mob's tier matches the next-needed tier
-  // in the CURRENT zone (same rule as manual combat).
-  if (!mob.special && mob.zone === (G.currentZone || 1)) {
-    if (!G.zoneProgress) G.zoneProgress = {};
-    const zoneMonsters = (ZONES.find(z => z.id === mob.zone) || {}).monsters || [];
-    const cur = G.zoneProgress[mob.zone] || 0;
-    if (mob.tier === cur + 1 && cur < zoneMonsters.length) {
-      G.zoneProgress[mob.zone] = cur + 1;
-      const np = G.zoneProgress[mob.zone];
-      if (np >= zoneMonsters.length) {
-        const nz = ZONES.find(z => z.id === mob.zone + 1);
-        if (typeof logBattle === 'function')
-          logBattle(`<span class="log-exp" style="color:#44ff88">🗺️ ฟาร์มผ่านด่าน ${(ZONES.find(z=>z.id===mob.zone)||{}).name}!${nz ? ` ปลดล็อค ${nz.emoji} ${nz.name}` : ' 🏆 ครบทุกด่าน!'}</span>`);
-      }
-      if (typeof renderZoneTabs === 'function') renderZoneTabs();
-      saveGame();
-    }
-  }
+  // NOTE: IDLE farming does NOT advance zone progress / unlock zones.
+  // Only manual zone fights (กดปุ่ม "สู้!") count toward clearing a zone —
+  // otherwise the auto-farm would silently "ผ่านด่าน" before the player ever
+  // fights the zone's monsters themselves.
   if (typeof giveExp === 'function') giveExp(expGain);
   if (typeof checkAchievements === 'function') checkAchievements('idle');
   if (typeof checkIdleMilestone === 'function') checkIdleMilestone();

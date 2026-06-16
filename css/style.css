@@ -1826,15 +1826,24 @@ body.preload{visibility:hidden}
   }
   #idle-panel-header > span:first-child { width: 100%; color: #9fc0ee; }
   #idle-stage {
-    min-height: 150px;          /* was 240px — fits a phone without scrolling past */
+    min-height: 180px;          /* was 240px — fits a phone without scrolling past */
     padding: .9rem .8rem;
     gap: .5rem;
   }
-  /* keep the fighters from overflowing the tighter stage */
+  /* fighters sized for phone — big enough to read clearly, still fits the stage */
   #idle-stage .idle-hero-sprite img,
   #idle-stage .idle-hero-sprite svg,
+  #idle-stage .idle-hero-sprite .png-sprite-wrap img,
   #idle-stage .idle-mob-sprite img,
-  #idle-stage .idle-mob-sprite svg { width: 56px !important; height: 56px !important; }
+  #idle-stage .idle-mob-sprite svg { width: 88px !important; height: 88px !important; }
+  #idle-stage .idle-mob-sprite { font-size: 3rem !important; }
+  /* full-screen IDLE tab has lots of room → bigger fighters */
+  body.mobile-idle-view #idle-stage .idle-hero-sprite img,
+  body.mobile-idle-view #idle-stage .idle-hero-sprite svg,
+  body.mobile-idle-view #idle-stage .idle-hero-sprite .png-sprite-wrap img,
+  body.mobile-idle-view #idle-stage .idle-mob-sprite img,
+  body.mobile-idle-view #idle-stage .idle-mob-sprite svg { width: 112px !important; height: 112px !important; }
+  body.mobile-idle-view #idle-stage .idle-mob-sprite { font-size: 3.8rem !important; }
 }
 
 /* ============================================================

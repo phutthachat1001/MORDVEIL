@@ -1148,6 +1148,8 @@ const SKILL_TREES = {
     {id:'w_atk2',  name:'+5 ATK',   icon:'⚔', type:'stat',  row:1,col:3, requires:'w_atk1', stat:{atk:5}},
     {id:'w_t2sk',  name:'พายุดาบ',  icon:'🌀', type:'skill', row:1,col:2, requires:'w_t1sk',
      skill:{id:'blade_storm',name:'พายุดาบ',desc:'โจมตี 4 ครั้ง แต่ละครั้ง ×0.8 ดาเมจ ชั่วคราวลด DEF ศัตรู',cooldown:5,tier:2}},
+    {id:'w_t2sk2', name:'โห่ร้องศึก',icon:'📣', type:'skill', row:1,col:4, requires:'w_t2sk',
+     skill:{id:'war_cry',name:'โห่ร้องศึก',desc:'บัฟตัวเอง ATK +50% เป็นเวลา 3 ตา (สแต็กกับสกิลอื่นได้)',cooldown:6,tier:2}},
     // ── Row 2 — T3 stat + T3 skill (shared) ──
     {id:'w_hp2',   name:'+40 HP',   icon:'❤', type:'stat',  row:2,col:1, requires:'w_def1', stat:{hp:40}},
     {id:'w_atk3',  name:'+8 ATK',   icon:'⚔', type:'stat',  row:2,col:3, requires:'w_atk2', stat:{atk:8}},
@@ -1202,6 +1204,8 @@ const SKILL_TREES = {
     {id:'m_exp2',  name:'+10% EXP', icon:'✨', type:'stat',  row:1,col:3, requires:'m_exp1', stat:{expBonus:0.1}},
     {id:'m_t2sk',  name:'พายุน้ำแข็ง',icon:'❄️', type:'skill', row:1,col:2, requires:'m_t1sk',
      skill:{id:'blizzard',name:'พายุน้ำแข็ง',desc:'โจมตี 3 ครั้ง ×1.0 + ลด ATK ศัตรู 40% (3 ตา)',cooldown:6,tier:2}},
+    {id:'m_t2sk2', name:'คลื่นมานา',icon:'🌊', type:'skill', row:1,col:4, requires:'m_t2sk',
+     skill:{id:'mana_surge',name:'คลื่นมานา',desc:'บัฟตัวเอง ดาเมจเวท +40% เป็นเวลา 3 ตา + เพิ่มความเร็วโจมตี',cooldown:6,tier:2}},
     // ── Row 2 — T3 shared ──
     {id:'m_atk2',  name:'+10 ATK',  icon:'🔮', type:'stat',  row:2,col:1, requires:'m_hp1',   stat:{atk:10}},
     {id:'m_exp3',  name:'+15% EXP', icon:'✨', type:'stat',  row:2,col:3, requires:'m_exp2',  stat:{expBonus:0.15}},
@@ -1253,6 +1257,8 @@ const SKILL_TREES = {
     // ── Row 1 — T2 ──
     {id:'r_gold1', name:'+10% Gold', icon:'💰', type:'stat',  row:1,col:1, requires:'r_crit1', stat:{goldBonus:0.1}},
     {id:'r_atk2',  name:'+5 ATK',    icon:'🗡', type:'stat',  row:1,col:3, requires:'r_atk1',  stat:{atk:5}},
+    {id:'r_t2sk2', name:'ระเบิดควัน',icon:'💨', type:'skill', row:1,col:4, requires:'r_t2sk',
+     skill:{id:'smoke_bomb',name:'ระเบิดควัน',desc:'หลบการโจมตี 2 ตา + การโจมตี 2 ครั้งถัดไป crit แน่นอน',cooldown:7,tier:2}},
     {id:'r_t2sk',  name:'เงามรณะ',  icon:'☠', type:'skill', row:1,col:2, requires:'r_t1sk',
      skill:{id:'death_mark',name:'เงามรณะ',desc:'ติดตรา: ครั้งถัดไปที่โจมตีทำ ×4 ดาเมจ (stack 2 ตา)',cooldown:5,tier:2}},
     // ── Row 2 — T3 shared ──
@@ -1306,6 +1312,8 @@ const SKILL_TREES = {
     // ── Row 1 — T2 ──
     {id:'a_atk2',   name:'+6 ATK',      icon:'🏹', type:'stat',  row:1,col:1, requires:'a_atk1', stat:{atk:6}},
     {id:'a_str2',   name:'+20% Streak', icon:'🔥', type:'stat',  row:1,col:3, requires:'a_str1',  stat:{streakBonus:0.2}},
+    {id:'a_t2sk2',  name:'ตาอินทรี',   icon:'🦅', type:'skill', row:1,col:4, requires:'a_t2sk',
+     skill:{id:'eagle_eye',name:'ตาอินทรี',desc:'ทะลุ DEF 100% + ไม่พลาดเป้า + crit +30% เป็นเวลา 4 ตา',cooldown:7,tier:2}},
     {id:'a_t2sk',   name:'ยิงสามลูก',  icon:'🏹', type:'skill', row:1,col:2, requires:'a_t1sk',
      skill:{id:'triple_shot',name:'ยิงสามลูก',desc:'ยิง 3 ลูกพร้อมกัน ×1.2 แต่ละลูก + ลูกกลาง crit เสมอ',cooldown:5,tier:2}},
     // ── Row 2 — T3 shared ──
@@ -1359,6 +1367,8 @@ const SKILL_TREES = {
     // ── Row 1 — T2 ──
     {id:'p_hp2',   name:'+50 HP',    icon:'❤', type:'stat',  row:1,col:1, requires:'p_hp1',  stat:{hp:50}},
     {id:'p_def2',  name:'+7 DEF',    icon:'🛡', type:'stat',  row:1,col:3, requires:'p_def1', stat:{def:7}},
+    {id:'p_t2sk2', name:'พื้นศักดิ์สิทธิ์',icon:'⛪', type:'skill', row:1,col:4, requires:'p_t2sk',
+     skill:{id:'consecrate',name:'พื้นศักดิ์สิทธิ์',desc:'ฟื้น 10% HP/ตา + สะท้อนดาเมจ 30% เป็นเวลา 4 ตา',cooldown:8,tier:2}},
     {id:'p_t2sk',  name:'โล่แสง',   icon:'🌟', type:'skill', row:1,col:2, requires:'p_t1sk',
      skill:{id:'light_shield',name:'โล่แสง',desc:'ลด DMG 40% 3 ตา + ฟื้น HP 5% ต่อตา ตลอด',cooldown:6,tier:2}},
     // ── Row 2 — T3 shared ──
