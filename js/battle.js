@@ -9,11 +9,18 @@ function renderZoneTabs() {
   tabs.innerHTML = '';
   tabs.style.display = 'flex';
   ZONES.forEach(z => {
-    // Zone 1 always unlocked; subsequent zones unlock when previous zone is fully cleared
+    // A zone is unlocked when ANY of these hold (keeps the tab strip in sync
+    // with the world map + with zones the player has already entered):
+    //   • it's zone 1
+    //   • the player meets its level requirement (same rule as the map)
+    //   • the previous zone is fully cleared
+    //   • the player has already progressed/entered this zone before
     const prevZone = ZONES.find(pz => pz.id === z.id - 1);
     const prevProgress = prevZone ? ((G.zoneProgress && G.zoneProgress[prevZone.id]) || 0) : 999;
     const prevCleared  = prevZone ? prevProgress >= prevZone.monsters.length : true;
-    const locked = z.id > 1 && !prevCleared;
+    const meetsLevel   = (G.level || 1) >= (z.reqLevel || 1);
+    const alreadyHere  = ((G.zoneProgress && G.zoneProgress[z.id]) || 0) > 0 || G.currentZone === z.id;
+    const locked = z.id > 1 && !prevCleared && !meetsLevel && !alreadyHere;
 
     const zProgress = (G.zoneProgress && G.zoneProgress[z.id]) || 0;
     const zTotal    = z.monsters.length;
