@@ -73,6 +73,34 @@ function dungeonRollKeyDrop(zone, isBoss) {
   return false;
 }
 
+// ---------- battle-screen entry button ----------
+// Show the 🕳️ ดันเจี้ยน button in the battle header only once the dungeon
+// is unlocked; badge it with free-runs/keys so it reads at a glance.
+function refreshDungeonButton() {
+  const btn = document.getElementById('btn-open-dungeon');
+  if (!btn) return;
+  if (typeof canEnterDungeon === 'function' && canEnterDungeon()) {
+    btn.style.display = 'inline-block';
+    const free = dungeonFreeRunsLeft();
+    const keys = dungeonKeys();
+    const tag = free > 0 ? '🆓' : (keys > 0 ? '🗝️' + keys : '🔒');
+    btn.innerHTML = `🕳️ ดันเจี้ยน ${tag}`;
+    btn.title = free > 0 ? `เข้าฟรีวันนี้ได้อีก ${free} รอบ` : (keys > 0 ? `มีกุญแจ ${keys} ดอก` : 'ต้องมีกุญแจ');
+  } else {
+    btn.style.display = 'none';
+  }
+}
+
+// click handler from the battle header button
+function battleOpenDungeon() {
+  if (typeof canEnterDungeon === 'function' && !canEnterDungeon()) {
+    if (typeof logBattle === 'function')
+      logBattle(`<span class="log-sys">🔒 หลุมลึก — ${dungeonUnlockHint()}</span>`);
+    return;
+  }
+  openDungeon();
+}
+
 // ---------- entry / overlay ----------
 function openDungeon() {
   let ov = document.getElementById('dg-overlay');
@@ -94,6 +122,7 @@ function closeDungeon() {
   _stopDgLoop();
   const ov = document.getElementById('dg-overlay');
   if (ov) { ov.classList.remove('active'); ov.style.display = 'none'; }
+  if (typeof refreshDungeonButton === 'function') refreshDungeonButton();
 }
 
 function _renderDgIntro() {
