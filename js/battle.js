@@ -2310,6 +2310,9 @@ function useSkill(id) {
 
   if (G.currentMonsterHp <= 0) { monsterDie(); return; }
   // REAL-TIME: using a skill no longer hands a free turn to the monster.
+  // Start the basic-attack cooldown so the Attack button re-enables (it was
+  // disabled at the top of this function) — otherwise normal attacks lock up.
+  _startAttackCooldown();
   renderSkillBar();
 }
 
