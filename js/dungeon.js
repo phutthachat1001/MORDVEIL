@@ -237,13 +237,13 @@ function _dgTick() {
                    + (eqBonus.crit || 0) / 100 + (G.critBonusFromTree || 0);
   let isCrit = Math.random() < critChance;
 
-  let hits = 1, label = '';
+  let hits = 1, label = '', castDot = null;
   if (typeof _dgReadySkill === 'function' && typeof _IDLE_SKILL_DMG !== 'undefined') {
     const skill = _dgReadySkill();
     if (skill && _IDLE_SKILL_DMG[skill.id]) {
       const def = _IDLE_SKILL_DMG[skill.id];
       atk = Math.floor(atk * def.mult);
-      hits = def.hits; label = def.label;
+      hits = def.hits; label = def.label; castDot = def.dot || null;
       _dgSkillCd[skill.id] = performance.now() + (skill.cd || 3) * _dgInterval();
     }
   }
@@ -252,6 +252,7 @@ function _dgTick() {
 
   const total = atk * hits;
   mob.hp -= total;
+  if (castDot && typeof _applyDot === 'function') _applyDot(mob, castDot, total);
   _flashDgMob(idx);
   _floatDg(idx, `${isCrit ? '💥' : ''}${label ? label + ' ' : ''}${hits > 1 ? atk + '×' + hits : total}`, isCrit ? 'crit' : '');
 
@@ -267,6 +268,15 @@ function _dgTick() {
     if (_dgFloor > (G.dungeonBestFloor || 0)) G.dungeonBestFloor = _dgFloor;
     if (_dgMobs.every(m => m.dead)) setTimeout(() => { if (_dgActive) _spawnDgFloor(); }, 650);
     return;
+  }
+
+  // tick poison/burn
+  if (typeof _tickIdleDots === 'function') {
+    const dotKilled = _tickIdleDots(_dgMobs, _floatDg);
+    if (dotKilled) {
+      _dgMobs.forEach((m, i) => { if (m._diedToDot) { m._diedToDot = false; _markDgMobDead(i); _rollDgDrops(m); } });
+      if (_dgMobs.every(m => m.dead)) { setTimeout(() => { if (_dgActive) _spawnDgFloor(); }, 650); return; }
+    }
   }
   _dgMobAttack();
 }

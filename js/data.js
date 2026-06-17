@@ -1000,14 +1000,17 @@ const INFINITY_TRIAL = {
   // แต่ละ branch มีน้ำหนัก = base + perKill × kills (clamp ไม่ติดลบ)
   // ยิ่งตีเยอะ → น้ำหนัก S/D สูงขึ้น, B/A ต่ำลง → S ออกบ่อยขึ้นแต่ไม่การันตี
   // label/rank ใช้โชว์ความ "เท่" ของผล (ไม่ใช่ลำดับ fixed อีกต่อไป)
+  // rank ของแต่ละ branch ต้อง "ไม่ซ้ำกัน" และตรงกับผลที่ได้จริง
+  // (เดิม C โชว์ rank A, D โชว์ rank S → ทำให้ดูเหมือนสุ่มได้ A แต่ได้ C)
   branchInfo: {
     B: { label:'เส้นทางตั้งรับ', rank:'B', base:40, perKill:-0.30 },
     A: { label:'เส้นทางบุก',      rank:'A', base:35, perKill:-0.10 },
-    C: { label:'เส้นทางพิฆาต',    rank:'A', base:18, perKill: 0.18 },
-    D: { label:'เส้นทางจอมทัพ',   rank:'S', base: 7, perKill: 0.30 },
+    C: { label:'เส้นทางพิฆาต',    rank:'C', base:18, perKill: 0.18 },
+    D: { label:'เส้นทางจอมทัพ',   rank:'D', base: 7, perKill: 0.30 },
   },
   // SECRET (S) — ต้องผ่านคลื่นลึกถึงจะมีสิทธิ์ลุ้น, น้ำหนักโตตาม kills
-  secret: { label:'TIER ลับ', rank:'SS', minWave:10, base:0, perKill:0.45, minKillsToRoll:30 },
+  // rank โชว์เป็น "S" (Tier ลับเดียวของเกม) — ไม่มี SS แยกต่างหาก
+  secret: { label:'TIER ลับ', rank:'S', minWave:10, base:0, perKill:0.45, minKillsToRoll:30 },
   // floor ขั้นต่ำของแต่ละ weight (กันติดลบ)
   minWeight: 1,
 
@@ -1602,6 +1605,35 @@ const INFINITY_IDLE_SKILLS = {};
     return '+stat';
   }
 })();
+
+// ============================================================
+// DAMAGE-OVER-TIME (DoT) for skills themed as พิษ/เผา ("X ตา")
+// Previously these skills only dealt their direct multiplier — the
+// "poison/burn for N turns" never actually happened. Tag each such skill
+// with a dot spec so combat (idle/trial/dungeon) applies the DoT.
+//   dot: { type:'poison'|'burn', pct:<fraction of the SKILL hit dealt per tick>,
+//          ticks:<number of follow-up ticks>, defDown?:<flat DEF reduction> }
+// pct is a fraction of the damage the casting hit dealt, so it scales with the
+// player's power without being overpowered.
+// ============================================================
+const SKILL_DOT = {
+  // rogue — poison line
+  venom_strike: { type:'poison', pct:0.30, ticks:4 },
+  death_venom:  { type:'poison', pct:0.45, ticks:4, defDown:0.25 },
+  // mage — flame line
+  wrath_flame:      { type:'burn', pct:0.30, ticks:4 },
+  apocalypse_flame: { type:'burn', pct:0.40, ticks:4 },
+  // archer — flame line
+  flame_arrow:  { type:'burn', pct:0.28, ticks:3 },
+  meteor_arrow: { type:'burn', pct:0.38, ticks:4 },
+  // warrior secret — blood massacre burn
+  blood_massacre: { type:'burn', pct:0.25, ticks:3 },
+  // mage T4 nova / void curse (already strong, light DoT)
+  doom_nova:  { type:'burn', pct:0.20, ticks:4 },
+  void_curse: { type:'poison', pct:0.20, ticks:5, defDown:0.2 },
+};
+// (the dot spec is folded onto the skill defs in idle.js, after _IDLE_SKILL_DMG
+//  is fully assembled — see attachSkillDots there)
 
 // ── FIX: IDLE entry nodes (row 5) were gated behind main-tree stat nodes
 // (e.g. r_spd1 required r_atk1). A player who spent points on skills could

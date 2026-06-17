@@ -56,6 +56,34 @@ const _IDLE_SKILL_DMG = {
 };
 // merge in the C/D/S branch skills defined in data.js (Infinity Trial branches)
 if (typeof INFINITY_IDLE_SKILLS !== 'undefined') Object.assign(_IDLE_SKILL_DMG, INFINITY_IDLE_SKILLS);
+// fold DoT specs (พิษ/เผา) onto the fully-assembled skill table so DoT-themed
+// skills (venom_strike, wrath_flame, flame_arrow, ...) actually apply DoT.
+if (typeof SKILL_DOT !== 'undefined') {
+  Object.keys(SKILL_DOT).forEach(id => { if (_IDLE_SKILL_DMG[id]) _IDLE_SKILL_DMG[id].dot = SKILL_DOT[id]; });
+}
+
+// Apply a DoT from a skill hit onto a mob. dmgDealt = the skill's direct damage.
+function _applyDot(mob, dotSpec, dmgDealt) {
+  if (!mob || !dotSpec) return;
+  const perTick = Math.max(1, Math.floor(dmgDealt * (dotSpec.pct || 0.25)));
+  mob.dot = { type: dotSpec.type || 'poison', perTick, ticks: dotSpec.ticks || 3 };
+  if (dotSpec.defDown) mob.defDown = Math.max(mob.defDown || 0, dotSpec.defDown);
+}
+
+// Tick all active DoTs on the mob list; returns true if any mob died from it.
+function _tickIdleDots(mobs, floatFn) {
+  let anyDied = false;
+  (mobs || []).forEach((m, i) => {
+    if (m.dead || !m.dot || m.dot.ticks <= 0) return;
+    m.hp -= m.dot.perTick;
+    const icon = m.dot.type === 'burn' ? '🔥' : '🟢';
+    if (typeof floatFn === 'function') floatFn(i, `${icon}${m.dot.perTick}`, 'idle-dmg-float');
+    m.dot.ticks--;
+    if (m.dot.ticks <= 0) m.dot = null;
+    if (m.hp <= 0 && !m.dead) { m.dead = true; anyDied = true; m._diedToDot = true; }
+  });
+  return anyDied;
+}
 
 // active IDLE buffs: { atk:<mult>, crit:<bool>, lifesteal:<pct>, turns:<remaining> }
 let _idleBuffs = {};
@@ -395,6 +423,7 @@ function _idleAttackTick() {
     const cdMs = (skill.cd || 3) * getAttackInterval();
     _idleSkillReady[skill.id] = performance.now() + cdMs;
   }
+  const castDot = (skill && _IDLE_SKILL_DMG[skill.id]) ? _IDLE_SKILL_DMG[skill.id].dot : null;
   if (isCrit) atk = Math.floor(atk * 2);
   if (castBuffLabel) _floatAboveIdleMob(idx, `${castBuffLabel}!`, 'idle-dmg-float crit');
 
@@ -404,6 +433,8 @@ function _idleAttackTick() {
 
   const totalDmg = atk * hits;
   mob.hp -= totalDmg;
+  // apply DoT (พิษ/เผา) if this cast was a DoT skill
+  if (castDot) _applyDot(mob, castDot, totalDmg);
   _updateIdleMobHp(idx);
   _showIdleFx(idx);
   const dmgText = (label ? label + ' ' : '') + (hits > 1 ? `${atk}×${hits}` : `${totalDmg}`);
@@ -424,6 +455,14 @@ function _idleAttackTick() {
     _idleMobDie(idx, mob);
     return;
   }
+
+  // tick poison/burn on all mobs (the target + any others still afflicted)
+  const dotKilled = _tickIdleDots(_idleMobs, _floatAboveIdleMob);
+  if (dotKilled) {
+    _idleMobs.forEach((m, i) => { if (m._diedToDot) { m._diedToDot = false; _idleMobDie(i, m); } });
+    if (_idleMobs.every(m => m.dead)) return;
+  }
+  _updateIdleMobHp(idx);
 
   // surviving mobs strike back at the hero
   _idleMobsAttackHero();

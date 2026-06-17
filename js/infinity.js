@@ -65,7 +65,7 @@ function _renderTrialIntro() {
         <li>❤️ HP ไม่ฟื้นระหว่างการทดสอบ — ตายเมื่อไหร่ จบทันที</li>
         <li>🎲 คลาสที่ได้เป็นการ <b>สุ่ม</b> — ทุกคลาสมีดีของตัวเอง!</li>
         <li>💀 ยิ่งตีได้เยอะ ยิ่งเพิ่ม <b>%</b> คลาสสายโหด (พิฆาต/จอมทัพ)</li>
-        <li>★ ทะลุคลื่นที่ ${T.secret.minWave}+ และตี ${T.secret.minKillsToRoll}+ → เริ่มมีลุ้น <span style="color:#ff00cc">Tier ลับ (SS)</span> — ยิ่งตีเยอะ % ยิ่งสูง</li>
+        <li>★ ทะลุคลื่นที่ ${T.secret.minWave}+ และตี ${T.secret.minKillsToRoll}+ → เริ่มมีลุ้น <span style="color:#ff00cc">Tier ลับ (S)</span> — ยิ่งตีเยอะ % ยิ่งสูง</li>
       </ul>
       <div class="trial-thresholds">
         <span>เริ่มต้น: B/A สูง — สาย C/D/S ต่ำ</span>
@@ -169,13 +169,13 @@ function _trialTick() {
   let isCrit = Math.random() < critChance;
 
   // skill auto-cast (reuse idle skill table)
-  let hits = 1, label = '';
+  let hits = 1, label = '', castDot = null;
   if (typeof _idleReadySkill === 'function' && typeof _IDLE_SKILL_DMG !== 'undefined') {
     const skill = _trialReadySkill();
     if (skill) {
       const def = _IDLE_SKILL_DMG[skill.id];
       atk = Math.floor(atk * def.mult);
-      hits = def.hits; label = def.label;
+      hits = def.hits; label = def.label; castDot = def.dot || null;
       _trialSkillCd[skill.id] = performance.now() + (skill.cd || 3) * _trialInterval();
     }
   }
@@ -185,6 +185,7 @@ function _trialTick() {
 
   const total = atk * hits;
   mob.hp -= total;
+  if (castDot && typeof _applyDot === 'function') _applyDot(mob, castDot, total);
   _flashTrialMob(idx);
   _floatTrial(idx, `${isCrit ? '💥' : ''}${label ? label + ' ' : ''}${hits > 1 ? atk + '×' + hits : total}`, isCrit ? 'crit' : '');
 
@@ -200,6 +201,16 @@ function _trialTick() {
     _markTrialMobDead(idx);
     if (_trialMobs.every(m => m.dead)) setTimeout(() => { if (_trialActive) _spawnTrialWave(); }, 500);
     return;
+  }
+
+  // tick poison/burn on all mobs
+  if (typeof _tickIdleDots === 'function') {
+    const dotKilled = _tickIdleDots(_trialMobs, _floatTrial);
+    if (dotKilled) {
+      _trialMobs.forEach(m => { if (m._diedToDot) { m._diedToDot = false; _trialKills++; } });
+      _trialMobs.forEach((m, i) => { if (m.dead) _markTrialMobDead(i); });
+      if (_trialMobs.every(m => m.dead)) { setTimeout(() => { if (_trialActive) _spawnTrialWave(); }, 500); return; }
+    }
   }
 
   // surviving mobs hit back
