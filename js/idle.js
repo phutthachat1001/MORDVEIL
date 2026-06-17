@@ -377,7 +377,7 @@ function _showIdleFx(idx) {
   probe.src = main;
   el.style.backgroundImage = `url('${main}')`;
   wrap.parentElement.appendChild(el);
-  setTimeout(() => el.remove(), 400);
+  setTimeout(() => el.remove(), 2000); // matches idleFxPop 2s (hold then fade)
 }
 
 // find an equipped offensive skill that's off cooldown (returns {id, cd} or null)

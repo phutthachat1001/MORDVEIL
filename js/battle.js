@@ -2662,7 +2662,7 @@ function _showAttackEffect(container, isCrit) {
   img.className = 'attack-fx-img' + (isCrit ? ' crit' : '');
   img.draggable = false;
   container.appendChild(img);
-  setTimeout(() => img.remove(), 650);
+  setTimeout(() => img.remove(), 2000); // matches attack-fx 2s (hold then fade)
 }
 
 // ---------- Monster attack ----------
