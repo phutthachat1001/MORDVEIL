@@ -499,6 +499,7 @@ function _idleMobDie(idx, mob) {
     if (dropped) {
       const col = (RARITIES[dropped.rarity] && RARITIES[dropped.rarity].color) || '#aaa';
       _floatAboveIdleMob(idx, `<span style="color:${col}">${dropped.icon||'⚔'} ${dropped.name}</span>`, 'idle-drop-float');
+      if (typeof rpgOnItemDrop === 'function') rpgOnItemDrop(dropped.rarity, mob.special === 'boss');
     }
   }
   // dungeon key drop from IDLE farming (same rate as manual; boss/special x2)

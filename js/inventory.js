@@ -37,9 +37,8 @@ const _CHEST_RARITY = { common:'common', uncommon:'uncommon', rare:'rare', boss:
 function grantChestReward(type, n = 1) {
   const rarity = _CHEST_RARITY[type] || 'common';
   for (let i = 0; i < n; i++) {
-    if (typeof _dropDirectItem === 'function') _dropDirectItem(rarity);
-    // keep "collect chest" quests working now that chests grant items directly
-    if (typeof rpgOnChestOpen === 'function') rpgOnChestOpen(type);
+    // _dropDirectItem already notifies item-collect quests (rpgOnItemDrop)
+    if (typeof _dropDirectItem === 'function') _dropDirectItem(rarity, null, type === 'boss');
   }
   if (typeof renderInventory === 'function') renderInventory();
   if (typeof updateNavBadges === 'function') updateNavBadges();

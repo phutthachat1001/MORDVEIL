@@ -263,20 +263,20 @@ const RPG_QUESTS = [
     reward:{ exp:500000, gold:20000, chest:'boss' }, minLevel:98 },
 
   // ════════════════════════════════════
-  // COLLECT QUESTS — เก็บของ/หีบ
+  // COLLECT QUESTS — เก็บของ (ดรอปจากมอน)
   // ════════════════════════════════════
-  { id:'col01', name:'รวบรวมทรัพย์สมบัติ', zone:1, type:'collect',
-    collectType:'chest', required:5,
-    desc:'เปิดหีบสมบัติ 5 ใบ (ทุกประเภท)',
+  { id:'col01', name:'รวบรวมของดรอป', zone:1, type:'collect',
+    collectType:'item', required:5,
+    desc:'เก็บไอเทมที่ดรอปจากมอน 5 ชิ้น (ทุกระดับ)',
     reward:{ exp:2000, gold:500 }, minLevel:1 },
-  { id:'col02', name:'นักล่าสมบัติ', zone:1, type:'collect',
-    collectType:'chest', required:20,
-    desc:'เปิดหีบสมบัติรวม 20 ใบ',
-    reward:{ exp:8000, gold:1500, chest:'rare' }, minLevel:5 },
+  { id:'col02', name:'นักล่าของหายาก', zone:1, type:'collect',
+    collectType:'item_rare', required:10,
+    desc:'เก็บไอเทมหายาก (Rare+) 10 ชิ้น',
+    reward:{ exp:8000, gold:1500 }, minLevel:5 },
   { id:'col03', name:'ราชาสมบัติ', zone:1, type:'collect',
-    collectType:'chest', required:50,
-    desc:'เปิดหีบสมบัติรวม 50 ใบ',
-    reward:{ exp:30000, gold:5000, chest:'boss' }, minLevel:20 },
+    collectType:'item', required:50,
+    desc:'เก็บไอเทมที่ดรอปรวม 50 ชิ้น',
+    reward:{ exp:30000, gold:5000 }, minLevel:20 },
   { id:'col04', name:'สะสมทอง', zone:1, type:'collect',
     collectType:'gold', required:1000,
     desc:'สะสมทอง 1,000 เหรียญ',
@@ -284,10 +284,10 @@ const RPG_QUESTS = [
   { id:'col05', name:'เศรษฐีแห่งดินแดน', zone:1, type:'collect',
     collectType:'gold', required:10000,
     desc:'สะสมทอง 10,000 เหรียญ',
-    reward:{ exp:15000, gold:2000, chest:'rare' }, minLevel:15 },
-  { id:'col06', name:'เปิดหีบบอส', zone:1, type:'collect',
-    collectType:'bosschest', required:3,
-    desc:'เปิดหีบบอส 3 ใบ',
+    reward:{ exp:15000, gold:2000 }, minLevel:15 },
+  { id:'col06', name:'ล่าของจากบอส', zone:1, type:'collect',
+    collectType:'bossitem', required:3,
+    desc:'เก็บไอเทมที่ดรอปจากบอส 3 ชิ้น',
     reward:{ exp:10000, gold:3000 }, minLevel:10 },
 
   // ════════════════════════════════════
@@ -363,7 +363,7 @@ const RPG_DAILY_POOL = [
   { id:'d_kill25',  name:'ล่าไม่หยุด',         desc:'กำจัดมอนสเตอร์ 25 ตัววันนี้',   type:'daily_kill',    required:25,  reward:{ exp:8000,  gold:1200, chest:'uncommon' } },
   { id:'d_boss1',   name:'ล่าบอสประจำวัน',     desc:'ปราบบอส 1 ตัววันนี้',           type:'daily_boss',    required:1,   reward:{ exp:5000,  gold:800,  chest:'rare'     } },
   { id:'d_boss3',   name:'นักล่าบอส',          desc:'ปราบบอส 3 ตัววันนี้',           type:'daily_boss',    required:3,   reward:{ exp:15000, gold:2500, chest:'boss'     } },
-  { id:'d_chest3',  name:'เปิดสมบัติ',         desc:'เปิดหีบสมบัติ 3 ใบวันนี้',     type:'daily_chest',   required:3,   reward:{ exp:2000,  gold:400  } },
+  { id:'d_chest3',  name:'เก็บของดรอป',        desc:'เก็บไอเทมที่ดรอป 3 ชิ้นวันนี้', type:'daily_item',    required:3,   reward:{ exp:2000,  gold:400  } },
   { id:'d_zone2',   name:'สำรวจหุบเขา',        desc:'ล่ามอนในโซน 2 จำนวน 10 ตัว',  type:'daily_zonekill',required:10, zone:2, reward:{ exp:4000,  gold:600  } },
   { id:'d_zone3',   name:'ล่ามังกร',            desc:'ล่ามอนในโซน 3 จำนวน 8 ตัว',   type:'daily_zonekill',required:8,  zone:3, reward:{ exp:8000,  gold:1000, chest:'uncommon' } },
   { id:'d_zone4',   name:'สำรวจซาก',           desc:'ล่ามอนในโซน 4 จำนวน 6 ตัว',   type:'daily_zonekill',required:6,  zone:4, reward:{ exp:15000, gold:2000, chest:'rare'     } },
@@ -495,23 +495,29 @@ function rpgAutoAcceptZoneQuests(zoneId) {
 }
 
 // จาก chest open (เรียกจาก openChest / gacha modal)
-function rpgOnChestOpen(chestType) {
+// Called whenever a piece of gear DROPS from a monster (manual + IDLE).
+//   rarity   = item rarity string · fromBoss = dropped by a boss kill
+const _RARE_PLUS = ['rare','epic','legend','ancient','mythic','limited','secret'];
+function rpgOnItemDrop(rarity, fromBoss) {
   if (G.gameMode !== 'fullrpg') return;
   let changed = false;
+  const isRarePlus = _RARE_PLUS.includes(rarity);
   RPG_QUESTS.forEach(q => {
     const st = _rpgState(q.id);
-    if (!st.active || st.done) return;
-    if (q.type === 'collect' && q.collectType === 'chest') {
-      st.progress = (st.progress||0) + 1; changed = true;
-      _rpgCheckComplete(q, st);
-    }
-    if (q.type === 'collect' && q.collectType === 'bosschest' && chestType === 'boss') {
-      st.progress = (st.progress||0) + 1; changed = true;
-      _rpgCheckComplete(q, st);
-    }
+    if (!st.active || st.done || q.type !== 'collect') return;
+    let inc = false;
+    if (q.collectType === 'item') inc = true;
+    else if (q.collectType === 'item_rare' && isRarePlus) inc = true;
+    else if (q.collectType === 'bossitem' && fromBoss) inc = true;
+    if (inc) { st.progress = (st.progress||0) + 1; changed = true; _rpgCheckComplete(q, st); }
   });
-  _rpgDailyChest();
+  _rpgDailyItem();
   if (changed) { saveGame(); renderRpgQuestPanel(); }
+}
+
+// backward-compat alias — old callers that opened chests now count as one item
+function rpgOnChestOpen(chestType) {
+  rpgOnItemDrop('rare', chestType === 'boss');
 }
 
 // จาก giveGold / goldGain ต่างๆ — track gold สะสม
@@ -699,10 +705,10 @@ function _rpgDailyKill(zoneId, tier) {
   if (changed) { saveGame(); renderRpgDailyPanel(); }
 }
 
-function _rpgDailyChest() {
+function _rpgDailyItem() {
   if (!G.rpgDaily?.quests) return;
   G.rpgDaily.quests.forEach(q => {
-    if (q.done || q.type !== 'daily_chest') return;
+    if (q.done || q.type !== 'daily_item') return;
     q.progress++; _rpgDailyCheck(q);
   });
   saveGame(); renderRpgDailyPanel();
@@ -963,7 +969,7 @@ function renderRpgDailyPanel() {
   const chestLabel = { common:'ธรรมดา', uncommon:'พิเศษ', rare:'หายาก', boss:'บอส' };
   const typeLabel  = {
     daily_kill:'⚔ ฆ่ามอน', daily_boss:'👑 ฆ่าบอส',
-    daily_chest:'📦 เปิดหีบ', daily_zonekill:'🗺 ล่าในโซน',
+    daily_item:'💎 เก็บของ', daily_zonekill:'🗺 ล่าในโซน',
     daily_gold:'💰 หาทอง', daily_equip:'🛡 สวมอุปกรณ์'
   };
 

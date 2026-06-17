@@ -2617,7 +2617,7 @@ function _scaleItemForZone(item, zone) {
   return item;
 }
 
-function _dropDirectItem(rarity, zone) {
+function _dropDirectItem(rarity, zone, fromBoss) {
   zone = zone || G.currentZone || 1;
   const floorIdx = _RARITY_ORDER.indexOf(_ZONE_RARITY_FLOOR[Math.min(6, Math.max(1, zone))] || 'common');
   if (G.inventory && G.inventory.length >= 50) {
@@ -2655,6 +2655,7 @@ function _dropDirectItem(rarity, zone) {
   // flag for achievements
   if (['rare','epic','legend','ancient'].includes(effRarity)) G.gotRareWeapon = true;
   if (effRarity === 'legend' || effRarity === 'ancient') G.gotLegendWeapon = true;
+  if (typeof rpgOnItemDrop === 'function') rpgOnItemDrop(effRarity, !!fromBoss);
   renderInventory();
 }
 
@@ -2968,8 +2969,8 @@ function monsterDie() {
   if (monster.isBoss) {
     // boss guaranteed 1-2 items, rarity based on zone
     const bossRarity = _dropRarityForZone(G.currentZone, true);
-    _dropDirectItem(bossRarity, G.currentZone);
-    if (Math.random() < 0.5) _dropDirectItem(bossRarity, G.currentZone);
+    _dropDirectItem(bossRarity, G.currentZone, true);
+    if (Math.random() < 0.5) _dropDirectItem(bossRarity, G.currentZone, true);
   } else {
     // normal monster: lower drop rate than boss (boss = guaranteed)
     // base drop rate scales with zone (6% → 13.5%), bonus from class + tree
