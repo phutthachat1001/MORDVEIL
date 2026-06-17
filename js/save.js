@@ -182,6 +182,8 @@ function loadGame() {
       if (G.dungeonBestFloor === undefined)    G.dungeonBestFloor = 0;
       if (!G.cards)                            G.cards = {};
       if (!G.talents)                          G.talents = {};
+      if (!G.worldBossDamage)                  G.worldBossDamage = {};
+      if (!G.worldBossClaimed)                 G.worldBossClaimed = {};
       if (G.dungeonFreeDate === undefined)     G.dungeonFreeDate  = null;
       if (G.dungeonFreeUsed === undefined)     G.dungeonFreeUsed  = 0;
       // existing saves have already learned the game → don't show onboarding

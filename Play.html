@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=90">
+<link rel="stylesheet" href="css/style.css?v=91">
 <script>
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
@@ -248,6 +248,7 @@
     <button onclick="showAchievements()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">ความสำเร็จ</button>
     <button onclick="openCardCollection()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">🃏 การ์ด</button>
     <button onclick="openTalentPanel()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">🎯 ติดตัว</button>
+    <button onclick="openWorldBoss()" style="background:linear-gradient(135deg,#3a1020,#1a0a14);border:1px solid #cc4466;color:#ff88aa;padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">🌍 บอสโลก</button>
     <button onclick="replayTutorial()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">❔ วิธีเล่น</button>
     <button class="btn-mute" onclick="toggleMute()" title="ปิดเสียง" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .5rem;border-radius:4px;cursor:pointer;font-size:.9rem">🔊</button>
     <button onclick="openShop()" style="background:linear-gradient(135deg,#1a2a40,#0f1a2e);border:2px solid var(--gold);color:var(--gold);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🏪 ร้านค้า</button>
@@ -279,6 +280,7 @@
     <button onclick="showAchievements()"      style="border-color:var(--border2)">🏆 ความสำเร็จ</button>
     <button onclick="openCardCollection()"    style="border-color:var(--border2)">🃏 การ์ด</button>
     <button onclick="openTalentPanel()"       style="border-color:var(--border2)">🎯 ติดตัว</button>
+    <button onclick="openWorldBoss()"         style="border-color:#cc4466;color:#ff88aa">🌍 บอสโลก</button>
     <button onclick="replayTutorial()"        style="border-color:var(--border2)">❔ วิธีเล่น</button>
     <button class="btn-mute" onclick="toggleMute()" style="border-color:var(--border2)">🔊</button>
     <button onclick="openShop()"              style="border-color:var(--gold);color:var(--gold)">🏪 ร้านค้า</button>
@@ -868,37 +870,38 @@
 <!-- ===== SCRIPTS (โหลดตามลำดับ dependency) =====
      NOTE: ?v=NN busts the browser/iOS HTTP cache. Bump this number (and the SW
      CACHE version in sw.js) on every deploy so updates show without reinstall. -->
-<script src="js/data.js?v=90"></script>
-<script src="js/cards.js?v=90"></script>
-<script src="js/state.js?v=90"></script>
-<script src="js/audio.js?v=90"></script>
-<script src="js/save.js?v=90"></script>
-<script src="js/achievements.js?v=90"></script>
-<script src="js/daily.js?v=90"></script>
-<script src="js/evolution.js?v=90"></script>
-<script src="js/infinity.js?v=90"></script>
-<script src="js/t4dungeon.js?v=90"></script>
-<script src="js/dungeon.js?v=90"></script>
-<script src="js/enhance.js?v=90"></script>
-<script src="js/skilltree.js?v=90"></script>
-<script src="js/talents.js?v=90"></script>
-<script src="js/exp.js?v=90"></script>
-<script src="js/shop.js?v=90"></script>
-<script src="js/inventory.js?v=90"></script>
-<script src="js/events.js?v=90"></script>
-<script src="js/cosmetic.js?v=90"></script>
-<script src="js/rpg-quests.js?v=90"></script>
-<script src="js/npc-encounter.js?v=90"></script>
-<script src="js/battle.js?v=90"></script>
-<script src="js/idle.js?v=90"></script>
-<script src="js/offline.js?v=90"></script>
-<script src="js/idle-events.js?v=90"></script>
-<script src="js/codex.js?v=90"></script>
-<script src="js/tasks.js?v=90"></script>
-<script src="js/hub.js?v=90"></script>
-<script src="js/intro.js?v=90"></script>
-<script src="js/tutorial.js?v=90"></script>
-<script src="js/ui.js?v=90"></script>
+<script src="js/data.js?v=91"></script>
+<script src="js/cards.js?v=91"></script>
+<script src="js/state.js?v=91"></script>
+<script src="js/audio.js?v=91"></script>
+<script src="js/save.js?v=91"></script>
+<script src="js/achievements.js?v=91"></script>
+<script src="js/daily.js?v=91"></script>
+<script src="js/evolution.js?v=91"></script>
+<script src="js/infinity.js?v=91"></script>
+<script src="js/t4dungeon.js?v=91"></script>
+<script src="js/dungeon.js?v=91"></script>
+<script src="js/enhance.js?v=91"></script>
+<script src="js/skilltree.js?v=91"></script>
+<script src="js/talents.js?v=91"></script>
+<script src="js/worldboss.js?v=91"></script>
+<script src="js/exp.js?v=91"></script>
+<script src="js/shop.js?v=91"></script>
+<script src="js/inventory.js?v=91"></script>
+<script src="js/events.js?v=91"></script>
+<script src="js/cosmetic.js?v=91"></script>
+<script src="js/rpg-quests.js?v=91"></script>
+<script src="js/npc-encounter.js?v=91"></script>
+<script src="js/battle.js?v=91"></script>
+<script src="js/idle.js?v=91"></script>
+<script src="js/offline.js?v=91"></script>
+<script src="js/idle-events.js?v=91"></script>
+<script src="js/codex.js?v=91"></script>
+<script src="js/tasks.js?v=91"></script>
+<script src="js/hub.js?v=91"></script>
+<script src="js/intro.js?v=91"></script>
+<script src="js/tutorial.js?v=91"></script>
+<script src="js/ui.js?v=91"></script>
 <script>
   // Override window.onload to handle both buttons properly
   window.onload = () => {
