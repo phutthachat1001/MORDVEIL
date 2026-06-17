@@ -483,41 +483,15 @@ function rpgOnExplore(zoneId) {
     }
   });
   if (changed) { saveGame(); renderRpgQuestPanel(); }
-  // auto-accept any newly-available quests for this zone (no NPC trip needed)
-  rpgAutoAcceptZoneQuests(zoneId);
+  // NOTE: no auto-accept. ALL quests (kill/collect/explore/NPC/story) must be
+  // accepted manually now — the player picks them up from the quest giver.
 }
 
-// Auto-accept ONLY plain KILL quests for the zone the player enters — so
-// fighting in a zone lights up the quest system + red badge without an NPC trip.
-// Collect / explore / NPC-talk / story quests are NOT auto-accepted — those are
-// taken manually (visit the NPC). Retroactive credit in rpgAcceptQuest applies.
+// Auto-accept is DISABLED — every quest must be taken manually by the player.
+// Kept as a no-op so any remaining callers don't error. Retroactive credit
+// still applies once a quest is accepted (see rpgAcceptQuest).
 function rpgAutoAcceptZoneQuests(zoneId) {
-  if (G.gameMode !== 'fullrpg') return;
-  const MAX_ACTIVE_AUTO = 3;
-  const curActive = rpgGetActiveQuests().filter(q => !q.chainFrom && !q.chainNext && q.type !== 'chain').length;
-  let slots = Math.max(0, MAX_ACTIVE_AUTO - curActive);
-  if (slots <= 0) return;
-
-  const candidates = RPG_QUESTS
-    .filter(q => q.type === 'kill')                       // kill quests only
-    .filter(q => !(q.chainFrom || q.chainNext))           // exclude story chain
-    .filter(q => (q.targetZone || q.zone) === zoneId)
-    .filter(q => G.level >= q.minLevel)
-    .filter(q => { const st = _rpgState(q.id); return !st.active && !st.done; })
-    .sort((a, b) => (a.targetTier || 0) - (b.targetTier || 0));
-
-  let any = false;
-  for (const q of candidates) {
-    if (slots <= 0) break;
-    rpgAcceptQuest(q.id);
-    // only consumes a slot if it didn't instantly complete (retroactive)
-    if (!_rpgState(q.id).done) slots--;
-    any = true;
-  }
-  if (any) {
-    if (typeof updateNavBadges === 'function') updateNavBadges();
-    if (typeof renderRpgQuestPanel === 'function') renderRpgQuestPanel();
-  }
+  /* intentionally does nothing — quests are manual-accept only */
 }
 
 // จาก chest open (เรียกจาก openChest / gacha modal)
@@ -929,11 +903,17 @@ function renderRpgQuestPanel() {
     const showOther = otherQ;              // แสดงทุก non-kill quests (collect/explore/skilltree)
     const hiddenKill = killQ.length - showKill.length;
 
-    // quest menu is VIEW-ONLY now: kill quests are auto-accepted by entering
-    // their zone; other quests are taken by talking to the matching NPC.
-    const _howToGet = (q) => q.type === 'kill'
-      ? '⚔ เข้าด่านโซนนี้เพื่อรับอัตโนมัติ'
-      : '💬 ไปคุยกับ NPC ที่หมู่บ้านเพื่อรับ';
+    // quest menu is VIEW-ONLY: every quest is accepted by talking to the
+    // NPC that gives it (no auto-accept). Point the player to that NPC.
+    const _npcName = { quest_giver:'Aldric (ผู้มอบเควส)', blacksmith:'Goran (ช่างตีเหล็ก)', sage:'Miriel (นักปราชญ์)', innkeeper:'Rosa (เจ้าของโรงเตี๊ยม)' };
+    const _giverOf = (qid) => {
+      for (const npc in NPC_QUEST_MAP) { if (NPC_QUEST_MAP[npc].includes(qid)) return npc; }
+      return null;
+    };
+    const _howToGet = (q) => {
+      const npc = _giverOf(q.id);
+      return npc ? `💬 ไปคุยกับ ${_npcName[npc] || npc} ที่หมู่บ้านเพื่อรับ` : '💬 ไปคุยกับ NPC ที่หมู่บ้านเพื่อรับ';
+    };
     const renderQCard = (q) => {
       const zc = zoneColors[q.zone] || '#aaa';
       const zoneName = q.zone > 0 ? (ZONES.find(z=>z.id===q.zone)?.name||'') : 'ทุกที่';

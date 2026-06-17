@@ -196,8 +196,8 @@ function updateNavBadges() {
   let questN = 0;
   if (G.gameMode === 'fullrpg') {
     // badge = the next story quest ready to accept (1) + active quests whose
-    // objective is already met (ready to turn in). Zone kill/explore quests are
-    // auto-accepted, so we don't flood the badge with every available quest.
+    // objective is already met (ready to turn in). All quests are manual-accept
+    // now (taken at NPCs), so the badge focuses on story + ready-to-claim.
     let story = 0, ready = 0;
     if (typeof RPG_QUESTS !== 'undefined' && typeof _rpgState === 'function') {
       const hasNextStory = RPG_QUESTS.some(q => {
