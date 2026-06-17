@@ -9,8 +9,6 @@ let _muted = (() => {
   try { return localStorage.getItem('wq_muted') === '1'; } catch(e) { return false; }
 })();
 
-function isMuted() { return _muted; }
-
 function toggleMute() {
   _muted = !_muted;
   try { localStorage.setItem('wq_muted', _muted ? '1' : '0'); } catch(e) {}

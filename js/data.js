@@ -396,15 +396,6 @@ const BOOTS = [
   {id:'b25',name:'รองเท้าแสงนิรันดร์',slot:'boots',rarity:'legend',attackSpeed:0.30,effect:'ฟื้น HP+18/เทิร์น',icon:'👢',requiredClass:'paladin'},
 ];
 
-// ความต้องการขั้นต่ำเพื่อต่อสู้บอส (ATK รวมอุปกรณ์)
-const BOSS_REQ = {
-  1: { atk: 15,  label: 'ราชากอบลิน' },
-  2: { atk: 45,  label: 'จอมซอมบี้' },
-  3: { atk: 100, label: 'มังกรราชัน' },
-  4: { atk: 200, label: 'ราชาอสูร' },
-  5: { atk: 380, label: 'เจ้าแห่งปราสาท' },
-  6: { atk: 700, label: 'เทพแห่งโกลาหล' },
-};
 
 // Milestone rewards — kill milestones
 const KILL_MILESTONES = [
@@ -598,14 +589,6 @@ const ENDLESS_DUNGEON = {
 const SHOP_SELL_PRICE = {common:10,uncommon:40,rare:150,epic:500,legend:1500,ancient:5000,mythic:15000};
 const SHOP_BUY_PRICE  = {common:200,uncommon:600,rare:2000,epic:6000,legend:20000,ancient:60000,mythic:200000};
 
-// Class hierarchy — tier สูงกว่า inherit สิทธิ์ tier ต่ำ
-const CLASS_HIERARCHY = {
-  warrior: ['warrior'],
-  mage:    ['mage'],
-  rogue:   ['rogue'],
-  archer:  ['archer'],
-  paladin: ['paladin'],
-};
 
 const RARITIES = {
   common:  {label:'ธรรมดา',  color:'var(--common)', bg:'#1a1a1a'},

@@ -685,10 +685,6 @@ function startIdleFarm() {
   }, 150);
 }
 
-function stopIdleFarm() {
-  if (_idleLoopTimer) { clearInterval(_idleLoopTimer); _idleLoopTimer = null; }
-}
-
 // refresh the spawn pool + hero max HP on zone change / clearing a monster
 function refreshIdleFarm() {
   if (!_idleLoopTimer) return;

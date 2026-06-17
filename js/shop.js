@@ -111,6 +111,7 @@ function equipItemToSlot(item) {
   renderEquipSlots();
   saveGame();
   if (item.attackSpeed && typeof restartAutoWithNewSpeed === 'function') restartAutoWithNewSpeed();
+  if (typeof _rpgDailyEquipCheck === 'function') _rpgDailyEquipCheck(); // progress "สวมอุปกรณ์" daily
   logBattle(`<span class="log-sys">✅ สวมใส่ ${item.icon||''} ${item.name}${item.attackSpeed ? ` ⚡-${Math.round(item.attackSpeed*100)}%` : ''}!</span>`);
 }
 

@@ -119,24 +119,6 @@ function tryDropSetPiece(zone, isBoss) {
 
 // ---------- UI helpers ----------
 
-function getSetStats() {
-  let bonus = { atk:0, def:0, sets:[] };
-  if (!G.classId) return bonus;
-  [3, 4].forEach(tier => {
-    const setKey = getSetKey(tier);
-    const set    = CLASS_SETS[setKey];
-    if (!set) return;
-    const pieces = getCollectedPieces(setKey);
-    pieces.forEach(i => {
-      const p = set.pieces[i];
-      bonus.atk += p.atk || 0;
-      bonus.def += p.def || 0;
-    });
-    if (hasCompleteSet(setKey)) bonus.sets.push(setKey);
-  });
-  return bonus;
-}
-
 function renderSetProgress() {
   const area = document.getElementById('set-progress-area');
   if (!area || !G.classId) return;

@@ -170,25 +170,6 @@ function renderMonsterList() {
   }
 }
 
-function _showBossLockedPopup(m, req, playerAtk) {
-  let box = document.getElementById('boss-locked-popup');
-  if (box) box.remove();
-  box = document.createElement('div');
-  box.id = 'boss-locked-popup';
-  box.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9000;background:#1a0800;border:2px solid #ff6644;border-radius:12px;padding:1.2rem 1.5rem;text-align:center;box-shadow:0 0 40px #ff664466;max-width:300px;width:90%';
-  const pct = Math.min(100, Math.floor((playerAtk / req.atk) * 100));
-  box.innerHTML = `<div style="font-size:2rem;margin-bottom:.4rem">🔒</div>
-    <div style="color:#ff8866;font-size:1rem;font-weight:700;margin-bottom:.4rem">${m.name} ยังล็อคอยู่!</div>
-    <div style="color:#aaa;font-size:.82rem;margin-bottom:.8rem">ต้องการ ATK ≥ ${req.atk}<br>ATK ปัจจุบัน: ${playerAtk}</div>
-    <div style="background:#330000;border-radius:6px;height:10px;margin-bottom:.6rem;overflow:hidden">
-      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#ff4400,#ff8800);border-radius:6px"></div>
-    </div>
-    <div style="color:#ff8800;font-size:.8rem;margin-bottom:.9rem">พลังยังไม่เพียงพอ (${pct}%)</div>
-    <button onclick="document.getElementById('boss-locked-popup').remove()" style="background:#3a1000;border:1px solid #ff6644;color:#ff8866;padding:.35rem 1.2rem;border-radius:8px;cursor:pointer">ตกลง</button>`;
-  document.body.appendChild(box);
-  setTimeout(() => { if (box.parentNode) box.remove(); }, 4000);
-}
-
 function _renderMilestoneProgress() {
   const kills = G.totalKills || 0;
   const next = KILL_MILESTONES.find(ms => kills < ms.kills);
@@ -261,26 +242,6 @@ function _renderZoneDropInfo(zone) {
         </div>
       </div>
     </details>`;
-}
-
-function _showMonsterDropTooltip(el, m) {
-  const cls       = CLASSES.find(c => c.id === G.classId);
-  const dropBonus = cls && cls.bonuses && cls.bonuses.dropBonus ? cls.bonuses.dropBonus : 0;
-  const zone      = G.currentZone || 1;
-
-  if (m.isBoss) {
-    const rarityNames = { common:'ธรรมดา', uncommon:'พิเศษ', rare:'หายาก', epic:'ยอดเยี่ยม', legend:'ตำนาน', ancient:'โบราณ' };
-    const r = _dropRarityForZone(zone, true);
-    const lines = [`💎 ดรอปของ 1-2 ชิ้น (100%)`, `ความหายาก: ${rarityNames[r]||r} ขึ้นไป`];
-    showDropTooltip(el, lines, '👑 บอส: ดรอปของแน่นอน');
-  } else {
-    const baseRate = 0.06 + (zone - 1) * 0.015; // sync กับ monsterDie
-    const total    = Math.min(0.30, baseRate + dropBonus + (G.dropBonusFromTree || 0));
-    const pctStr   = `${Math.round(total * 100)}%`;
-    const rarityLabel = {1:'ธรรมดา-หายาก', 2:'พิเศษ-มหากาพย์', 3:'หายาก-ตำนาน', 4:'มหากาพย์-โบราณ', 5:'ตำนาน-โบราณ', 6:'ตำนาน-โบราณ'}[zone] || '';
-    const lines = [`📦 ดรอปโดยตรง (ไม่มีกล่อง)`, `ด่าน ${zone}: ${rarityLabel}`];
-    showDropTooltip(el, lines, `โอกาสดรอป: ${pctStr}`);
-  }
 }
 
 // ---------- Stats ----------
@@ -1784,22 +1745,6 @@ function showBattleContent(monster, stats) {
   if (typeof startMonsterAutoAttack === 'function') startMonsterAutoAttack();
 }
 
-function _setEnemyInfo(monster, stats) {
-  // legacy — kept for skill paths that call it directly
-  const nameEl = document.getElementById('battle-enemy-name');
-  const typeEl = document.getElementById('battle-enemy-type');
-  const atkEl  = document.getElementById('battle-enemy-atk');
-  if (nameEl) nameEl.textContent = monster.name + (monster.isBoss ? ' 👑' : '');
-  if (typeEl) typeEl.textContent = monster.isBoss ? '🔴 บอสศัตรู' : '⚔ ศัตรูทั่วไป';
-  if (atkEl)  atkEl.textContent  = `ATK: ${stats.atk}`;
-}
-
-function renderEnemyQueue() {
-  // legacy — not shown in multi-enemy mode (cards replace this)
-  const el = document.getElementById('battle-enemy-queue');
-  if (el) el.innerHTML = '';
-}
-
 // ── Multi-enemy card rendering ──────────────────────────────────
 function renderEnemyCards() {
   const container = document.getElementById('battle-enemy-side');
@@ -3100,53 +3045,6 @@ function monsterDie() {
   }, 800);
 }
 
-function spawnSameMonster(monster) {
-  const stats = getMonsterStats(G.currentZone, monster.tier, monster.isBoss);
-  G.currentMonster      = {...monster, zone:G.currentZone};
-  G.currentMonsterHp    = stats.maxHp;
-  G.currentMonsterMaxHp = stats.maxHp;
-  G.battleInProgress    = true;
-  G.monsterPoisonTurns  = 0;
-  G.monsterBurnTurns    = 0;
-  G.turnCount           = 0;
-
-  const monEl = document.getElementById('pixel-monster');
-  if (monEl) {
-    monEl.classList.remove('die-anim');
-    monEl.innerHTML = getMonsterSprite(monster.name, monster.isBoss, G.currentZone, monster.img);
-  }
-  _setEnemyInfo(monster, stats);
-  updateMonsterHpBar();
-  renderEnemyQueue();
-  document.getElementById('btn-attack').disabled = false;
-  renderSkillBar();
-}
-
-function spawnNextEnemy(next, prevMonster) {
-  const stats = getMonsterStats(G.currentZone, next.tier, next.isBoss);
-  G.currentMonster      = {...next, zone:G.currentZone};
-  G.currentMonsterHp    = stats.maxHp;
-  G.currentMonsterMaxHp = stats.maxHp;
-  G.battleInProgress    = true;
-  G.monsterPoisonTurns  = 0;
-  G.monsterBurnTurns    = 0;
-  G.turnCount           = 0;
-
-  const monEl = document.getElementById('pixel-monster');
-  if (monEl) {
-    monEl.classList.remove('die-anim');
-    monEl.innerHTML = getMonsterSprite(next.name, next.isBoss, G.currentZone, next.img);
-    monEl.classList.add('spawn-anim');
-    setTimeout(() => monEl.classList.remove('spawn-anim'), 400);
-  }
-  _setEnemyInfo(next, stats);
-  updateMonsterHpBar();
-  renderEnemyQueue();
-  document.getElementById('btn-attack').disabled = false;
-  renderSkillBar();
-  logBattle(`<span class="log-sys">⚔ ตัวถัดไป: ${next.name}! HP:${stats.maxHp} (เหลือ ${(G.enemyQueue||[]).length} ตัว)</span>`);
-}
-
 // ---------- Kill counter ----------
 
 function updateKillCounter() {
@@ -3273,13 +3171,6 @@ function _spawnKillParticles(el, isBoss) {
     });
     setTimeout(() => p.remove(), 700);
   }
-}
-
-function animateSprite(id, cls) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.className = 'monster-sprite ' + cls;
-  if (cls === 'shake') setTimeout(() => { el.className = 'monster-sprite'; }, 300);
 }
 
 // ---------- Kill Milestone system ----------

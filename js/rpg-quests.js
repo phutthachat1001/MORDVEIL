@@ -487,13 +487,6 @@ function rpgOnExplore(zoneId) {
   // accepted manually now — the player picks them up from the quest giver.
 }
 
-// Auto-accept is DISABLED — every quest must be taken manually by the player.
-// Kept as a no-op so any remaining callers don't error. Retroactive credit
-// still applies once a quest is accepted (see rpgAcceptQuest).
-function rpgAutoAcceptZoneQuests(zoneId) {
-  /* intentionally does nothing — quests are manual-accept only */
-}
-
 // จาก chest open (เรียกจาก openChest / gacha modal)
 // Called whenever a piece of gear DROPS from a monster (manual + IDLE).
 //   rarity   = item rarity string · fromBoss = dropped by a boss kill

@@ -14,10 +14,6 @@ function getSkillPointsEarned(level) {
 function _isIdleNode(node) {
   return !!node && node.row >= 5;
 }
-function _isIdleNodeId(nodeId) {
-  const tree = SKILL_TREES[G.classId] || [];
-  return _isIdleNode(tree.find(n => n.id === nodeId));
-}
 
 // Recompute the DERIVED skill-tree bonuses (speed/crit/exp/gold/regen/streak/
 // drop) from the currently-unlocked nodes + current data values. This makes
@@ -92,14 +88,6 @@ function refreshSkillPoints() {
 }
 
 // ── node helpers ──
-function getSkillTree() {
-  if (!G.classId) return [];
-  return (SKILL_TREES[G.classId] || []).filter(n => {
-    if (!n.branch) return true;
-    if (!G.classBranch) return n.row < 3; // แสดง row 0-2 ก่อนเลือก branch
-    return n.branch === G.classBranch;   // branch ตรงกันแสดงทุก row
-  });
-}
 
 function isNodeUnlocked(nodeId) {
   return !!(G.skillTreeSpent && G.skillTreeSpent[nodeId]);
@@ -561,28 +549,4 @@ function _formatStatShort(s) {
   if (s.offlineCapBonus)parts.push(`+${s.offlineCapBonus}ชม.ออฟไลน์`);
   if (s.offlineEffBonus)parts.push(`+${Math.round(s.offlineEffBonus*100)}%ออฟไลน์`);
   return parts.join(' ');
-}
-
-// ── evo quest UI in renderEvolutionButton ──
-function renderEvoQuestProgress(next) {
-  if (!next || !next.conditions || !next.conditions.evoQuest) return '';
-  const qid = next.conditions.evoQuest;
-  const quest = EVO_QUESTS[qid];
-  if (!quest) return '';
-  const done = G.evoQuestDone && G.evoQuestDone[qid];
-  if (done) return `<div class="evo-cond">📜 ${quest.name}: <span style="color:#44ff88">✓ สำเร็จ</span></div>`;
-
-  const c = quest.conditions;
-  let lines = `<div class="evo-cond fail">📜 เควส: ${quest.name}</div>`;
-  if (c.bossKills)    lines += condLine('👑 Boss',   c.bossKills,  G.bossKills);
-  if (c.kills)        lines += condLine('💀 Kill',   c.kills,      G.totalKills);
-  if (c.tasks)        lines += condLine('✅ งาน',    c.tasks,      G.totalTasks);
-  if (c.epicTasks)    lines += condLine('🔥 Epic',   c.epicTasks,  G.epicTasksDone||0);
-  if (c.critCount)    lines += condLine('💥 Crit',   c.critCount,  G.critCount||0);
-  if (c.streak)       lines += condLine('🔥 Streak', c.streak,     G.streak);
-  if (c.gold)         lines += condLine('💰 ทอง',    c.gold,       G.gold);
-  if (c.hpHealed)     lines += condLine('💚 HP ฟื้น',c.hpHealed,   G.totalHpHealed||0);
-  if (c.hardTasks)    lines += condLine('💪 งานยาก', c.hardTasks,  G.hardTasksDone||0);
-  if (c.totalDmgTaken)lines += condLine('🩸 รับดาเมจ',c.totalDmgTaken,G.totalDmgTaken||0);
-  return lines;
 }

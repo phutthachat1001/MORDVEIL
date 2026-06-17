@@ -14,9 +14,7 @@ const EV_COLORS = {
 };
 
 let _evCountdownInterval = null;
-let _evPendingAction     = null;  // function to call if user picks choice A
 let _wandererItem        = null;  // ไอเทมพ่อค้าเร่ร่อน
-let _wandererTimer       = null;
 let _urgentTimer         = null;
 
 // ---------- screen shake + flash ----------
