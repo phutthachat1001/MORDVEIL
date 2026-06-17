@@ -37,21 +37,21 @@ const ZONES = [
    ]},
   {id:2,name:'หุบเขาซอมบี้',emoji:'🪦',reqLevel:10,
    monsters:[
-    {name:'ซอมบี้เน่า',sprite:'🧟',tier:1,isBoss:false},
-    {name:'ซอมบี้เดิน',sprite:'🤢',tier:2,isBoss:false},
-    {name:'ซอมบี้นักรบ',sprite:'⚔️',tier:3,isBoss:false},
-    {name:'ซอมบี้แม่มด',sprite:'💀',tier:4,isBoss:false},
-    {name:'ซอมบี้ยักษ์',sprite:'🦴',tier:5,isBoss:false},
-    {name:'จอมซอมบี้',sprite:'👻',tier:6,isBoss:true}
+    {name:'ซอมบี้เน่า',sprite:'🧟',img:'zombie_rot',     tier:1,isBoss:false},
+    {name:'ซอมบี้เดิน',sprite:'🤢',img:'zombie_walk',    tier:2,isBoss:false},
+    {name:'ซอมบี้นักรบ',sprite:'⚔️',img:'zombie_warrior', tier:3,isBoss:false},
+    {name:'ซอมบี้แม่มด',sprite:'💀',img:'zombie_mage',    tier:4,isBoss:false},
+    {name:'ซอมบี้ยักษ์',sprite:'🦴',img:'zombie_giant',   tier:5,isBoss:false},
+    {name:'จอมซอมบี้',sprite:'👻',img:'zombie_king',     tier:6,isBoss:true}
    ]},
   {id:3,name:'ถ้ำมังกร',emoji:'🐉',reqLevel:25,
    monsters:[
-    {name:'มังกรน้ำแข็ง',sprite:'❄️',tier:1,isBoss:false},
-    {name:'มังกรไฟ',sprite:'🔥',tier:2,isBoss:false},
-    {name:'มังกรพิษ',sprite:'☠️',tier:3,isBoss:false},
-    {name:'มังกรสายฟ้า',sprite:'⚡',tier:4,isBoss:false},
-    {name:'มังกรมืด',sprite:'🌑',tier:5,isBoss:false},
-    {name:'มังกรราชัน',sprite:'🐲',tier:6,isBoss:true}
+    {name:'มังกรน้ำแข็ง',sprite:'❄️',img:'dragon_ice',    tier:1,isBoss:false},
+    {name:'มังกรไฟ',sprite:'🔥',img:'dragon_fire',        tier:2,isBoss:false},
+    {name:'มังกรพิษ',sprite:'☠️',img:'dragon_poison',     tier:3,isBoss:false},
+    {name:'มังกรสายฟ้า',sprite:'⚡',img:'dragon_thunder', tier:4,isBoss:false},
+    {name:'มังกรมืด',sprite:'🌑',img:'dragon_dark',       tier:5,isBoss:false},
+    {name:'มังกรราชัน',sprite:'🐲',img:'dragon_king',     tier:6,isBoss:true}
    ]},
   {id:4,name:'ซากอสูร',emoji:'💀',reqLevel:40,
    monsters:[

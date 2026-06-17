@@ -164,12 +164,15 @@ function _cardCellHtml(c) {
   const owned = _cardOwned(c.id);
   const have = owned > 0;
   const R = (typeof RARITIES !== 'undefined' && RARITIES[c.rarity]) || { label:c.rarity, color:'#aaa', bg:'#111' };
-  const face = have ? (c.icon || '🃏') : '❔';
+  const emoji = c.icon || '🃏';
+  const face = have
+    ? (c.img ? `<img src="assets/sprites/${c.img}.png" style="width:34px;height:34px;object-fit:contain;image-rendering:pixelated" onerror="this.outerHTML='${emoji.replace(/'/g,'')}'">` : emoji)
+    : '❔';
   const st = c.stat || {};
   const statStr = have ? `+${st.atk||0}A +${st.def||0}D +${st.hp||0}H${st.crit?` +${Math.round(st.crit*100)}%C`:''}` : '???';
   return `<div title="${have?c.name:'ยังไม่เก็บได้'}" style="width:72px;text-align:center;border:1.5px solid ${have?R.color:'#333'};
     border-radius:10px;padding:.35rem .2rem;background:${have?(R.bg||'#111'):'#0c0c12'};opacity:${have?1:.5}">
-    <div style="font-size:1.6rem;filter:${have?'none':'grayscale(1) brightness(.5)'}">${face}</div>
+    <div style="font-size:1.6rem;height:38px;display:flex;align-items:center;justify-content:center;filter:${have?'none':'grayscale(1) brightness(.5)'}">${face}</div>
     <div style="font-size:.56rem;color:${have?R.color:'#666'};font-weight:700;line-height:1.1;height:1.7em;overflow:hidden">${have?c.name:'? ? ?'}</div>
     <div style="font-size:.52rem;color:#9a9">${statStr}</div>
     ${owned>1?`<div style="font-size:.55rem;color:#fc8">×${owned}</div>`:''}
