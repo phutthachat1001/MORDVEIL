@@ -30,23 +30,25 @@ let _idleSkillReady = {};       // skillId -> timestamp(ms) when it can cast aga
 //       { speed:true }   → (flavor) faster — handled via shorter effective CD
 //     plus turns:<n>
 const _IDLE_SKILL_DMG = {
-  // ── T1 / branch damage skills ──
-  quick_stab:    { mult: 1.2, hits: 2, label: '🗡 แทงเร็ว' },
-  slam:          { mult: 2.5, hits: 1, label: '💥 กระทืบ' },
-  dragon_breath: { mult: 2.0, hits: 1, label: '🐉 ลมหายใจ' },
-  magic_bolt:    { mult: 1.8, hits: 1, label: '🔥 ลูกไฟ' },
-  precise_shot:  { mult: 2.0, hits: 1, label: '🎯 ยิงแม่น' },
-  holy_strike_t1:{ mult: 1.8, hits: 1, label: '✨ ฟันศักดิ์สิทธิ์' },
-  backstab:      { mult: 2.2, hits: 1, label: '🗡 ลอบแทง' },
-  power_shot:    { mult: 2.4, hits: 1, label: '🏹 ธนูทรง' },
-  fireball:      { mult: 2.6, hits: 1, label: '🔥 ไฟบรรลัย' },
-  shadow_strike: { mult: 2.8, hits: 1, label: '🌑 เงาสังหาร' },
-  // ── extra damage skills that previously only worked in manual fights ──
-  heavy_blow:    { mult: 2.0, hits: 1, label: '💢 โจมตีหนัก' },
-  blade_storm:   { mult: 0.8, hits: 4, label: '🌀 พายุดาบ' },
-  blizzard:      { mult: 1.0, hits: 3, label: '❄️ พายุน้ำแข็ง' },
-  triple_shot:   { mult: 1.2, hits: 3, label: '🏹 ยิงสามลูก' },
-  arcane_burst:  { mult: 4.0, hits: 1, label: '💥 เวทระเบิด' },
+  // ── T1 damage skills (effective dmg ≈ 2.2) ──
+  // T1 base attacks (effective dmg ≈ 2.2)
+  quick_stab:    { mult: 1.1, hits: 2, label: '🗡 แทงเร็ว' },     // 2.2
+  magic_bolt:    { mult: 2.2, hits: 1, label: '🔥 ลูกไฟ' },
+  precise_shot:  { mult: 2.2, hits: 1, label: '🎯 ยิงแม่น' },
+  holy_strike_t1:{ mult: 2.2, hits: 1, label: '✨ ฟันศักดิ์สิทธิ์' },
+  power_shot:    { mult: 2.2, hits: 1, label: '🏹 ธนูทรง' },
+  fireball:      { mult: 2.2, hits: 1, label: '🔥 ไฟบรรลัย' },
+  shadow_strike: { mult: 2.2, hits: 1, label: '🌑 เงาสังหาร' },
+  // T3 base attacks (effective dmg ≈ 4.0)
+  slam:          { mult: 4.0, hits: 1, label: '💥 กระทืบ' },
+  dragon_breath: { mult: 4.0, hits: 1, label: '🐉 ลมหายใจ' },
+  backstab:      { mult: 4.2, hits: 1, label: '🗡 ลอบแทง' },
+  arcane_burst:  { mult: 4.2, hits: 1, label: '💥 เวทระเบิด' },
+  // ── T2 damage skills (effective dmg ≈ 3.0) ──
+  heavy_blow:    { mult: 3.0, hits: 1, label: '💢 โจมตีหนัก' },
+  blade_storm:   { mult: 1.0, hits: 3, label: '🌀 พายุดาบ' },    // 3.0
+  blizzard:      { mult: 1.0, hits: 3, label: '❄️ พายุน้ำแข็ง' }, // 3.0
+  triple_shot:   { mult: 1.1, hits: 3, label: '🏹 ยิงสามลูก' },   // 3.3
   // ── T2 BUFF skills (ชุดที่ 2 — ทำงานใน IDLE ด้วย) ──
   war_cry:    { mult: 1, hits: 1, label: '📣 โห่ร้องศึก',   buff: { atk: 1.5, turns: 4 } },
   mana_surge: { mult: 1, hits: 1, label: '🌊 คลื่นมานา',    buff: { atk: 1.4, turns: 4 } },
@@ -55,35 +57,38 @@ const _IDLE_SKILL_DMG = {
   consecrate: { mult: 1, hits: 1, label: '⛪ พื้นศักดิ์สิทธิ์', buff: { lifesteal: 0.25, turns: 5 } },
 
   // ── ROGUE base (T1/T2) ──
-  death_mark:    { mult: 1, hits: 1, label: '🎯 เงามรณะ', buff: { atk: 2.0, turns: 2 } },      // marks → big next hits
-  arrow_rain:    { mult: 1.2, hits: 5, label: '🏹 ฝนลูกธนู', dot: { type:'poison', pct:0.15, ticks:3 } },
+  death_mark:    { mult: 1, hits: 1, label: '🎯 เงามรณะ', buff: { atk: 2.0, turns: 2 } },      // T2 buff: next hits ×2
+  // arrow_rain = T3 multi-hit (effective ≈ 4.0)
+  arrow_rain:    { mult: 1.3, hits: 3, label: '🏹 ฝนลูกธนู', dot: { type:'poison', pct:0.15, ticks:3 } }, // 3.9 + DoT
 
-  // ── A/B branch skills (T3/T4) that were missing from combat ──
+  // ── A/B branch skills (T3/T4) — balanced to tier targets ──
+  //   T3 damage ≈ 4.0 · T4 damage ≈ 6.5 · buff/heal keep mult≈1 (utility role,
+  //   effect values scale by tier instead).
   // WARRIOR
-  iron_shield:      { mult: 1, hits: 1, label: '🛡 โล่เหล็กกล้า', buff: { dmgReduce: 0.5, turns: 3 } },
-  doom_nova:        { mult: 5.0, hits: 1, label: '🌑 โนวาหายนะ', dot: { type:'burn', pct:0.2, ticks:4 } },
-  eternal_fortress: { mult: 1, hits: 1, label: '🏰 ปราการนิรันดร์', buff: { dmgReduce: 0.85, atk: 1.5, turns: 3 } },
+  iron_shield:      { mult: 1, hits: 1, label: '🛡 โล่เหล็กกล้า', buff: { dmgReduce: 0.5, turns: 3 } },            // T3 def buff
+  doom_nova:        { mult: 6.5, hits: 1, label: '🌑 โนวาหายนะ', dot: { type:'burn', pct:0.2, ticks:4 } },         // T4 nuke + burn
+  eternal_fortress: { mult: 1, hits: 1, label: '🏰 ปราการนิรันดร์', buff: { dmgReduce: 0.9, atk: 1.8, turns: 3 } }, // T4 fortress
   // MAGE
-  dark_nova:   { mult: 3.5, hits: 1, label: '🌑 โนวามืด', buff: { lifesteal: 0.2, turns: 1 } },
-  holy_light:  { mult: 2.5, hits: 1, label: '☀️ แสงศักดิ์สิทธิ์', buff: { heal: 0.35, dmgReduce: 0.3, turns: 2 } },
-  void_curse:  { mult: 6.0, hits: 1, label: '🌀 สาปจักรวาล', dot: { type:'poison', pct:0.2, ticks:5, defDown:0.2 } },
-  heaven_rain: { mult: 1.5, hits: 6, label: '🌟 ฝนแสงสวรรค์', buff: { regen: 0.06, turns: 5 } },
+  dark_nova:   { mult: 4.0, hits: 1, label: '🌑 โนวามืด', buff: { lifesteal: 0.2, turns: 1 } },                    // T3
+  holy_light:  { mult: 4.0, hits: 1, label: '☀️ แสงศักดิ์สิทธิ์', buff: { heal: 0.35, dmgReduce: 0.3, turns: 2 } }, // T3 hybrid
+  void_curse:  { mult: 6.5, hits: 1, label: '🌀 สาปจักรวาล', dot: { type:'poison', pct:0.22, ticks:5, defDown:0.2 } }, // T4
+  heaven_rain: { mult: 1.1, hits: 6, label: '🌟 ฝนแสงสวรรค์', buff: { regen: 0.07, turns: 5 } },                   // T4 6.6 + regen
   // ROGUE
-  shadow_step:    { mult: 3.0, hits: 1, label: '🌫 ก้าวเงา', buff: { crit: true, dmgReduce: 1.0, turns: 2 } },
-  plunder:        { mult: 2.5, hits: 1, label: '💰 ปล้นสะดม' },
-  shadow_execute: { mult: 8.0, hits: 1, label: '☠️ จ้องมรณะ', execute: 0.30 },
-  empire_plunder: { mult: 1.8, hits: 5, label: '👑 ปล้นจักรวรรดิ' },
+  shadow_step:    { mult: 4.0, hits: 1, label: '🌫 ก้าวเงา', buff: { crit: true, dmgReduce: 1.0, turns: 2 } },     // T3 dodge+dmg
+  plunder:        { mult: 4.0, hits: 1, label: '💰 ปล้นสะดม' },                                                    // T3
+  shadow_execute: { mult: 6.5, hits: 1, label: '☠️ จ้องมรณะ', execute: 0.30 },                                     // T4 + execute
+  empire_plunder: { mult: 1.4, hits: 5, label: '👑 ปล้นจักรวรรดิ' },                                              // T4 7.0
   // ARCHER
-  hunters_mark:  { mult: 1, hits: 1, label: '🎯 ตราล่า', buff: { atk: 2.2, turns: 5 } },
-  wind_shot:     { mult: 4.0, hits: 1, label: '🍃 ลูกธนูลม' },
-  thunder_storm: { mult: 1.5, hits: 8, label: '⚡ พายุสายฟ้า' },
+  hunters_mark:  { mult: 1, hits: 1, label: '🎯 ตราล่า', buff: { atk: 2.4, turns: 5 } },                          // T3 atk buff
+  wind_shot:     { mult: 4.0, hits: 1, label: '🍃 ลูกธนูลม' },                                                     // T3
+  thunder_storm: { mult: 0.85, hits: 8, label: '⚡ พายุสายฟ้า' },                                                  // T4 6.8 (8 hits)
   // PALADIN
-  light_shield:    { mult: 1, hits: 1, label: '🔆 โล่แสง', buff: { dmgReduce: 0.4, regen: 0.05, turns: 3 } },
-  divine_heal:     { mult: 1, hits: 1, label: '💗 รักษาศักดิ์สิทธิ์', buff: { heal: 0.5, turns: 1 } },
-  holy_aura:       { mult: 1, hits: 1, label: '😇 ออร่าศักดิ์สิทธิ์', buff: { regen: 0.2, dmgReduce: 0.25, turns: 5 } },
-  holy_smite:      { mult: 4.0, hits: 1, label: '⚡ สมิตศักดิ์สิทธิ์', buff: { heal: 0.15, turns: 1 } },
-  divine_radiance: { mult: 2.0, hits: 1, label: '🌅 พระประภา', buff: { heal: 1.0, dmgReduce: 0.7, turns: 4 } },
-  final_judgment:  { mult: 5.0, hits: 1, label: '⚖️ พิพากษา', buff: { crit: true, turns: 1 } },
+  light_shield:    { mult: 1, hits: 1, label: '🔆 โล่แสง', buff: { dmgReduce: 0.4, regen: 0.05, turns: 3 } },      // T2 def
+  divine_heal:     { mult: 1, hits: 1, label: '💗 รักษาศักดิ์สิทธิ์', buff: { heal: 0.5, turns: 1 } },             // T3 heal
+  holy_aura:       { mult: 1, hits: 1, label: '😇 ออร่าศักดิ์สิทธิ์', buff: { regen: 0.2, dmgReduce: 0.25, turns: 5 } }, // T3
+  holy_smite:      { mult: 4.0, hits: 1, label: '⚡ สมิตศักดิ์สิทธิ์', buff: { heal: 0.15, turns: 1 } },           // T3 dmg+heal
+  divine_radiance: { mult: 1, hits: 1, label: '🌅 พระประภา', buff: { heal: 1.0, dmgReduce: 0.7, turns: 4 } },      // T4 full heal/shield
+  final_judgment:  { mult: 6.5, hits: 1, label: '⚖️ พิพากษา', buff: { crit: true, turns: 1 } },                    // T4 nuke
 };
 // merge in the C/D/S branch skills defined in data.js (Infinity Trial branches)
 if (typeof INFINITY_IDLE_SKILLS !== 'undefined') Object.assign(_IDLE_SKILL_DMG, INFINITY_IDLE_SKILLS);
