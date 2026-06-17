@@ -556,7 +556,8 @@ function _idleDropItem(zone, tier) {
   }
   if (!pool.length) return null;
   const base = pool[Math.floor(Math.random() * pool.length)];
-  const item = { ...base, uid: Date.now() + Math.random() };
+  let item = { ...base, uid: Date.now() + Math.random() };
+  if (typeof _scaleItemForZone === 'function') item = _scaleItemForZone(item, zone);
   if (!G.inventory) G.inventory = [];
   G.inventory.push(item);
   if (['rare','epic','legend','ancient'].includes(effRarity)) G.gotRareWeapon = true;

@@ -2604,6 +2604,19 @@ const _RARITY_ORDER = ['common','uncommon','rare','epic','legend','ancient'];
 // below this floor, so late zones never dump common/uncommon trash.
 const _ZONE_RARITY_FLOOR = { 1:'common', 2:'uncommon', 3:'rare', 4:'epic', 5:'legend', 6:'legend' };
 
+// Zone power multiplier for dropped gear — same rarity from a deeper zone is
+// stronger. zone1 = 1.0 ... zone6 = 1.9. Applied at drop time so old saved
+// items keep their original numbers (no retroactive jump).
+const _ZONE_GEAR_MULT = { 1:1.0, 2:1.18, 3:1.36, 4:1.54, 5:1.72, 6:1.9 };
+function _scaleItemForZone(item, zone) {
+  const m = _ZONE_GEAR_MULT[Math.min(6, Math.max(1, zone || 1))] || 1;
+  if (item.atk) item.atk = Math.max(1, Math.round(item.atk * m));
+  if (item.def) item.def = Math.max(1, Math.round(item.def * m));
+  if (item.hp)  item.hp  = Math.max(1, Math.round(item.hp  * m));
+  item.dropZone = zone;           // for Collection / display
+  return item;
+}
+
 function _dropDirectItem(rarity, zone) {
   zone = zone || G.currentZone || 1;
   const floorIdx = _RARITY_ORDER.indexOf(_ZONE_RARITY_FLOOR[Math.min(6, Math.max(1, zone))] || 'common');
@@ -2634,7 +2647,7 @@ function _dropDirectItem(rarity, zone) {
   if (!pool.length) return;
 
   const base = pool[Math.floor(Math.random() * pool.length)];
-  const item = { ...base, uid: Date.now() + Math.random() };
+  const item = _scaleItemForZone({ ...base, uid: Date.now() + Math.random() }, zone);
   if (!G.inventory) G.inventory = [];
   G.inventory.push(item);
   const rarityColor = RARITIES[effRarity] ? RARITIES[effRarity].color : '#aaa';

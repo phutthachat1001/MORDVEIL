@@ -103,11 +103,25 @@ const CARD_CONFIG = {
     limited: { atk:35, def:25, hp:280, crit:0.05 },
     secret:  { atk:55, def:40, hp:450, crit:0.10 },
   },
-  // ดรอปต่อการสังหารมอนตัวที่ตรงกับการ์ด (ปกติ) · บอส ×2
-  dropByTier:  { 1:0.05, 2:0.045, 3:0.04, 4:0.035, 5:0.03, 6:0.06 },
-  bossMult: 2,
+  // โอกาสดรอปการ์ด — "ยิ่งด่านยาก/มอนยาก ยิ่งหายาก" (ไล่จากด่าน1ตัวแรกสุด)
+  //   chance = topChance × decay^(rank-1)
+  //   rank = (zone-1)*5 + min(tier,5)  → ด่าน1ตัว1 = rank1 (เยอะสุด)
+  //          ด่าน6ตัว5 = rank30 (ต่ำสุด)
+  topChance: 0.06,   // ด่าน 1 ตัวแรก = 6%
+  decayPerRank: 0.93, // ลดลง 7% ต่ออันดับความยาก → ด่าน6ตัว5 ≈ 0.7%
+  bossChance: 0.05,   // การ์ดบอส (tier 6) — บอสนานๆเจอ เลยให้คงที่พอเหมาะ
   secretDropChance: 0.0015, // 0.15% จากบอสด่านนั้น (ต้องเป็นบอส)
 };
+
+// โอกาสดรอปการ์ดมอนตาม zone+tier (rank ความยากรวม)
+function cardDropChance(zone, tier, isBoss) {
+  if (typeof CARD_CONFIG === 'undefined') return 0;
+  if (isBoss || tier >= 6) return CARD_CONFIG.bossChance;
+  const z = Math.min(6, Math.max(1, zone || 1));
+  const t = Math.min(5, Math.max(1, tier || 1));
+  const rank = (z - 1) * 5 + t;        // 1..30
+  return CARD_CONFIG.topChance * Math.pow(CARD_CONFIG.decayPerRank, rank - 1);
+}
 
 // rarity ของการ์ดมอนตาม tier
 function _cardRarityForTier(tier, isBoss) {

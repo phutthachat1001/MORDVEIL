@@ -58,11 +58,11 @@ function cardRollDrop(zone, tier, isBoss) {
   if (typeof ALL_CARDS === 'undefined' || typeof CARD_CONFIG === 'undefined') return;
   zone = Math.min(6, Math.max(1, zone || 1));
 
-  // 1) การ์ดมอนตัวนี้ (ตรง zone+tier)
+  // 1) การ์ดมอนตัวนี้ (ตรง zone+tier) — โอกาสไล่ตามความยากด่าน/มอน
   const monCard = CARDS.find(c => c.source === 'monster' && c.zone === zone && c.tier === tier);
   if (monCard) {
-    let chance = (CARD_CONFIG.dropByTier[tier] || 0.04);
-    if (isBoss) chance *= (CARD_CONFIG.bossMult || 2);
+    const chance = (typeof cardDropChance === 'function')
+      ? cardDropChance(zone, tier, isBoss) : 0.04;
     if (Math.random() < chance) _grantCard(monCard);
   }
 
@@ -116,34 +116,45 @@ function openCardCollection() {
   ov.classList.add('active');
 }
 
+let _cardTab = 'cards';   // 'cards' | 'gear'
+function setCardTab(t) { _cardTab = t; _renderCardCollection(); }
+
 function _renderCardCollection() {
   const ov = document.getElementById('card-overlay');
   if (!ov) return;
   const { owned, total } = cardCollectionCount();
   const cb = getCardStatBonus();
 
-  // group by zone (monster + secret cards), then a Limited section
   let sections = '';
-  (typeof ZONES !== 'undefined' ? ZONES : []).forEach(z => {
-    const zoneCards = CARDS.filter(c => c.zone === z.id);
-    sections += `<div style="margin:.6rem 0 .3rem;color:#9ad;font-size:.8rem;font-weight:700">${z.emoji} ${z.name}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:.4rem">${zoneCards.map(_cardCellHtml).join('')}</div>`;
-  });
-  const limitedOwned = (typeof LIMITED_CARDS !== 'undefined') ? LIMITED_CARDS.filter(c => _cardOwned(c.id) > 0) : [];
-  if (limitedOwned.length) {
-    sections += `<div style="margin:.7rem 0 .3rem;color:#22ccff;font-size:.8rem;font-weight:700">🎴 Limited</div>
-      <div style="display:flex;flex-wrap:wrap;gap:.4rem">${limitedOwned.map(_cardCellHtml).join('')}</div>`;
+  if (_cardTab === 'gear') {
+    sections = _gearByZoneHtml();
+  } else {
+    // group by zone (monster + secret cards), then a Limited section
+    (typeof ZONES !== 'undefined' ? ZONES : []).forEach(z => {
+      const zoneCards = CARDS.filter(c => c.zone === z.id);
+      sections += `<div style="margin:.6rem 0 .3rem;color:#9ad;font-size:.8rem;font-weight:700">${z.emoji} ${z.name}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.4rem">${zoneCards.map(_cardCellHtml).join('')}</div>`;
+    });
+    const limitedOwned = (typeof LIMITED_CARDS !== 'undefined') ? LIMITED_CARDS.filter(c => _cardOwned(c.id) > 0) : [];
+    if (limitedOwned.length) {
+      sections += `<div style="margin:.7rem 0 .3rem;color:#22ccff;font-size:.8rem;font-weight:700">🎴 Limited</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.4rem">${limitedOwned.map(_cardCellHtml).join('')}</div>`;
+    }
   }
+
+  const tabBtn = (id, label) => `<button onclick="setCardTab('${id}')" style="flex:1;padding:.35rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:.78rem;
+    border:1px solid ${_cardTab===id?'var(--gold)':'#334'};background:${_cardTab===id?'rgba(255,215,0,.12)':'rgba(255,255,255,.03)'};color:${_cardTab===id?'var(--gold)':'#9aa'}">${label}</button>`;
 
   ov.innerHTML = `
     <div class="modal" onclick="event.stopPropagation()" style="max-width:460px;width:95%;text-align:left;max-height:86vh;overflow-y:auto">
       <div style="text-align:center;margin-bottom:.4rem">
-        <div style="font-size:1.15rem;font-weight:800;color:var(--gold)">🃏 สมุดสะสมการ์ด</div>
-        <div style="font-size:.8rem;color:#bbb">เก็บได้ <b style="color:#9fe">${owned}/${total}</b> ใบ</div>
+        <div style="font-size:1.15rem;font-weight:800;color:var(--gold)">🃏 สมุดสะสม</div>
+        <div style="font-size:.8rem;color:#bbb">การ์ด <b style="color:#9fe">${owned}/${total}</b> ใบ</div>
       </div>
-      <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:.5rem .7rem;margin:.4rem 0;font-size:.78rem;color:#cce">
+      <div style="display:flex;gap:.4rem;margin:.4rem 0">${tabBtn('cards','🃏 การ์ด')}${tabBtn('gear','📦 ของดรอปตามด่าน')}</div>
+      ${_cardTab==='cards' ? `<div style="background:rgba(0,0,0,.3);border-radius:8px;padding:.5rem .7rem;margin:.4rem 0;font-size:.78rem;color:#cce">
         โบนัสรวมจากการ์ด: <b style="color:#ff8">ATK +${cb.atk}</b> · <b style="color:#8cf">DEF +${cb.def}</b> · <b style="color:#8f8">HP +${cb.hp}</b>${cb.crit?` · <b style="color:#fc8">CRIT +${Math.round(cb.crit*100)}%</b>`:''}
-      </div>
+      </div>` : `<div style="font-size:.72rem;color:#889;margin:.3rem 0">ของด่านลึกแรงกว่าด่านตื้น (rarity เดียวกัน) — ตัวเลขคือพลังโดยประมาณหลังคูณด่าน</div>`}
       ${sections}
       <button class="btn-close-modal" onclick="document.getElementById('card-overlay').classList.remove('active')">ปิด</button>
     </div>`;
@@ -163,4 +174,31 @@ function _cardCellHtml(c) {
     <div style="font-size:.52rem;color:#9a9">${statStr}</div>
     ${owned>1?`<div style="font-size:.55rem;color:#fc8">×${owned}</div>`:''}
   </div>`;
+}
+
+// ---------- Gear-by-zone tab ----------
+// Shows, per zone: the rarity window (with roll %) and the zone power multiplier
+// so the player can see that deeper zones drop stronger gear.
+function _gearByZoneHtml() {
+  let html = '';
+  (typeof ZONES !== 'undefined' ? ZONES : []).forEach(z => {
+    const table = (typeof _ZONE_DROP_TABLES !== 'undefined' && _ZONE_DROP_TABLES[z.id]) || [];
+    const total = table.reduce((s, [, w]) => s + w, 0) || 1;
+    const mult  = (typeof _ZONE_GEAR_MULT !== 'undefined' && _ZONE_GEAR_MULT[z.id]) || 1;
+    const chips = table.map(([r, w]) => {
+      const R = (typeof RARITIES !== 'undefined' && RARITIES[r]) || { label:r, color:'#aaa' };
+      const pct = Math.round((w / total) * 100);
+      return `<span style="display:inline-flex;gap:.2rem;align-items:center;padding:.12rem .4rem;border-radius:6px;
+        background:rgba(255,255,255,.04);border:1px solid ${R.color};color:${R.color};font-size:.64rem;font-weight:700">
+        ${R.label} <span style="color:#999;font-weight:400">${pct}%</span></span>`;
+    }).join('');
+    html += `<div style="margin:.55rem 0 .25rem;display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#9ad;font-size:.8rem;font-weight:700">${z.emoji} ${z.name}</span>
+        <span style="font-size:.66rem;color:#fc8">พลัง ×${mult.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.3rem">${chips || '<span style="color:#666;font-size:.7rem">—</span>'}</div>`;
+  });
+  html += `<div style="font-size:.66rem;color:#778;margin-top:.6rem;line-height:1.5">
+    👑 บอสด่าน: ดรอปแน่นอน + ความหายากสูงกว่ามอนปกติ · 🃏 ยิ่งด่านลึก การ์ดยิ่งหายาก</div>`;
+  return html;
 }
