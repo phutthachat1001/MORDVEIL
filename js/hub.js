@@ -223,6 +223,10 @@ function openHub() {
 function closeHub() {
   const s = document.getElementById('hub-screen');
   s.style.opacity = '0';
+  // pause the looping hub video so it stops decoding in the background
+  // (saves battery / prevents the phone from heating up). openHub() resumes it.
+  const hv = document.getElementById('hub-bg-video');
+  if (hv) { try { hv.pause(); } catch(e){} }
   setTimeout(() => { s.style.display = 'none'; s.style.bottom = ''; }, 400);
 }
 

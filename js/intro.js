@@ -56,6 +56,13 @@ function fadeToGame(callback) {
     ov.style.opacity = '1';
     setTimeout(() => {
       callback();
+      // STOP the intro background video — it's a fixed full-screen <video> that
+      // otherwise keeps decoding/looping behind the game forever, which heats up
+      // phones and drains the battery. Returning to intro reloads the page.
+      const bgv = document.getElementById('bg-video');
+      if (bgv) { try { bgv.pause(); } catch(e){} bgv.removeAttribute('src');
+                 bgv.querySelectorAll('source').forEach(s => s.remove());
+                 try { bgv.load(); } catch(e){} bgv.style.display = 'none'; }
       setTimeout(() => {
         ov.style.opacity = '0';
         setTimeout(() => { ov.style.display = 'none'; }, 600);
