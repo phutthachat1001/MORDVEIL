@@ -12,12 +12,10 @@ function giveExp(amount) {
   while (G.exp >= expRequired(G.level)) {
     G.exp -= expRequired(G.level);
     G.level++;
-    // auto stat (ครึ่งของเดิม — ส่วนที่เหลือมาจากแต้มที่จัดเอง)
-    G.maxHp += 5;
-    G.hp = Math.min(G.hp + 5, G.maxHp);
-    G.baseAtk += 1;
-    // แต้มสแตทให้จัดเอง: +3 แต้ม/เลเวล (ลงในหน้าตัวละคร)
-    G.statPoints = (G.statPoints || 0) + 3;
+    G.maxHp += 10;
+    G.hp = Math.min(G.hp + 10, G.maxHp);
+    G.baseAtk += 2;
+    G.baseDef += 1;
     if (typeof refreshSkillPoints === 'function') refreshSkillPoints();
     leveled = true;
     logBattle(`<span class="log-sys">⭐ เลเวลอัพ! ตอนนี้ LV ${G.level}!</span>`);

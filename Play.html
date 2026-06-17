@@ -247,8 +247,6 @@
     <button onclick="showStats()"        style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">สถิติ</button>
     <button onclick="showAchievements()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">ความสำเร็จ</button>
     <button onclick="openCardCollection()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">🃏 การ์ด</button>
-    <button onclick="openTalentPanel()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">🎯 ติดตัว</button>
-    <button onclick="openWorldBoss()" style="background:linear-gradient(135deg,#3a1020,#1a0a14);border:1px solid #cc4466;color:#ff88aa;padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">🌍 บอสโลก</button>
     <button onclick="replayTutorial()" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .6rem;border-radius:4px;cursor:pointer;font-size:.8rem">❔ วิธีเล่น</button>
     <button class="btn-mute" onclick="toggleMute()" title="ปิดเสียง" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:.2rem .5rem;border-radius:4px;cursor:pointer;font-size:.9rem">🔊</button>
     <button onclick="openShop()" style="background:linear-gradient(135deg,#1a2a40,#0f1a2e);border:2px solid var(--gold);color:var(--gold);padding:.2rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem">🏪 ร้านค้า</button>
@@ -279,8 +277,6 @@
     <button onclick="showStats()"             style="border-color:var(--border2)">📊 สถิติ</button>
     <button onclick="showAchievements()"      style="border-color:var(--border2)">🏆 ความสำเร็จ</button>
     <button onclick="openCardCollection()"    style="border-color:var(--border2)">🃏 การ์ด</button>
-    <button onclick="openTalentPanel()"       style="border-color:var(--border2)">🎯 ติดตัว</button>
-    <button onclick="openWorldBoss()"         style="border-color:#cc4466;color:#ff88aa">🌍 บอสโลก</button>
     <button onclick="replayTutorial()"        style="border-color:var(--border2)">❔ วิธีเล่น</button>
     <button class="btn-mute" onclick="toggleMute()" style="border-color:var(--border2)">🔊</button>
     <button onclick="openShop()"              style="border-color:var(--gold);color:var(--gold)">🏪 ร้านค้า</button>
@@ -349,8 +345,8 @@
       <div class="panel-header" style="display:flex;align-items:center;gap:.5rem">
         <span>⚔ สนามรบ</span>
         <span style="margin-left:auto"></span>
-        <button id="btn-open-dungeon" onclick="battleOpenDungeon()" style="display:none;background:rgba(170,68,255,.15);border:1px solid #aa66ff;color:#cc99ff;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">🕳️ ดันเจี้ยน</button>
-        <button id="btn-open-worldboss" onclick="openWorldBoss()" style="display:none;background:rgba(204,68,102,.15);border:1px solid #cc4466;color:#ff88aa;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">🌍 บอสโลก</button>
+        <button id="btn-open-dungeon" onclick="battleOpenDungeon()" style="background:rgba(170,68,255,.15);border:1px solid #aa66ff;color:#cc99ff;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">🕳️ ดันตีบวก</button>
+        <button id="btn-open-worldboss" onclick="openWorldBoss()" style="background:rgba(204,68,102,.15);border:1px solid #cc4466;color:#ff88aa;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">🌍 บอสโลก</button>
         <button id="btn-open-bag" onclick="toggleInventoryPopup()" style="background:rgba(255,200,60,.15);border:1px solid #ffcc44;color:#ffdd88;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">🎒 กระเป๋า</button>
         <button id="btn-back-map" onclick="showBattleMap()" style="display:none;background:rgba(68,136,255,.15);border:1px solid #4488ff;color:#88aaff;padding:.15rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem">🗺 แผนที่</button>
       </div>

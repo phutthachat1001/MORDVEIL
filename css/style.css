@@ -181,13 +181,6 @@ body.preload{visibility:hidden}
 .zone-tab{background:var(--bg4);border:1px solid var(--border);color:var(--text2);padding:.3rem .7rem;border-radius:6px;cursor:pointer;font-size:.8rem;font-family:'Chakra Petch','Sarabun',sans-serif;transition:all .2s}
 .zone-tab.active{border-color:var(--gold);color:var(--gold);background:var(--bg3);box-shadow:0 0 8px var(--gold)44}
 .zone-tab.locked{opacity:.4;cursor:not-allowed}
-/* action pills (บอสโลก / ดันตีบวก) — โดดเด่นต่างจากแท็บโซน */
-.zone-tab-action{font-weight:700;margin-left:.15rem}
-.zone-tab-worldboss{background:linear-gradient(135deg,#3a1020,#1a0a14);border-color:#cc4466;color:#ff88aa}
-.zone-tab-worldboss:hover{box-shadow:0 0 8px #cc446688}
-.zone-tab-dungeon{background:linear-gradient(135deg,#2a1840,#140a24);border-color:#8844cc;color:#bb88ff}
-.zone-tab-dungeon:hover{box-shadow:0 0 8px #8844cc88}
-.zone-tab-dungeon.locked{opacity:.5}
 .battle-arena{padding:0;display:flex;flex-direction:column;align-items:center;overflow-y:auto;flex:1}
 .monster-select{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;width:100%;margin-bottom:1rem;padding:.8rem}
 .mon-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:.4rem .3rem;border-radius:6px;cursor:pointer;font-size:.75rem;text-align:center;transition:all .2s}
@@ -766,16 +759,14 @@ body.preload{visibility:hidden}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin:.8rem 0}
 .stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.4rem .6rem;font-size:.82rem}
 .stat-box .sval{color:var(--gold);font-weight:600}
-/* อัพสแตทเอง */
-.stat-alloc-wrap{background:rgba(255,204,68,.06);border:1px solid #5a4a1a;border-radius:8px;padding:.5rem .6rem;margin:.2rem 0 .6rem}
-.stat-alloc-head{font-size:.82rem;color:#ffe08a;margin-bottom:.4rem}
-.stat-alloc-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.35rem;margin-bottom:.4rem}
-.stat-alloc-btn{background:linear-gradient(135deg,#2a2410,#1a1608);border:1px solid #ffcc44;color:#ffe08a;padding:.4rem .2rem;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:700;transition:all .15s}
-.stat-alloc-btn:hover:not(:disabled){background:linear-gradient(135deg,#3a3018,#2a2410);box-shadow:0 0 8px #ffcc4455}
-.stat-alloc-btn:disabled{opacity:.4;cursor:not-allowed}
-.stat-alloc-spent{font-size:.72rem;color:var(--text2);display:flex;align-items:center;gap:.5rem}
-.stat-reset-btn{background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:.15rem .5rem;border-radius:5px;cursor:pointer;font-size:.7rem;margin-left:auto}
-.stat-reset-btn:hover{color:#ff8888;border-color:#aa4444}
+/* ปุ่มเปิด Talent ในหน้าตัวละคร */
+.talent-open-btn{width:100%;margin:.2rem 0 .6rem;padding:.55rem;border-radius:10px;cursor:pointer;font-weight:700;font-size:.85rem;
+  background:linear-gradient(135deg,#2a1830,#1a1020);border:1px solid #aa66ff;color:#cc99ff;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:.5rem}
+.talent-open-btn:hover{box-shadow:0 0 10px #aa66ff55;background:linear-gradient(135deg,#3a2440,#2a1830)}
+.talent-open-btn.has-points{border-color:#ffcc44;color:#ffe08a;animation:talent-pulse 1.6s ease-in-out infinite}
+.talent-open-badge{background:#ffcc44;color:#111;font-size:.7rem;font-weight:800;padding:.1rem .45rem;border-radius:10px}
+@keyframes talent-pulse{0%,100%{box-shadow:0 0 6px #ffcc4433}50%{box-shadow:0 0 14px #ffcc4488}}
 .equipped-weapon{background:var(--bg3);border-radius:8px;padding:.7rem;margin:.5rem 0}
 .weapon-name{font-size:.9rem;margin-bottom:.2rem}
 .weapon-bonus{font-size:.78rem;color:var(--text2)}

@@ -79,15 +79,18 @@ function dungeonRollKeyDrop(zone, isBoss) {
 function refreshDungeonButton() {
   const btn = document.getElementById('btn-open-dungeon');
   if (!btn) return;
+  btn.style.display = 'inline-block';   // แสดงเสมอ — ล็อก 🔒 ถ้ายังเข้าไม่ได้
   if (typeof canEnterDungeon === 'function' && canEnterDungeon()) {
-    btn.style.display = 'inline-block';
     const free = dungeonFreeRunsLeft();
     const keys = dungeonKeys();
-    const tag = free > 0 ? '🆓' : (keys > 0 ? '🗝️' + keys : '🔒');
-    btn.innerHTML = `🕳️ ดันเจี้ยน ${tag}`;
-    btn.title = free > 0 ? `เข้าฟรีวันนี้ได้อีก ${free} รอบ` : (keys > 0 ? `มีกุญแจ ${keys} ดอก` : 'ต้องมีกุญแจ');
+    const tag = free > 0 ? '🆓' : (keys > 0 ? '🗝️' + keys : '');
+    btn.innerHTML = `🕳️ ดันตีบวก ${tag}`.trim();
+    btn.title = free > 0 ? `เข้าฟรีวันนี้ได้อีก ${free} รอบ` : (keys > 0 ? `มีกุญแจ ${keys} ดอก` : 'หลุมลึก — ฟาร์มหินตีบวก');
+    btn.style.opacity = '1';
   } else {
-    btn.style.display = 'none';
+    btn.innerHTML = '🕳️🔒 ดันตีบวก';
+    btn.title = (typeof dungeonUnlockHint === 'function') ? dungeonUnlockHint() : 'ยังเข้าไม่ได้';
+    btn.style.opacity = '.6';
   }
 }
 

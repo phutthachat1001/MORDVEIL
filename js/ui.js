@@ -117,65 +117,19 @@ function updateCharPanel() {
   document.getElementById('btn-prestige').style.display = G.level >= 100 ? 'block' : 'none';
 }
 
-// ---------- Stat point allocation ----------
-// แต้มที่ได้จาก level up — จัดลง HP/ATK/DEF เองในหน้าตัวละคร
-const STAT_PER_POINT = { hp: 8, atk: 1, def: 1 };
-
+// ---------- Talent summary (ปุ่มเปิด Talent ในหน้าตัวละคร) ----------
+// แทนระบบแต้มสแตทเดิม — Talent คือระบบ build/อัพสแตทของเกม
 function renderStatAlloc() {
   const el = document.getElementById('stat-alloc-area');
   if (!el) return;
-  const pts = G.statPoints || 0;
-  if (!G.allocatedStats) G.allocatedStats = { hp:0, atk:0, def:0 };
-  const a = G.allocatedStats;
-  if (pts <= 0 && (a.hp + a.atk + a.def) === 0) { el.innerHTML = ''; return; }
-
-  const row = (key, icon, label) => {
-    const gain = STAT_PER_POINT[key];
-    return `<button class="stat-alloc-btn" ${pts<=0?'disabled':''} onclick="allocateStat('${key}')">
-      ${icon} +${gain} ${label}</button>`;
-  };
+  if (typeof talentPointsFree !== 'function') { el.innerHTML = ''; return; }
+  const free = talentPointsFree();
+  const hasPoints = free > 0;
   el.innerHTML = `
-    <div class="stat-alloc-wrap">
-      <div class="stat-alloc-head">✨ แต้มสแตท: <b>${pts}</b>
-        ${pts>0?'<span style="color:#ffcc44;font-size:.7rem">— เลือกอัพได้เลย!</span>':''}</div>
-      ${pts>0 ? `<div class="stat-alloc-btns">
-        ${row('hp','❤','HP')}${row('atk','⚔','ATK')}${row('def','🛡','DEF')}
-      </div>` : ''}
-      <div class="stat-alloc-spent">ลงไปแล้ว — ❤${a.hp} ⚔${a.atk} 🛡${a.def}
-        ${(a.hp+a.atk+a.def)>0?`<button class="stat-reset-btn" onclick="resetStatPoints()">↺ รีเซ็ต</button>`:''}</div>
-    </div>`;
-}
-
-function allocateStat(key) {
-  if ((G.statPoints || 0) <= 0) return;
-  const gain = STAT_PER_POINT[key];
-  if (!gain) return;
-  if (!G.allocatedStats) G.allocatedStats = { hp:0, atk:0, def:0 };
-  G.statPoints--;
-  G.allocatedStats[key]++;
-  if (key === 'hp')  { G.maxHp += gain; G.hp += gain; }
-  if (key === 'atk') G.baseAtk += gain;
-  if (key === 'def') G.baseDef += gain;
-  if (typeof saveGame === 'function') saveGame();
-  updateTopBar();
-  updateCharPanel();
-}
-
-// รีเซ็ตแต้มทั้งหมดที่ลงไป (คืนแต้ม + ถอน stat ที่เพิ่ม)
-function resetStatPoints() {
-  if (!G.allocatedStats) return;
-  const a = G.allocatedStats;
-  const back = a.hp + a.atk + a.def;
-  if (back <= 0) return;
-  G.maxHp   -= a.hp * STAT_PER_POINT.hp;
-  G.hp       = Math.min(G.hp, G.maxHp);
-  G.baseAtk -= a.atk * STAT_PER_POINT.atk;
-  G.baseDef -= a.def * STAT_PER_POINT.def;
-  G.statPoints = (G.statPoints || 0) + back;
-  G.allocatedStats = { hp:0, atk:0, def:0 };
-  if (typeof saveGame === 'function') saveGame();
-  updateTopBar();
-  updateCharPanel();
+    <button class="talent-open-btn${hasPoints?' has-points':''}" onclick="openTalentPanel()">
+      🎯 ติดตัวละคร (Talent)
+      ${hasPoints ? `<span class="talent-open-badge">+${free} แต้ม</span>` : ''}
+    </button>`;
 }
 
 function switchTab(name) {
