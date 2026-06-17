@@ -53,6 +53,37 @@ const _IDLE_SKILL_DMG = {
   smoke_bomb: { mult: 1, hits: 1, label: '💨 ระเบิดควัน',   buff: { crit: true, turns: 3 } },
   eagle_eye:  { mult: 1, hits: 1, label: '🦅 ตาอินทรี',     buff: { crit: true, turns: 4 } },
   consecrate: { mult: 1, hits: 1, label: '⛪ พื้นศักดิ์สิทธิ์', buff: { lifesteal: 0.25, turns: 5 } },
+
+  // ── ROGUE base (T1/T2) ──
+  death_mark:    { mult: 1, hits: 1, label: '🎯 เงามรณะ', buff: { atk: 2.0, turns: 2 } },      // marks → big next hits
+  arrow_rain:    { mult: 1.2, hits: 5, label: '🏹 ฝนลูกธนู', dot: { type:'poison', pct:0.15, ticks:3 } },
+
+  // ── A/B branch skills (T3/T4) that were missing from combat ──
+  // WARRIOR
+  iron_shield:      { mult: 1, hits: 1, label: '🛡 โล่เหล็กกล้า', buff: { dmgReduce: 0.5, turns: 3 } },
+  doom_nova:        { mult: 5.0, hits: 1, label: '🌑 โนวาหายนะ', dot: { type:'burn', pct:0.2, ticks:4 } },
+  eternal_fortress: { mult: 1, hits: 1, label: '🏰 ปราการนิรันดร์', buff: { dmgReduce: 0.85, atk: 1.5, turns: 3 } },
+  // MAGE
+  dark_nova:   { mult: 3.5, hits: 1, label: '🌑 โนวามืด', buff: { lifesteal: 0.2, turns: 1 } },
+  holy_light:  { mult: 2.5, hits: 1, label: '☀️ แสงศักดิ์สิทธิ์', buff: { heal: 0.35, dmgReduce: 0.3, turns: 2 } },
+  void_curse:  { mult: 6.0, hits: 1, label: '🌀 สาปจักรวาล', dot: { type:'poison', pct:0.2, ticks:5, defDown:0.2 } },
+  heaven_rain: { mult: 1.5, hits: 6, label: '🌟 ฝนแสงสวรรค์', buff: { regen: 0.06, turns: 5 } },
+  // ROGUE
+  shadow_step:    { mult: 3.0, hits: 1, label: '🌫 ก้าวเงา', buff: { crit: true, dmgReduce: 1.0, turns: 2 } },
+  plunder:        { mult: 2.5, hits: 1, label: '💰 ปล้นสะดม' },
+  shadow_execute: { mult: 8.0, hits: 1, label: '☠️ จ้องมรณะ', execute: 0.30 },
+  empire_plunder: { mult: 1.8, hits: 5, label: '👑 ปล้นจักรวรรดิ' },
+  // ARCHER
+  hunters_mark:  { mult: 1, hits: 1, label: '🎯 ตราล่า', buff: { atk: 2.2, turns: 5 } },
+  wind_shot:     { mult: 4.0, hits: 1, label: '🍃 ลูกธนูลม' },
+  thunder_storm: { mult: 1.5, hits: 8, label: '⚡ พายุสายฟ้า' },
+  // PALADIN
+  light_shield:    { mult: 1, hits: 1, label: '🔆 โล่แสง', buff: { dmgReduce: 0.4, regen: 0.05, turns: 3 } },
+  divine_heal:     { mult: 1, hits: 1, label: '💗 รักษาศักดิ์สิทธิ์', buff: { heal: 0.5, turns: 1 } },
+  holy_aura:       { mult: 1, hits: 1, label: '😇 ออร่าศักดิ์สิทธิ์', buff: { regen: 0.2, dmgReduce: 0.25, turns: 5 } },
+  holy_smite:      { mult: 4.0, hits: 1, label: '⚡ สมิตศักดิ์สิทธิ์', buff: { heal: 0.15, turns: 1 } },
+  divine_radiance: { mult: 2.0, hits: 1, label: '🌅 พระประภา', buff: { heal: 1.0, dmgReduce: 0.7, turns: 4 } },
+  final_judgment:  { mult: 5.0, hits: 1, label: '⚖️ พิพากษา', buff: { crit: true, turns: 1 } },
 };
 // merge in the C/D/S branch skills defined in data.js (Infinity Trial branches)
 if (typeof INFINITY_IDLE_SKILLS !== 'undefined') Object.assign(_IDLE_SKILL_DMG, INFINITY_IDLE_SKILLS);
@@ -412,8 +443,13 @@ function _idleAttackTick() {
     const def = _IDLE_SKILL_DMG[skill.id];
     if (def.buff) {
       // buff skill — apply the temporary buff instead of doing direct damage
-      _idleBuffs = { ...def.buff };  // {atk?,crit?,lifesteal?,turns}
+      _idleBuffs = { ...def.buff };  // {atk?,crit?,lifesteal?,heal?,dmgReduce?,turns}
       castBuffLabel = def.label;
+      // instant heal on cast (heal = fraction of max HP)
+      if (def.buff.heal) {
+        const h = Math.floor(_idlePlayerMax * def.buff.heal);
+        if (h > 0) { _idlePlayerHp = Math.min(_idlePlayerMax, _idlePlayerHp + h); _updateIdleHeroHp(); }
+      }
     } else {
       atk = Math.floor(atk * def.mult);
       hits = def.hits;
@@ -435,6 +471,12 @@ function _idleAttackTick() {
   mob.hp -= totalDmg;
   // apply DoT (พิษ/เผา) if this cast was a DoT skill
   if (castDot) _applyDot(mob, castDot, totalDmg);
+  // execute: skills like shadow_execute finish low-HP mobs instantly
+  const castExec = (skill && _IDLE_SKILL_DMG[skill.id]) ? _IDLE_SKILL_DMG[skill.id].execute : 0;
+  if (castExec && mob.hp > 0 && (mob.hp / mob.maxHp) <= castExec) {
+    mob.hp = 0;
+    _floatAboveIdleMob(idx, '☠️ สังหาร!', 'idle-dmg-float crit');
+  }
   _updateIdleMobHp(idx);
   _showIdleFx(idx);
   const dmgText = (label ? label + ' ' : '') + (hits > 1 ? `${atk}×${hits}` : `${totalDmg}`);
@@ -446,6 +488,11 @@ function _idleAttackTick() {
   if (totalLeech > 0) {
     const heal = Math.floor(totalDmg * totalLeech);
     if (heal > 0) _idlePlayerHp = Math.min(_idlePlayerMax, _idlePlayerHp + heal);
+  }
+  // heal-over-time buff (regen each turn, fraction of max HP)
+  if ((_idleBuffs.turns||0) > 0 && _idleBuffs.regen) {
+    const h = Math.floor(_idlePlayerMax * _idleBuffs.regen);
+    if (h > 0) { _idlePlayerHp = Math.min(_idlePlayerMax, _idlePlayerHp + h); _updateIdleHeroHp(); }
   }
   // tick down the active buff (1 IDLE hit = 1 turn)
   if ((_idleBuffs.turns||0) > 0) { _idleBuffs.turns--; if (_idleBuffs.turns <= 0) _idleBuffs = {}; }
@@ -473,6 +520,10 @@ function _idleMobsAttackHero() {
   const def = (G.baseDef || 0) + (eq.def || 0);
   let dmg = 0;
   _idleMobs.forEach(m => { if (!m.dead) dmg += Math.max(1, m.atk - Math.floor(def * 0.5)); });
+  // active damage-reduction buff (e.g. โล่/ออร่า/เกราะแสง)
+  if ((_idleBuffs.turns || 0) > 0 && _idleBuffs.dmgReduce) {
+    dmg = Math.floor(dmg * (1 - _idleBuffs.dmgReduce));
+  }
   if (dmg <= 0) return;
   _idlePlayerHp -= dmg;
   if (_idlePlayerHp <= 0) {
