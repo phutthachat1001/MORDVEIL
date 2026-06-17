@@ -45,6 +45,16 @@ function recalcTreeBonuses() {
     if (s.offlineCapBonus)offCap   += s.offlineCapBonus;
     if (s.offlineEffBonus)offEff   += s.offlineEffBonus;
   });
+  // fold in TALENT contributions (kept here so this one function owns all the
+  // derived globals — combat/idle read these directly)
+  const tal = (typeof getTalentDerived === 'function') ? getTalentDerived() : null;
+  if (tal) {
+    speed += tal.speed || 0;
+    crit  += tal.crit || 0;
+    exp   += tal.expBonus || 0;
+    gold  += tal.goldBonus || 0;
+    drop  += tal.dropBonus || 0;
+  }
   G.attackSpeedBonus    = Math.min(0.9, speed);
   G.critBonusFromTree   = crit;
   G.expBonusFromTree    = exp;
@@ -52,6 +62,9 @@ function recalcTreeBonuses() {
   G.regenBonusFromTree  = regen;
   G.streakBonusFromTree = streak;
   G.dropBonusFromTree   = drop;
+  // lifesteal / damage-reduction from talents (combine with secret-trait values)
+  G.talentLifesteal  = tal ? (tal.lifesteal || 0) : 0;
+  G.talentDmgReduce  = tal ? (tal.damageReduction || 0) : 0;
   // IDLE-tree farm/offline bonuses
   G.idleExpBonus     = idleExp;
   G.idleGoldBonus    = idleGold;

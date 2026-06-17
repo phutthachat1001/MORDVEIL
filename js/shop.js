@@ -67,6 +67,14 @@ function getEquippedStatBonus() {
     bonus.hp   += cb.hp   || 0;
     bonus.crit += (cb.crit || 0) * 100; // crit stored 0-1 → bonus.crit is %
   }
+  // ── Talent flat stats (atk/def/hp/crit) ──
+  if (typeof getTalentStatBonus === 'function') {
+    const tb = getTalentStatBonus();
+    bonus.atk  += tb.atk  || 0;
+    bonus.def  += tb.def  || 0;
+    bonus.hp   += tb.hp   || 0;
+    bonus.crit += (tb.crit || 0) * 100; // crit fraction → %
+  }
   return bonus;
 }
 

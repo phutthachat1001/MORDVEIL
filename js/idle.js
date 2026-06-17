@@ -489,7 +489,7 @@ function _idleAttackTick() {
 
   // lifesteal from active buff (+ secret-trait lifesteal stacks)
   const buffLeech = ((_idleBuffs.turns||0) > 0 && _idleBuffs.lifesteal) ? _idleBuffs.lifesteal : 0;
-  const totalLeech = buffLeech + (G.lifestealBonus || 0);
+  const totalLeech = buffLeech + (G.lifestealBonus || 0) + (G.talentLifesteal || 0);
   if (totalLeech > 0) {
     const heal = Math.floor(totalDmg * totalLeech);
     if (heal > 0) _idlePlayerHp = Math.min(_idlePlayerMax, _idlePlayerHp + heal);
@@ -525,6 +525,9 @@ function _idleMobsAttackHero() {
   const def = (G.baseDef || 0) + (eq.def || 0);
   let dmg = 0;
   _idleMobs.forEach(m => { if (!m.dead) dmg += Math.max(1, m.atk - Math.floor(def * 0.5)); });
+  // permanent damage reduction (skill tree + talents)
+  const permDR = Math.min(0.8, (G.damageReduction || 0) + (G.talentDmgReduce || 0));
+  if (permDR > 0) dmg = Math.floor(dmg * (1 - permDR));
   // active damage-reduction buff (e.g. โล่/ออร่า/เกราะแสง)
   if ((_idleBuffs.turns || 0) > 0 && _idleBuffs.dmgReduce) {
     dmg = Math.floor(dmg * (1 - _idleBuffs.dmgReduce));

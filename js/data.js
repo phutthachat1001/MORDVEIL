@@ -1028,6 +1028,31 @@ const INFINITY_TRIAL = {
 };
 
 // ============================================================
+// TALENTS — ระบบติดตัวละคร (ปั้น build เอง)
+// ได้ 1 แต้มทุก 3 เลเวล · ลงในต้นไม้ talent · รีเซ็ตได้ด้วยทอง
+// แต่ละ talent มีหลายขั้น (maxRank) · ผลรวม fold เข้า stat/derived ทั้งหมด
+//   stat keys: atk,def,hp (flat ต่อขั้น) · crit,lifesteal,speed,expBonus,
+//              goldBonus,dropBonus,damageReduction (fraction ต่อขั้น)
+// ============================================================
+const TALENT_POINTS_PER_LEVELS = 3;   // +1 แต้มทุก 3 เลเวล
+const TALENT_RESET_COST = 2000;       // ทองในการรีเซ็ต
+const TALENTS = [
+  // ── สายโจมตี (offense) ──
+  { id:'t_atk',     name:'พละกำลัง',     icon:'💪', desc:'+4 ATK ต่อขั้น',           col:'off', maxRank:5, per:{ atk:4 } },
+  { id:'t_crit',    name:'จุดตาย',       icon:'🎯', desc:'+3% โอกาสคริติคอลต่อขั้น',  col:'off', maxRank:5, per:{ crit:0.03 } },
+  { id:'t_speed',   name:'ว่องไว',       icon:'⚡', desc:'+4% ความเร็วโจมตีต่อขั้น',  col:'off', maxRank:5, per:{ speed:0.04 } },
+  { id:'t_lifesteal',name:'ดูดพลัง',     icon:'🩸', desc:'+3% ดูดเลือดต่อขั้น',      col:'off', maxRank:4, per:{ lifesteal:0.03 } },
+  // ── สายป้องกัน (defense) ──
+  { id:'t_hp',      name:'อึด',          icon:'❤️', desc:'+40 HP ต่อขั้น',           col:'def', maxRank:5, per:{ hp:40 } },
+  { id:'t_def',     name:'แกร่ง',        icon:'🛡', desc:'+3 DEF ต่อขั้น',           col:'def', maxRank:5, per:{ def:3 } },
+  { id:'t_tough',   name:'หนังเหนียว',   icon:'🪨', desc:'ลดดาเมจที่รับ 2% ต่อขั้น',  col:'def', maxRank:5, per:{ damageReduction:0.02 } },
+  // ── สายเก็บเกี่ยว (utility) ──
+  { id:'t_exp',     name:'หัวไว',        icon:'📘', desc:'+5% EXP ต่อขั้น',          col:'util', maxRank:5, per:{ expBonus:0.05 } },
+  { id:'t_gold',    name:'นักสะสม',      icon:'💰', desc:'+5% ทองต่อขั้น',           col:'util', maxRank:5, per:{ goldBonus:0.05 } },
+  { id:'t_drop',    name:'โชคลาภ',       icon:'🍀', desc:'+2% โอกาสดรอปของต่อขั้น',  col:'util', maxRank:5, per:{ dropBonus:0.02 } },
+];
+
+// ============================================================
 // EVOLUTION QUESTS — เงื่อนไขเปลี่ยนอาชีพแบบ quest
 // ============================================================
 const EVO_QUESTS = {
