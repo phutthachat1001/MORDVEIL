@@ -60,6 +60,7 @@ function renderMonsterList() {
   const area = document.getElementById('monster-list-area');
   area.style.display = 'block';
   if (typeof refreshDungeonButton === 'function') refreshDungeonButton();
+  if (typeof refreshWorldBossButton === 'function') refreshWorldBossButton();
   const zone = ZONES.find(z => z.id === G.currentZone);
   if (!zone) { area.innerHTML = ''; return; }
 

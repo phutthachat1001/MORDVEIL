@@ -309,6 +309,7 @@ function _wbFloat(html, cls) {
 function refreshWorldBossButton() {
   const btn = document.getElementById('btn-open-worldboss');
   if (!btn) return;
+  if (!G.classId) { btn.style.display = 'none'; return; }
   const boss = _wbCurrentBoss();
   btn.innerHTML = `${boss.icon} บอสโลก`;
   btn.style.display = 'inline-block';
