@@ -82,6 +82,93 @@ const ZONES = [
    ]}
 ];
 
+// ============================================================
+// MONSTER CARDS — การ์ดสะสม (ดรอปจากมอนตัวนั้นๆ)
+// เก็บการ์ดแล้วได้โบนัส stat ถาวร (สะสมยิ่งเยอะ ยิ่งแกร่ง)
+//  rarity ตาม tier ของมอน · บอส = การ์ดแรร์ขึ้น
+//  + 2 ระดับพิเศษเหนือ mythic:
+//    • Limited (ฟ้า) — การ์ดอีเวนต์ หาได้เฉพาะบางช่วง
+//    • Secret  (ดำ)  — การ์ดลับ หายากสุดๆ (ดรอปจากบอสด้วยอัตราต่ำมาก)
+// ============================================================
+const CARD_CONFIG = {
+  // โบนัส stat ต่อการ์ด 1 ใบ (ตาม rarity)
+  statByRarity: {
+    common:  { atk:1,  def:1,  hp:8  },
+    uncommon:{ atk:2,  def:2,  hp:15 },
+    rare:    { atk:4,  def:3,  hp:30 },
+    epic:    { atk:7,  def:5,  hp:55 },
+    legend:  { atk:12, def:9,  hp:90 },
+    ancient: { atk:18, def:14, hp:140 },
+    mythic:  { atk:28, def:20, hp:220 },
+    limited: { atk:35, def:25, hp:280, crit:0.05 },
+    secret:  { atk:55, def:40, hp:450, crit:0.10 },
+  },
+  // ดรอปต่อการสังหารมอนตัวที่ตรงกับการ์ด (ปกติ) · บอส ×2
+  dropByTier:  { 1:0.05, 2:0.045, 3:0.04, 4:0.035, 5:0.03, 6:0.06 },
+  bossMult: 2,
+  secretDropChance: 0.0015, // 0.15% จากบอสด่านนั้น (ต้องเป็นบอส)
+};
+
+// rarity ของการ์ดมอนตาม tier
+function _cardRarityForTier(tier, isBoss) {
+  if (isBoss) return ['ancient','mythic'][Math.min(1, Math.floor((tier-5)))] || 'ancient';
+  return ['common','common','uncommon','rare','epic','legend'][tier-1] || 'common';
+}
+
+// สร้าง CARDS จาก ZONES (1 ใบ/มอน) + การ์ด Secret ลับ 1 ใบ/ด่าน
+const CARDS = (function buildCards() {
+  const list = [];
+  ZONES.forEach(z => {
+    z.monsters.forEach((m, idx) => {
+      const rarity = _cardRarityForTier(m.tier, m.isBoss);
+      list.push({
+        id: `card_z${z.id}_t${m.tier}`,
+        name: m.name,
+        icon: m.sprite || '👾',
+        img: m.img || null,
+        zone: z.id, tier: m.tier, isBoss: !!m.isBoss,
+        rarity,
+        source: 'monster',          // ดรอปจากมอนตัวนี้
+        stat: CARD_CONFIG.statByRarity[rarity],
+      });
+    });
+    // การ์ด Secret ลับประจำด่าน — ดรอปจากบอสด่านนั้นเท่านั้น (โอกาสต่ำมาก)
+    const boss = z.monsters.find(mm => mm.isBoss);
+    list.push({
+      id: `card_secret_z${z.id}`,
+      name: `เงาลับแห่ง${z.name}`,
+      icon: '🃏',
+      zone: z.id, tier: 6, isBoss: false,
+      rarity: 'secret',
+      source: 'secret',            // ดรอปลับจากบอสด่านนี้
+      bossSprite: boss ? boss.sprite : '👑',
+      stat: CARD_CONFIG.statByRarity.secret,
+    });
+  });
+  return list;
+})();
+
+// การ์ด Limited (อีเวนต์) — เพิ่ม/เปิดได้ตามช่วงเวลา (ดู isCardAvailable)
+// availableFrom/To = วันที่ ISO (YYYY-MM-DD) ที่ดรอปได้ · ถ้าไม่กำหนด = ปิดไว้ก่อน
+const LIMITED_CARDS = [
+  { id:'card_ltd_founder', name:'การ์ดผู้บุกเบิก', icon:'🎴', rarity:'limited', source:'limited',
+    stat: CARD_CONFIG.statByRarity.limited, dropZone:'any', dropChance:0.004,
+    availableFrom:'2026-06-01', availableTo:'2026-07-31',
+    desc:'การ์ดฉลองเปิดเกม — ดรอปได้จากมอนทุกด่านในช่วงเปิดตัวเท่านั้น' },
+];
+
+// การ์ดทั้งหมด (มอน + ลับ + ลิมิเต็ด)
+const ALL_CARDS = CARDS.concat(LIMITED_CARDS);
+
+// การ์ด Limited ใบนี้เปิดให้ดรอปอยู่ไหม (ตามวันที่)
+function isCardAvailable(card) {
+  if (card.source !== 'limited') return true;
+  const today = new Date().toISOString().slice(0, 10);
+  if (card.availableFrom && today < card.availableFrom) return false;
+  if (card.availableTo   && today > card.availableTo)   return false;
+  return true;
+}
+
 const WEAPONS = [
   // COMMON (gray)
   {id:'w01',name:'ดาบไม้',rarity:'common',atk:2,effect:null,icon:'🪵'},
@@ -513,7 +600,10 @@ const RARITIES = {
   epic:    {label:'มหากาพย์',color:'var(--epic)',    bg:'#1a0d1a'},
   legend:  {label:'ตำนาน',   color:'var(--legend)',  bg:'#1a0d00'},
   ancient: {label:'โบราณ',   color:'#ff4400',        bg:'#1a0500'},
-  mythic:  {label:'เทพนิยาย',color:'#ff00cc',        bg:'#1a0014'}
+  mythic:  {label:'เทพนิยาย',color:'#ff00cc',        bg:'#1a0014'},
+  // ── card-only rarities (above mythic) ──
+  limited: {label:'ลิมิเต็ด',color:'#22ccff',        bg:'#001824'},  // ฟ้า — หาได้บางช่วง
+  secret:  {label:'ซีเคร็ต', color:'#e8e8e8',        bg:'#050505', dark:true}  // ดำ — หายากสุดๆ
 };
 
 const CHEST_TABLES = {

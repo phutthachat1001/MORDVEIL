@@ -58,6 +58,15 @@ function getEquippedStatBonus() {
       }
     });
   }
+
+  // ── Card collection bonus: every collected card adds its stat (global) ──
+  if (typeof getCardStatBonus === 'function') {
+    const cb = getCardStatBonus();
+    bonus.atk  += cb.atk  || 0;
+    bonus.def  += cb.def  || 0;
+    bonus.hp   += cb.hp   || 0;
+    bonus.crit += (cb.crit || 0) * 100; // crit stored 0-1 → bonus.crit is %
+  }
   return bonus;
 }
 

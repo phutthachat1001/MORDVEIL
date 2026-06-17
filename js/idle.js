@@ -503,6 +503,8 @@ function _idleMobDie(idx, mob) {
   }
   // dungeon key drop from IDLE farming (same rate as manual; boss/special x2)
   if (typeof dungeonRollKeyDrop === 'function') dungeonRollKeyDrop(mob.zone, !!mob.special);
+  // monster card drop from IDLE farming
+  if (typeof cardRollDrop === 'function') cardRollDrop(mob.zone, mob.tier || 1, !!mob.special);
 
   // crafting materials from IDLE farming (lower rate than manual)
   if (typeof ZONE_MATERIALS !== 'undefined' && (mob.special || Math.random() < 0.20)) {
