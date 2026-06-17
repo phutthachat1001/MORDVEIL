@@ -955,8 +955,11 @@ body.preload{visibility:hidden}
 .inv-cell.rarity-uncommon{border-color:var(--uncommon)}
 .inv-cell.rarity-rare{border-color:var(--rare)}
 .inv-cell.rarity-epic{border-color:var(--epic)}
-.inv-cell.rarity-legend{border-color:var(--legend);box-shadow:0 0 8px #ff880033}
-.inv-cell.rarity-ancient{border-color:#ff4400;box-shadow:0 0 10px #ff440044}
+.inv-cell.rarity-legend{border-color:var(--legend);box-shadow:0 0 8px #ff880055}
+.inv-cell.rarity-ancient{border-color:#ff4400;box-shadow:0 0 11px #ff440066}
+.inv-cell.rarity-mythic{border-color:#ff00cc;box-shadow:0 0 13px #ff00cc77}
+.inv-cell.rarity-limited{border-color:#22ccff;box-shadow:0 0 13px #22ccff88}
+.inv-cell.rarity-secret{border-color:#e8e8e8;background:#060606;box-shadow:0 0 14px #ffffff66}
 /* eq badge inside cell */
 .inv-cell .eq-badge{position:absolute;top:1px;left:2px;font-size:.5rem;background:var(--gold);color:#000;border-radius:2px;padding:0 2px;font-weight:700}
 
@@ -978,6 +981,9 @@ body.preload{visibility:hidden}
 .inv-item.rarity-epic{border-color:var(--epic)}
 .inv-item.rarity-legend{border-color:var(--legend);box-shadow:0 0 8px #ff880044}
 .inv-item.rarity-ancient{border-color:#ff4400;box-shadow:0 0 10px #ff440066}
+.inv-item.rarity-mythic{border-color:#ff00cc;box-shadow:0 0 12px #ff00cc77}
+.inv-item.rarity-limited{border-color:#22ccff;box-shadow:0 0 12px #22ccff88}
+.inv-item.rarity-secret{border-color:#e8e8e8;background:#060606;box-shadow:0 0 13px #ffffff66}
 .inv-item.equipped{box-shadow:0 0 10px var(--gold)88}
 
 /* OVERLAYS */
@@ -1326,6 +1332,9 @@ body.preload{visibility:hidden}
 .rarity-glow-epic{color:var(--epic);text-shadow:0 0 20px var(--epic)}
 .rarity-glow-legend{color:var(--legend);text-shadow:0 0 25px var(--legend)}
 .rarity-glow-ancient{color:#ff4400;text-shadow:0 0 30px #ff4400}
+.rarity-glow-mythic{color:#ff00cc;text-shadow:0 0 30px #ff00cc}
+.rarity-glow-limited{color:#22ccff;text-shadow:0 0 28px #22ccff}
+.rarity-glow-secret{color:#fff;text-shadow:0 0 30px #fff,0 0 8px #000}
 .btn-close-modal{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:.6rem 1.5rem;border-radius:8px;cursor:pointer;font-family:'Sarabun',sans-serif;margin-top:1rem}
 .btn-equip-modal{background:linear-gradient(135deg,#1a3020,#103040);border:1px solid var(--green);color:var(--green);padding:.6rem 1.5rem;border-radius:8px;cursor:pointer;font-family:'Sarabun',sans-serif;margin-top:1rem;margin-right:.5rem}
 

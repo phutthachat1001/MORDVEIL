@@ -177,28 +177,63 @@ function _cardCellHtml(c) {
 }
 
 // ---------- Gear-by-zone tab ----------
-// Shows, per zone: the rarity window (with roll %) and the zone power multiplier
-// so the player can see that deeper zones drop stronger gear.
+// Shows, per zone, the ACTUAL items that can drop there — each rarity in the
+// zone's drop window (at/above the zone rarity floor), listing the real items
+// of that rarity with a rarity-colored frame and zone-scaled stats.
+function _gearStatStr(item, mult) {
+  const parts = [];
+  if (item.atk) parts.push(`⚔${Math.round(item.atk * mult)}`);
+  if (item.def) parts.push(`🛡${Math.round(item.def * mult)}`);
+  if (item.hp)  parts.push(`❤${Math.round(item.hp  * mult)}`);
+  if (item.crit) parts.push(`✦${item.crit}%`);
+  if (item.attackSpeed) parts.push(`⚡${Math.round(item.attackSpeed*100)}%`);
+  return parts.join(' ') || '-';
+}
+
+function _gearItemCardHtml(item, mult) {
+  const R = (typeof RARITIES !== 'undefined' && RARITIES[item.rarity]) || { color:'#aaa', bg:'#111' };
+  return `<div title="${item.name}" style="width:96px;border:1.5px solid ${R.color};border-radius:9px;
+    padding:.3rem .25rem;background:${R.bg || '#111'};text-align:center;box-shadow:0 0 6px ${R.color}33">
+    <div style="font-size:1.3rem;line-height:1">${item.icon || '⚔'}</div>
+    <div style="font-size:.55rem;color:${R.color};font-weight:700;line-height:1.1;height:2.1em;overflow:hidden;margin:.15rem 0">${item.name}</div>
+    <div style="font-size:.54rem;color:#bcd">${_gearStatStr(item, mult)}</div>
+  </div>`;
+}
+
 function _gearByZoneHtml() {
   let html = '';
+  const order = (typeof _RARITY_ORDER !== 'undefined') ? _RARITY_ORDER : ['common','uncommon','rare','epic','legend','ancient'];
   (typeof ZONES !== 'undefined' ? ZONES : []).forEach(z => {
     const table = (typeof _ZONE_DROP_TABLES !== 'undefined' && _ZONE_DROP_TABLES[z.id]) || [];
     const total = table.reduce((s, [, w]) => s + w, 0) || 1;
     const mult  = (typeof _ZONE_GEAR_MULT !== 'undefined' && _ZONE_GEAR_MULT[z.id]) || 1;
-    const chips = table.map(([r, w]) => {
+    const floor = (typeof _ZONE_RARITY_FLOOR !== 'undefined' && _ZONE_RARITY_FLOOR[z.id]) || 'common';
+    const floorIdx = order.indexOf(floor);
+
+    html += `<div style="margin:.6rem 0 .25rem;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #223;padding-top:.4rem">
+        <span style="color:#9ad;font-size:.82rem;font-weight:700">${z.emoji} ${z.name}</span>
+        <span style="font-size:.66rem;color:#fc8">พลัง ×${mult.toFixed(2)}</span>
+      </div>`;
+
+    // for each rarity this zone rolls (sorted high→low), list its actual items
+    const rolls = table.slice().sort((a,b) => order.indexOf(b[0]) - order.indexOf(a[0]));
+    rolls.forEach(([r, w]) => {
+      if (order.indexOf(r) < floorIdx) return; // below the zone floor → won't drop
       const R = (typeof RARITIES !== 'undefined' && RARITIES[r]) || { label:r, color:'#aaa' };
       const pct = Math.round((w / total) * 100);
-      return `<span style="display:inline-flex;gap:.2rem;align-items:center;padding:.12rem .4rem;border-radius:6px;
-        background:rgba(255,255,255,.04);border:1px solid ${R.color};color:${R.color};font-size:.64rem;font-weight:700">
-        ${R.label} <span style="color:#999;font-weight:400">${pct}%</span></span>`;
-    }).join('');
-    html += `<div style="margin:.55rem 0 .25rem;display:flex;justify-content:space-between;align-items:center">
-        <span style="color:#9ad;font-size:.8rem;font-weight:700">${z.emoji} ${z.name}</span>
-        <span style="font-size:.66rem;color:#fc8">พลัง ×${mult.toFixed(2)}</span>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:.3rem">${chips || '<span style="color:#666;font-size:.7rem">—</span>'}</div>`;
+      const items = [];
+      (typeof SLOT_SLOTS !== 'undefined' ? SLOT_SLOTS : []).forEach(slot => {
+        (ALL_ITEMS_BY_SLOT[slot] || []).forEach(it => { if (it.rarity === r) items.push(it); });
+      });
+      if (!items.length) return;
+      const CAP = 12;
+      const shown = items.slice(0, CAP);
+      const more  = items.length - shown.length;
+      html += `<div style="margin:.3rem 0 .15rem;color:${R.color};font-size:.7rem;font-weight:700">${R.label} <span style="color:#888;font-weight:400">~${pct}%</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:.35rem">${shown.map(it => _gearItemCardHtml(it, mult)).join('')}${more>0?`<div style="align-self:center;font-size:.62rem;color:#778">+${more} ชิ้น</div>`:''}</div>`;
+    });
   });
   html += `<div style="font-size:.66rem;color:#778;margin-top:.6rem;line-height:1.5">
-    👑 บอสด่าน: ดรอปแน่นอน + ความหายากสูงกว่ามอนปกติ · 🃏 ยิ่งด่านลึก การ์ดยิ่งหายาก</div>`;
+    👑 บอสด่าน: ดรอปแน่นอน + ความหายากสูงกว่ามอนปกติ · ตัวเลขคือพลังหลังคูณด่านแล้ว</div>`;
   return html;
 }
