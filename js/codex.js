@@ -95,18 +95,20 @@ function _renderCodexContent(zoneId) {
   const zone = ZONES.find(z => z.id === zoneId);
   if (!zone) { el.innerHTML = ''; return; }
 
-  // build list of all items that can drop from this zone (tier-based rarity)
-  const tierRarityMap = { 1:'common', 2:'common', 3:'uncommon', 4:'rare', 5:'rare', 6:'boss' };
+  // Build the list of items that can ACTUALLY drop in this zone, using the
+  // real drop system (zone rarity window + zone floor) — so each zone shows a
+  // distinct set, not the same full catalogue everywhere.
+  const table = (typeof _ZONE_DROP_TABLES !== 'undefined' && _ZONE_DROP_TABLES[zoneId]) || [];
+  const floor = (typeof _ZONE_RARITY_FLOOR !== 'undefined' && _ZONE_RARITY_FLOOR[zoneId]) || 'common';
+  const order = (typeof _RARITY_ORDER !== 'undefined') ? _RARITY_ORDER : ['common','uncommon','rare','epic','legend','ancient'];
+  const floorIdx = order.indexOf(floor);
+  // rarities this zone can roll (at/above its floor)
+  const zoneRarities = table.map(([r]) => r).filter(r => order.indexOf(r) >= floorIdx);
   const zoneItems = [];
-  zone.monsters.forEach(m => {
-    const chestType = m.isBoss ? 'boss' : (m.tier >= 4 ? 'rare' : m.tier >= 2 ? 'uncommon' : 'common');
-    const table = CHEST_TABLES[chestType] || CHEST_TABLES.common;
-    table.forEach(entry => {
-      SLOT_SLOTS.forEach(slot => {
-        const pool = (ALL_ITEMS_BY_SLOT[slot] || []).filter(i => i.rarity === entry.r);
-        pool.forEach(item => {
-          if (!zoneItems.find(x => x.id === item.id)) zoneItems.push(item);
-        });
+  zoneRarities.forEach(r => {
+    SLOT_SLOTS.forEach(slot => {
+      (ALL_ITEMS_BY_SLOT[slot] || []).forEach(item => {
+        if (item.rarity === r && !zoneItems.find(x => x.id === item.id)) zoneItems.push(item);
       });
     });
   });
