@@ -12,6 +12,9 @@ let G = {
   baseAtk: 10,
   baseDef: 5,
   gold: 0,
+  // อัพสแตทเอง — ได้แต้มทุก level up, จัดลงในหน้าตัวละคร
+  statPoints: 0,                          // แต้มที่ยังไม่ได้ใช้
+  allocatedStats: { hp:0, atk:0, def:0 }, // จำนวนแต้มที่ลงแต่ละสาย (ไว้คำนวณ + reset)
   tasks: [],
   inventory: [],
   equippedWeaponId: null,

@@ -122,6 +122,9 @@ function loadGame() {
         G.equippedSlots = { weapon:null, helmet:null, armor:null, gloves:null, pants:null, boots:null };
         if (G.equippedWeaponId) G.equippedSlots.weapon = G.equippedWeaponId;
       }
+      // migrate: stat allocation fields
+      if (G.statPoints === undefined) G.statPoints = 0;
+      if (!G.allocatedStats) G.allocatedStats = { hp:0, atk:0, def:0 };
       // migrate: event system fields
       if (!G.eventLog)              G.eventLog              = [];
       if (!G.streakEventsTriggered) G.streakEventsTriggered = [];

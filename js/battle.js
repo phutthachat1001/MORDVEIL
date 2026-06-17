@@ -52,6 +52,26 @@ function renderZoneTabs() {
     };
     tabs.appendChild(tab);
   });
+
+  // ── action pills ต่อท้ายแถว: บอสโลก + ดันหาของตีบวก ──
+  const wbPill = document.createElement('div');
+  wbPill.className = 'zone-tab zone-tab-action zone-tab-worldboss';
+  wbPill.textContent = '🌍 บอสโลก';
+  wbPill.title = 'บอสโลก — ดาเมจสะสมรายสัปดาห์';
+  wbPill.onclick = () => { if (typeof openWorldBoss === 'function') openWorldBoss(); };
+  tabs.appendChild(wbPill);
+
+  const dgUnlocked = typeof canEnterDungeon === 'function' ? canEnterDungeon() : true;
+  const dgPill = document.createElement('div');
+  dgPill.className = 'zone-tab zone-tab-action zone-tab-dungeon' + (dgUnlocked ? '' : ' locked');
+  dgPill.textContent = dgUnlocked ? '🕳️ ดันตีบวก' : '🕳️🔒 ดันตีบวก';
+  dgPill.title = dgUnlocked ? 'หลุมลึกนิรันดร์ — ฟาร์มหินตีบวก/วัตถุดิบ'
+    : (typeof dungeonUnlockHint === 'function' ? dungeonUnlockHint() : 'ยังเข้าไม่ได้');
+  dgPill.onclick = () => {
+    if (typeof battleOpenDungeon === 'function') battleOpenDungeon();
+    else if (typeof openDungeon === 'function') openDungeon();
+  };
+  tabs.appendChild(dgPill);
 }
 
 // ---------- Monster list ----------

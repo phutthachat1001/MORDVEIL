@@ -310,12 +310,15 @@ function _renderTrialResult(result) {
     : `<span class="trial-rank trial-rank-${result.rank}">${result.rank}</span> ${result.label}`;
 
   // show the odds this run had (so the % system feels transparent)
+  // เรียงจาก % มาก→น้อย เพื่อให้อ่านเข้าใจง่าย (ไม่งงว่าทำไม B มาก่อน A)
   const ch = result.chances || {};
-  const chRow = Object.keys(ch).map(b => {
-    const info = (b === 'S') ? INFINITY_TRIAL.secret : INFINITY_TRIAL.branchInfo[b];
-    const hit = b === result.branch;
-    return `<span style="opacity:${hit?1:.5};font-weight:${hit?800:400}">${info.rank} ${ch[b]}%</span>`;
-  }).join(' · ');
+  const chRow = Object.keys(ch)
+    .sort((a, b) => ch[b] - ch[a])
+    .map(b => {
+      const info = (b === 'S') ? INFINITY_TRIAL.secret : INFINITY_TRIAL.branchInfo[b];
+      const hit = b === result.branch;
+      return `<span style="opacity:${hit?1:.5};font-weight:${hit?800:400}">${info.rank} ${ch[b]}%</span>`;
+    }).join(' · ');
 
   // preview the kills-based rewards the player will receive
   const R = INFINITY_TRIAL.killRewards || {};
