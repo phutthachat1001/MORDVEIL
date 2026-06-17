@@ -331,7 +331,7 @@ body.preload{visibility:hidden}
 .attack-fx-img{
   position:absolute;
   top:40%;left:50%;
-  width:130px;height:130px;
+  width:185px;height:185px;
   pointer-events:none;
   object-fit:contain;
   image-rendering:pixelated;
@@ -339,7 +339,7 @@ body.preload{visibility:hidden}
   animation:attack-fx-anim .6s cubic-bezier(.2,.8,.3,1) forwards;
 }
 .attack-fx-img.crit{
-  width:185px;height:185px;
+  width:250px;height:250px;
   animation:attack-fx-crit .65s cubic-bezier(.2,.85,.25,1) forwards;
 }
 
@@ -349,14 +349,14 @@ body.preload{visibility:hidden}
   100%{opacity:0;transform:translate(-50%,-50%) scale(2.4)}
 }
 .fx-shockwave{
-  position:absolute;top:40%;left:50%;width:120px;height:120px;
+  position:absolute;top:40%;left:50%;width:165px;height:165px;
   border-radius:50%;pointer-events:none;z-index:19;
   border:3px solid rgba(150,200,255,.8);
   box-shadow:0 0 18px rgba(120,180,255,.6),inset 0 0 18px rgba(120,180,255,.4);
   animation:fx-shockwave .5s ease-out forwards;
 }
 .fx-shockwave.crit{
-  width:150px;height:150px;
+  width:210px;height:210px;
   border-color:rgba(255,210,60,.95);
   box-shadow:0 0 26px rgba(255,190,0,.8),inset 0 0 22px rgba(255,190,0,.5);
 }
@@ -2041,21 +2041,21 @@ body.preload{visibility:hidden}
 .idle-fx {
   position: absolute;
   top: 50%; left: 50%;
-  width: 64px; height: 64px;
   transform: translate(-50%,-50%);
   pointer-events: none;
   z-index: 8;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  width: 80px; height: 80px;
-  animation: idleFxPop .46s cubic-bezier(.2,.8,.3,1) forwards;
+  width: 130px; height: 130px;
+  animation: idleFxPop .5s cubic-bezier(.2,.8,.3,1) forwards;
 }
 @keyframes idleFxPop {
-  0%   { opacity: 0; transform: translate(-50%,-50%) scale(.35) rotate(-20deg); filter: brightness(1.7); }
-  20%  { opacity: 1; transform: translate(-50%,-50%) scale(1.35) rotate(6deg);  filter: brightness(1.5) drop-shadow(0 0 10px rgba(150,200,255,.8)); }
-  40%  { opacity: 1; transform: translate(-50%,-50%) scale(.95) rotate(-2deg);  filter: brightness(1); }
-  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.25) rotate(9deg); }
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(.4) rotate(-22deg); filter: brightness(1.8); }
+  18%  { opacity: 1; transform: translate(-50%,-50%) scale(1.7) rotate(7deg);  filter: brightness(1.6) drop-shadow(0 0 16px rgba(150,200,255,.9)); }
+  38%  { opacity: 1; transform: translate(-50%,-50%) scale(1.2) rotate(-3deg); filter: brightness(1.1) drop-shadow(0 0 10px rgba(150,200,255,.5)); }
+  60%  { opacity: 1; transform: translate(-50%,-50%) scale(1.4) rotate(3deg); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(1.65) rotate(10deg); }
 }
 .idle-mob-name { font-size: .62rem; color: #cdd; margin-top: .25rem; white-space: nowrap; text-shadow: 0 1px 2px #000; }
 
