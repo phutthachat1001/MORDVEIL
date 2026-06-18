@@ -3,7 +3,10 @@
 // ============================================================
 
 function expRequired(level) {
-  return Math.floor(100 * Math.pow(level, 1.8));
+  // Steeper curve (1.95) so late levels take meaningfully longer — combined
+  // with reduced per-kill / idle EXP this stretches LV90 from ~2 days to a
+  // week+ of play instead of a couple of sessions.
+  return Math.floor(100 * Math.pow(level, 1.95));
 }
 
 function giveExp(amount) {

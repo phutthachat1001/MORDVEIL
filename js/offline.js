@@ -44,7 +44,7 @@ function _calcOfflineRewards(ms) {
   const killExpBase = G.gameMode === 'fullrpg' ? 0.5 : 0.03;
   // IDLE-tree EXP/Gold bonuses also apply to offline farming
   const expMult  = 1 + (G.expBonusFromTree || 0)  + (G.idleExpBonus  || 0);
-  const expPer = Math.max(1, Math.floor(full.maxHp * killExpBase * 3 * IDLE_REWARD_MULT * expMult));
+  const expPer = Math.max(1, Math.floor(full.maxHp * killExpBase * 2 * IDLE_REWARD_MULT * expMult));
   let goldPer  = Math.max(1, Math.floor(full.atk * 1.2 * IDLE_REWARD_MULT)); // sync with idle.js gold rate
   const cls = (typeof CLASSES !== 'undefined') ? CLASSES.find(c => c.id === G.classId) : null;
   if (cls && cls.bonuses && cls.bonuses.goldMult) goldPer = Math.floor(goldPer * cls.bonuses.goldMult);

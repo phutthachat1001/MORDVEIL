@@ -22,7 +22,7 @@ let _trialSkillCd  = {};   // skillId -> ready timestamp(ms)
 let _trialDeepestWave = 0;
 
 // ---------- entry / gate ----------
-const TRIAL_MIN_LEVEL = 35;   // ต้องถึง Lv35 ก่อนเข้าการทดสอบ (T2→T3)
+const TRIAL_MIN_LEVEL = 50;   // ต้องถึง Lv50 ก่อนเข้าการทดสอบ (T2→T3) — ยืดเกมให้ช้าลง
 
 function canEnterTrial() {
   return G.classId && (G.classTier || 1) === 2 && !G.classBranch

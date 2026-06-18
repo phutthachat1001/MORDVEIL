@@ -2895,7 +2895,7 @@ function monsterDie() {
 
   // Base EXP per kill (boss baseline), then scaled down for normal monsters
   const killExpBase = G.gameMode === 'fullrpg' ? 0.5 : 0.03;
-  let expGain = Math.floor(stats.maxHp * killExpBase * 3); // ×3 = boss baseline
+  let expGain = Math.floor(stats.maxHp * killExpBase * 2); // ×2 baseline (toned down for slower leveling)
   if (G.gameMode === 'fullrpg' && monster.isBoss) expGain = Math.floor(expGain * 1.5);
   expGain = Math.floor(expGain * rewardMult);
   // apply event exp rewards (ferocious ×3, rare ×2 etc.)

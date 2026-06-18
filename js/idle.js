@@ -11,7 +11,7 @@
 // fast and the numbers visibly tick (proper IDLE-game feel).
 const IDLE_HP_MULT     = 0.18;  // HP scale vs real monster (low → quick kills)
 const IDLE_ATK_MULT    = 0.25;  // ATK scale vs real monster (gentle on the hero)
-const IDLE_REWARD_MULT = 0.35;  // EXP/gold vs a boss-baseline kill
+const IDLE_REWARD_MULT = 0.28;  // EXP/gold vs a boss-baseline kill (toned down ~20% to slow idle leveling)
 const IDLE_RESPAWN_MS  = 3000;  // hero respawn delay on death
 
 let _idleMobs       = [];       // [{name, sprite, img, tier, zone, hp, maxHp, atk, dead}]
@@ -554,7 +554,7 @@ function _idleMobDie(idx, mob) {
 
   const full = getMonsterStats(mob.zone, mob.tier, false);
   const killExpBase = G.gameMode === 'fullrpg' ? 0.5 : 0.03;
-  let expGain = Math.floor(full.maxHp * killExpBase * 3 * IDLE_REWARD_MULT);
+  let expGain = Math.floor(full.maxHp * killExpBase * 2 * IDLE_REWARD_MULT);
   const expBoostMult = (typeof getExpBoostMult === 'function') ? getExpBoostMult() : 1;
   const comboMult = (typeof idleComboExpMult === 'function') ? idleComboExpMult() : 1;
   // IDLE-tree adds idleExpBonus on top of the general tree EXP bonus
