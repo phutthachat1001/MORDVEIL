@@ -581,6 +581,15 @@ const ENDLESS_DUNGEON = {
     abyss_essence: { base: 0.00, perFloor: 0.002, cap: 0.12, minFloor: 16 },
   },
   bossBundleMult: 3,          // ชั้นบอสดรอปเป็นชุด ×3
+  // ── Depth milestones: รางวัลครั้งเดียวเมื่อทำลายสถิติทะลุชั้นที่กำหนด ──
+  // ให้ปลายเกมมีเป้าหมายไต่ลึกจริงๆ (ไม่ใช่แค่ตัวเลขสถิติ)
+  depthMilestones: [
+    { floor: 10,  gold: 20000,  stones: 30,  cores: 8,  keys: 2 },
+    { floor: 25,  gold: 60000,  stones: 70,  cores: 18, keys: 4, shards: 5 },
+    { floor: 50,  gold: 200000, stones: 150, cores: 40, keys: 8, shards: 15, essence: 3 },
+    { floor: 75,  gold: 500000, stones: 300, cores: 80, keys: 15, shards: 30, essence: 8 },
+    { floor: 100, gold: 1500000,stones: 600, cores: 150,keys: 30, shards: 60, essence: 20, card: true },
+  ],
 };
 
 // ราคาซื้อ/ขาย ตาม rarity

@@ -161,6 +161,7 @@ function _renderDgIntro() {
         <li>❤️ HP ไม่ฟื้นระหว่างดิ่ง — ตายแล้วของที่เก็บยังอยู่ทั้งหมด</li>
       </ul>
       <div class="t4d-progress">ความลึกที่ดีที่สุด: <b>ชั้น ${best}</b> · กุญแจ: <b>${keys}</b> 🗝️</div>
+      ${_dgMilestoneHtml(best)}
       <div style="margin:.4rem 0;font-size:.82rem">${entryLine}</div>
       <button class="btn-trial-start" onclick="startDungeon()" ${canRun?'':'disabled style="opacity:.4;cursor:not-allowed"'}>${free>0?'🆓 ดิ่งลงหลุม (ฟรี)':keys>0?'🗝️ ใช้กุญแจดิ่งลงหลุม':'🔒 ไม่มีสิทธิ์เข้า'}</button>
       <button class="btn-trial-cancel" onclick="closeDungeon()">ออก</button>
@@ -268,7 +269,7 @@ function _dgTick() {
     mob.dead = true;
     _markDgMobDead(idx);
     _rollDgDrops(mob);
-    if (_dgFloor > (G.dungeonBestFloor || 0)) G.dungeonBestFloor = _dgFloor;
+    if (_dgFloor > (G.dungeonBestFloor || 0)) { G.dungeonBestFloor = _dgFloor; _dgCheckDepthMilestone(_dgFloor); }
     if (_dgMobs.every(m => m.dead)) setTimeout(() => { if (_dgActive) _spawnDgFloor(); }, 650);
     return;
   }
@@ -347,6 +348,60 @@ function _rollDgDrops(mob) {
     if (txt) _floatDg(0, `🎁 ${txt}`, mob.isBoss ? 'crit' : '');
   }
   if (gained.length) { if (typeof updateTopBar === 'function') updateTopBar(); }
+}
+
+// milestone list for the intro — shows reward + reached status, highlights next
+function _dgMilestoneHtml(best) {
+  const list = (typeof ENDLESS_DUNGEON !== 'undefined' && ENDLESS_DUNGEON.depthMilestones) || [];
+  if (!list.length) return '';
+  const rows = list.map(m => {
+    const reached = best >= m.floor;
+    const parts = [];
+    if (m.gold)   parts.push(`💰${(m.gold/1000)}k`);
+    if (m.stones) parts.push(`🔨${m.stones}`);
+    if (m.keys)   parts.push(`🗝️${m.keys}`);
+    if (m.shards) parts.push(`🕳️${m.shards}`);
+    if (m.card)   parts.push('🃏');
+    return `<div style="display:flex;justify-content:space-between;font-size:.68rem;padding:.1rem .3rem;border-radius:5px;
+      background:${reached?'rgba(40,80,40,.3)':'rgba(255,255,255,.03)'};color:${reached?'#8c8':'#9ab'}">
+      <span>${reached?'✓':'🔒'} ชั้น ${m.floor}</span><span>${parts.join(' ')}</span></div>`;
+  }).join('');
+  return `<div style="margin:.4rem 0;text-align:left">
+    <div style="font-size:.66rem;color:#9ad;font-weight:700;margin-bottom:.2rem">🏆 รางวัลทะลุชั้น (ครั้งเดียว):</div>
+    <div style="display:flex;flex-direction:column;gap:.15rem">${rows}</div></div>`;
+}
+
+// ---------- depth milestones (one-time rewards for new depth records) ----------
+function _dgCheckDepthMilestone(floor) {
+  const list = (typeof ENDLESS_DUNGEON !== 'undefined' && ENDLESS_DUNGEON.depthMilestones) || [];
+  if (!G.dungeonDepthClaimed) G.dungeonDepthClaimed = [];
+  list.forEach(m => {
+    if (floor < m.floor || G.dungeonDepthClaimed.includes(m.floor)) return;
+    G.dungeonDepthClaimed.push(m.floor);
+    if (m.gold) G.gold = (G.gold || 0) + m.gold;
+    if (!G.materials) G.materials = {};
+    if (m.stones)  G.materials.enhance_stone = (G.materials.enhance_stone || 0) + m.stones;
+    if (m.cores)   G.materials.enhance_core  = (G.materials.enhance_core  || 0) + m.cores;
+    if (m.keys)    G.materials.dungeon_key   = (G.materials.dungeon_key   || 0) + m.keys;
+    if (m.shards)  G.materials.void_shard    = (G.materials.void_shard    || 0) + m.shards;
+    if (m.essence) G.materials.abyss_essence = (G.materials.abyss_essence || 0) + m.essence;
+    if (m.card && typeof CARDS !== 'undefined' && typeof _grantCard === 'function') {
+      const secrets = CARDS.filter(c => c.source === 'secret');
+      if (secrets.length) _grantCard(secrets[Math.floor(Math.random() * secrets.length)]);
+    }
+    const parts = [];
+    if (m.gold)    parts.push(`💰${m.gold.toLocaleString()}`);
+    if (m.stones)  parts.push(`🔨${m.stones}`);
+    if (m.cores)   parts.push(`💠${m.cores}`);
+    if (m.keys)    parts.push(`🗝️${m.keys}`);
+    if (m.shards)  parts.push(`🕳️${m.shards}`);
+    if (m.essence) parts.push(`🌌${m.essence}`);
+    if (m.card)    parts.push('🃏การ์ด');
+    _floatDg(0, `🏆 ชั้น ${m.floor}!`, 'crit');
+    if (typeof logBattle === 'function')
+      logBattle(`<span class="log-exp" style="color:#ffd34d">🏆 ทะลุชั้น ${m.floor}! รางวัล: ${parts.join(' · ')}</span>`);
+    if (typeof saveGame === 'function') saveGame();
+  });
 }
 
 // ---------- end ----------
