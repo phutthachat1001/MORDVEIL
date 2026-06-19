@@ -2070,6 +2070,18 @@ body.preload{visibility:hidden}
   72%  { opacity: 1; transform: translate(-50%,-50%) scale(1.28) rotate(0deg); filter: brightness(1) drop-shadow(0 0 8px rgba(150,200,255,.4)); }
   100% { opacity: 0; transform: translate(-50%,-50%) scale(1.45) rotate(8deg); }
 }
+/* SKILL cast FX — bigger + colored glow so it clearly differs from a normal hit */
+.idle-fx.is-skill { width: 200px; height: 200px; z-index: 9; }
+.idle-fx.fx-skill  { filter: drop-shadow(0 0 18px rgba(120,170,255,.95)) saturate(1.3); }
+.idle-fx.fx-burn   { filter: drop-shadow(0 0 18px rgba(255,140,40,1)) hue-rotate(-15deg) saturate(1.5) brightness(1.15); }
+.idle-fx.fx-poison { filter: drop-shadow(0 0 18px rgba(120,255,90,1)) hue-rotate(70deg) saturate(1.6); }
+.idle-fx.fx-buff   { filter: drop-shadow(0 0 20px rgba(255,210,80,1)) hue-rotate(35deg) saturate(1.4) brightness(1.2); }
+/* whole-mob flash on a skill hit */
+.idle-mob.skill-hit { animation: idle-skill-flash .35s ease-out; }
+@keyframes idle-skill-flash {
+  0% { filter: brightness(2.2) drop-shadow(0 0 14px #fff); }
+  100% { filter: brightness(1); }
+}
 .idle-mob-name { font-size: .62rem; color: #cdd; margin-top: .25rem; white-space: nowrap; text-shadow: 0 1px 2px #000; }
 
 /* shared HP bar for hero + mobs */

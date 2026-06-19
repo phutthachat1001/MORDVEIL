@@ -363,13 +363,25 @@ function getAttackFxFallbackUrl() {
   return `./assets/effects/${_fxClass()}_T${Math.min(2, tier)}.png`;
 }
 
-function _showIdleFx(idx) {
+// FX tint by skill flavor so a skill cast reads differently from a normal hit
+function _fxSkillTint(skillDef) {
+  if (!skillDef) return '';
+  if (skillDef.buff)  return 'fx-buff';                 // ทอง — บัฟ/ฮีล
+  if (skillDef.dot)   return skillDef.dot.type === 'burn' ? 'fx-burn' : 'fx-poison';
+  return 'fx-skill';                                    // ฟ้า-ม่วง — สกิลโจมตี
+}
+
+// idx = target mob · skillDef (optional) = the skill that fired this hit.
+// When a skill fires, the FX is bigger + tinted + flashes so it clearly
+// reads as a skill, not a plain auto-attack.
+function _showIdleFx(idx, skillDef) {
   const stage = document.getElementById('idle-stage');
   if (!stage) return;
   const wrap = stage.querySelector(`.idle-mob[data-idx="${idx}"] .idle-mob-sprite`);
   if (!wrap) return;
   const el = document.createElement('div');
-  el.className = 'idle-fx';
+  const tint = skillDef ? _fxSkillTint(skillDef) : '';
+  el.className = 'idle-fx' + (skillDef ? ' is-skill ' + tint : '');
   const main = getAttackFxUrl(), fb = getAttackFxFallbackUrl();
   // probe the branch-specific FX; if it 404s, swap to the base-tier FX
   const probe = new Image();
@@ -377,6 +389,11 @@ function _showIdleFx(idx) {
   probe.src = main;
   el.style.backgroundImage = `url('${main}')`;
   wrap.parentElement.appendChild(el);
+  // a skill cast also flashes the whole mob for extra punch
+  if (skillDef) {
+    const mobEl = stage.querySelector(`.idle-mob[data-idx="${idx}"]`);
+    if (mobEl) { mobEl.classList.add('skill-hit'); setTimeout(() => mobEl.classList.remove('skill-hit'), 350); }
+  }
   setTimeout(() => el.remove(), 2000); // matches idleFxPop 2s (hold then fade)
 }
 
@@ -483,7 +500,9 @@ function _idleAttackTick() {
     _floatAboveIdleMob(idx, '☠️ สังหาร!', 'idle-dmg-float crit');
   }
   _updateIdleMobHp(idx);
-  _showIdleFx(idx);
+  // pass the skill def when a skill fired this tick → bigger, tinted FX
+  const firedSkillDef = skill ? _IDLE_SKILL_DMG[skill.id] : null;
+  _showIdleFx(idx, firedSkillDef);
   const dmgText = (label ? label + ' ' : '') + (hits > 1 ? `${atk}×${hits}` : `${totalDmg}`);
   _floatAboveIdleMob(idx, `${isCrit ? '💥' : ''}${dmgText}`, 'idle-dmg-float' + (isCrit ? ' crit' : ''));
 
