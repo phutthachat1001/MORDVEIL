@@ -33,6 +33,8 @@ let G = {
   todayCount: 0,
   skillPoints: 0,
   prestigeCount: 0,
+  prestigePoints: 0,       // currency for permanent prestige upgrades
+  prestigeUpgrades: {},    // { upgradeId: rank } — permanent, survives prestige
   prestigeBadges: [],
   unlockedAchievements: [],
   gotRareWeapon: false,

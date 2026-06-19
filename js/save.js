@@ -181,6 +181,8 @@ function loadGame() {
       if (!G.materials)                        G.materials = {};
       if (G.dungeonBestFloor === undefined)    G.dungeonBestFloor = 0;
       if (!G.dungeonDepthClaimed)              G.dungeonDepthClaimed = [];
+      if (G.prestigePoints === undefined)      G.prestigePoints = 0;
+      if (!G.prestigeUpgrades)                 G.prestigeUpgrades = {};
       if (!G.cards)                            G.cards = {};
       if (!G.talents)                          G.talents = {};
       if (!G.worldBossDamage)                  G.worldBossDamage = {};

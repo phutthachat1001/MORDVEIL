@@ -36,24 +36,6 @@ function renderDailyQuests() {
 }
 
 // ---------- Prestige ----------
-
-function doPrestige() {
-  if (G.level < 100) return;
-  const cls = CLASSES.find(c => c.id === G.classId);
-  G.prestigeCount++;
-  G.prestigeBadges.push({ count:G.prestigeCount, class:G.classId, icon:cls ? cls.icon : '⭐' });
-
-  // reset combat stats but keep badges & achievements
-  G.level = 1; G.exp = 0;
-  G.maxHp = 100; G.hp = 100;
-  G.baseAtk = 10; G.baseDef = 5; G.skillPoints = 0;
-  G.tasks = []; G.inventory = []; G.equippedWeaponId = null;
-  G.equippedSlots = { weapon:null, helmet:null, armor:null, gloves:null, pants:null, boots:null };
-  G.chests = { common:0, uncommon:0, rare:0, boss:0 };
-  G.defeatedMonsters = {}; G.battleInProgress = false; G.currentMonster = null;
-
-  logBattle(`<span class="log-exp">✨ PRESTIGE ${G.prestigeCount}! เริ่มใหม่ด้วยพลังที่แข็งแกร่งกว่าเดิม!</span>`);
-  checkAchievements();
-  saveGame();
-  renderAll();
-}
+// doPrestige() + the upgrade system now live in js/prestige.js (reworked to
+// grant Prestige Points and permanent upgrades). This stub is intentionally
+// gone to avoid shadowing the new version.

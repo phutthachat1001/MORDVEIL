@@ -111,10 +111,16 @@ function updateCharPanel() {
   document.getElementById('prestige-badge-area').innerHTML =
     G.prestigeBadges.map(b => `<span class="prestige-badge">${b.icon} Prestige ${b.count}</span>`).join(' ');
 
-  // prestige button
-  document.getElementById('prestige-info').textContent =
-    G.level >= 100 ? 'พร้อม Prestige!' : `ต้องการ LV 100 (ตอนนี้ LV ${G.level})`;
-  document.getElementById('btn-prestige').style.display = G.level >= 100 ? 'block' : 'none';
+  // prestige button — always available (opens the menu); info shows points/readiness
+  const pInfo = document.getElementById('prestige-info');
+  if (pInfo) {
+    const pts = G.prestigePoints || 0;
+    pInfo.innerHTML = G.level >= (typeof PRESTIGE_MIN_LEVEL !== 'undefined' ? PRESTIGE_MIN_LEVEL : 100)
+      ? `✨ พร้อม Prestige! · มี <b style="color:#ffd966">${pts}</b> แต้ม`
+      : `ถึง LV ${(typeof PRESTIGE_MIN_LEVEL !== 'undefined' ? PRESTIGE_MIN_LEVEL : 100)} เพื่อ Prestige · มี <b style="color:#ffd966">${pts}</b> แต้ม`;
+  }
+  const pBtn = document.getElementById('btn-prestige');
+  if (pBtn) pBtn.style.display = 'block';
 }
 
 // ---------- Talent summary (ปุ่มเปิด Talent ในหน้าตัวละคร) ----------

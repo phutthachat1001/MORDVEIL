@@ -1066,6 +1066,28 @@ const TALENTS = [
 ];
 
 // ============================================================
+// PRESTIGE — รีเซ็ตเลเวล/ของ แลก Prestige Point → ซื้อโบนัสถาวร (ข้ามรอบ)
+// ยิ่ง prestige ยิ่งเก่ง รอบใหม่ไวขึ้น — endgame loop ที่เล่นซ้ำได้
+// ============================================================
+const PRESTIGE_MIN_LEVEL = 100;       // ต้องถึง LV100 ก่อน prestige
+// แต้มที่ได้ตอนรีเซ็ต = floor((level-100)/10) + 3 + prestigeCount  (โตขึ้นทุกรอบ)
+function prestigePointsForReset() {
+  const lvl = G.level || 1;
+  if (lvl < PRESTIGE_MIN_LEVEL) return 0;
+  return Math.floor((lvl - PRESTIGE_MIN_LEVEL) / 10) + 3 + (G.prestigeCount || 0);
+}
+// โบนัสถาวร — แต่ละขั้นบวกค่าตาม per · stat keys เหมือน talent
+const PRESTIGE_UPGRADES = [
+  { id:'p_atk',   name:'พลังนิรันดร์',   icon:'⚔️', desc:'+5% ATK ฐานต่อขั้น',        cost:1, maxRank:20, per:{ atkPct:0.05 } },
+  { id:'p_hp',    name:'ชีวิตนิรันดร์',  icon:'❤️', desc:'+5% HP ฐานต่อขั้น',         cost:1, maxRank:20, per:{ hpPct:0.05 } },
+  { id:'p_exp',   name:'ปัญญานิรันดร์',  icon:'📘', desc:'+8% EXP ต่อขั้น',           cost:1, maxRank:15, per:{ expBonus:0.08 } },
+  { id:'p_gold',  name:'ทรัพย์นิรันดร์', icon:'💰', desc:'+8% ทองต่อขั้น',            cost:1, maxRank:15, per:{ goldBonus:0.08 } },
+  { id:'p_drop',  name:'โชคนิรันดร์',    icon:'🍀', desc:'+3% โอกาสดรอปต่อขั้น',      cost:2, maxRank:10, per:{ dropBonus:0.03 } },
+  { id:'p_start', name:'เริ่มแกร่ง',     icon:'🚀', desc:'เริ่มรอบใหม่ที่เลเวลสูงขึ้น +5/ขั้น', cost:3, maxRank:8,  per:{ startLevel:5 } },
+  { id:'p_crit',  name:'คมนิรันดร์',     icon:'🎯', desc:'+2% คริติคอลต่อขั้น',       cost:2, maxRank:10, per:{ crit:0.02 } },
+];
+
+// ============================================================
 // EVOLUTION QUESTS — เงื่อนไขเปลี่ยนอาชีพแบบ quest
 // ============================================================
 const EVO_QUESTS = {

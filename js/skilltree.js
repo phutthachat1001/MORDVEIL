@@ -51,6 +51,14 @@ function recalcTreeBonuses() {
     gold  += tal.goldBonus || 0;
     drop  += tal.dropBonus || 0;
   }
+  // fold in PRESTIGE permanent bonuses (exp/gold/drop/crit)
+  const pre = (typeof getPrestigeBonus === 'function') ? getPrestigeBonus() : null;
+  if (pre) {
+    crit += pre.crit || 0;
+    exp  += pre.expBonus || 0;
+    gold += pre.goldBonus || 0;
+    drop += pre.dropBonus || 0;
+  }
   G.attackSpeedBonus    = Math.min(0.9, speed);
   G.critBonusFromTree   = crit;
   G.expBonusFromTree    = exp;
