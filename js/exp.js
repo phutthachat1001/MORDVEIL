@@ -38,6 +38,7 @@ function giveExp(amount) {
     // refresh evolution + skill-tree UI in realtime (no reload needed)
     if (typeof renderEvolutionButton === 'function') renderEvolutionButton();
     if (typeof renderSkillTree === 'function') renderSkillTree();
+    if (typeof renderGoalTracker === 'function') renderGoalTracker();
   }
   saveGame();
 }

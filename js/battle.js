@@ -61,6 +61,7 @@ function renderMonsterList() {
   area.style.display = 'block';
   if (typeof refreshDungeonButton === 'function') refreshDungeonButton();
   if (typeof refreshWorldBossButton === 'function') refreshWorldBossButton();
+  if (typeof renderGoalTracker === 'function') renderGoalTracker();
   const zone = ZONES.find(z => z.id === G.currentZone);
   if (!zone) { area.innerHTML = ''; return; }
 

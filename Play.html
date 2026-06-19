@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=105">
+<link rel="stylesheet" href="css/style.css?v=106">
 <script>
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
@@ -368,6 +368,9 @@
         </div>
       </div>
       <div class="panel-body battle-arena" id="battle-arena">
+
+        <!-- เป้าหมายถัดไป (Goal Tracker) -->
+        <div id="goal-tracker" style="width:100%"></div>
 
         <!-- monster list (แสดงตอนยังไม่เลือกมอน) -->
         <div id="monster-list-area" style="width:100%;display:block"></div>
@@ -869,38 +872,39 @@
 <!-- ===== SCRIPTS (โหลดตามลำดับ dependency) =====
      NOTE: ?v=NN busts the browser/iOS HTTP cache. Bump this number (and the SW
      CACHE version in sw.js) on every deploy so updates show without reinstall. -->
-<script src="js/data.js?v=105"></script>
-<script src="js/cards.js?v=105"></script>
-<script src="js/state.js?v=105"></script>
-<script src="js/audio.js?v=105"></script>
-<script src="js/save.js?v=105"></script>
-<script src="js/achievements.js?v=105"></script>
-<script src="js/daily.js?v=105"></script>
-<script src="js/evolution.js?v=105"></script>
-<script src="js/infinity.js?v=105"></script>
-<script src="js/t4dungeon.js?v=105"></script>
-<script src="js/dungeon.js?v=105"></script>
-<script src="js/enhance.js?v=105"></script>
-<script src="js/skilltree.js?v=105"></script>
-<script src="js/talents.js?v=105"></script>
-<script src="js/worldboss.js?v=105"></script>
-<script src="js/exp.js?v=105"></script>
-<script src="js/shop.js?v=105"></script>
-<script src="js/inventory.js?v=105"></script>
-<script src="js/events.js?v=105"></script>
-<script src="js/cosmetic.js?v=105"></script>
-<script src="js/rpg-quests.js?v=105"></script>
-<script src="js/npc-encounter.js?v=105"></script>
-<script src="js/battle.js?v=105"></script>
-<script src="js/idle.js?v=105"></script>
-<script src="js/offline.js?v=105"></script>
-<script src="js/idle-events.js?v=105"></script>
-<script src="js/codex.js?v=105"></script>
-<script src="js/tasks.js?v=105"></script>
-<script src="js/hub.js?v=105"></script>
-<script src="js/intro.js?v=105"></script>
-<script src="js/tutorial.js?v=105"></script>
-<script src="js/ui.js?v=105"></script>
+<script src="js/data.js?v=106"></script>
+<script src="js/cards.js?v=106"></script>
+<script src="js/state.js?v=106"></script>
+<script src="js/audio.js?v=106"></script>
+<script src="js/save.js?v=106"></script>
+<script src="js/achievements.js?v=106"></script>
+<script src="js/daily.js?v=106"></script>
+<script src="js/evolution.js?v=106"></script>
+<script src="js/infinity.js?v=106"></script>
+<script src="js/t4dungeon.js?v=106"></script>
+<script src="js/dungeon.js?v=106"></script>
+<script src="js/enhance.js?v=106"></script>
+<script src="js/skilltree.js?v=106"></script>
+<script src="js/talents.js?v=106"></script>
+<script src="js/worldboss.js?v=106"></script>
+<script src="js/exp.js?v=106"></script>
+<script src="js/shop.js?v=106"></script>
+<script src="js/inventory.js?v=106"></script>
+<script src="js/events.js?v=106"></script>
+<script src="js/cosmetic.js?v=106"></script>
+<script src="js/rpg-quests.js?v=106"></script>
+<script src="js/npc-encounter.js?v=106"></script>
+<script src="js/battle.js?v=106"></script>
+<script src="js/goals.js?v=106"></script>
+<script src="js/idle.js?v=106"></script>
+<script src="js/offline.js?v=106"></script>
+<script src="js/idle-events.js?v=106"></script>
+<script src="js/codex.js?v=106"></script>
+<script src="js/tasks.js?v=106"></script>
+<script src="js/hub.js?v=106"></script>
+<script src="js/intro.js?v=106"></script>
+<script src="js/tutorial.js?v=106"></script>
+<script src="js/ui.js?v=106"></script>
 <script>
   // Override window.onload to handle both buttons properly
   window.onload = () => {
